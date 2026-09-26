@@ -1,0 +1,1205 @@
+You are acting as a **structural-engineering test-data designer, ETABS API simulation architect, and software QA engineer**.
+
+Your task is to create a realistic test dataset and test framework for a structural quantity software called **Quentra**.
+
+Important constraint:
+
+**You do not have access to ETABS itself.**
+
+Therefore, your job is to produce test data that is as close as reasonably possible to what Quentra would receive from ETABS, while keeping all expected engineering answers independently calculable and verifiable.
+
+The goal is NOT to fake ETABS behavior blindly.
+
+The goal is to build a **golden benchmark suite** that can be run on macOS and used to test:
+
+- structural geometry extraction logic
+- concrete quantity calculations
+- reinforcement quantity calculations
+- story aggregation
+- material grouping
+- opening deductions
+- unit conversion
+- warnings
+- unsupported cases
+- malformed inputs
+- engineering assumptions
+- traceability
+- regression behavior
+
+The final result should be useful later when real ETABS API snapshots become available.
+
+---
+
+# 1. Core Principle
+
+Every test case must have three clearly separated layers:
+
+## A. Structural Truth
+
+The actual physical geometry and reinforcement assumptions of the test structure.
+
+This is the source of truth.
+
+Example:
+
+Beam:
+- Width = 0.30 m
+- Depth = 0.60 m
+- Length = 6.00 m
+
+Therefore:
+
+Concrete volume =
+0.30 × 0.60 × 6.00
+= 1.08 m³
+
+## B. ETABS-Like Input
+
+A JSON representation approximating what Quentra may receive after extracting information from ETABS.
+
+This should include realistic fields such as:
+
+- object ID
+- object name
+- story
+- object type
+- material
+- section name
+- coordinates
+- width
+- depth
+- thickness
+- length
+- area
+- openings
+- reinforcement results
+- units
+- source metadata
+- design status
+- warnings
+
+Do NOT claim these are exact ETABS API fields unless verified.
+
+Use names that are suitable for a normalized Quentra snapshot layer.
+
+## C. Expected Quentra Output
+
+The expected result after Quentra processes the input.
+
+For example:
+
+- gross concrete volume
+- net concrete volume
+- steel mass
+- story total
+- element total
+- warnings
+- completeness status
+- evidence/source type
+- expected classification
+
+---
+
+# 2. Do Not Pretend Synthetic Data Is Real ETABS Data
+
+Every generated case must identify its provenance.
+
+Use:
+
+```json
+{
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false
+  }
+}
+```
+
+Later real ETABS captures may use:
+
+```json
+{
+  "provenance": {
+    "type": "captured_etabs_snapshot",
+    "etabs_verified": true,
+    "etabs_version": "..."
+  }
+}
+```
+
+Never mix these two categories.
+
+---
+
+# 3. Create a Canonical Snapshot Schema
+
+Design a JSON schema suitable for Quentra test fixtures.
+
+It should support approximately:
+
+```json
+{
+  "schemaVersion": "1.0",
+
+  "model": {
+    "name": "",
+    "units": "",
+    "source": "",
+    "stories": []
+  },
+
+  "materials": [],
+
+  "sections": [],
+
+  "elements": [],
+
+  "designResults": [],
+
+  "warnings": [],
+
+  "provenance": {}
+}
+```
+
+For each element support fields such as:
+
+```json
+{
+  "id": "",
+  "name": "",
+  "type": "",
+  "story": "",
+  "material": "",
+  "section": "",
+
+  "geometry": {},
+
+  "reinforcement": {},
+
+  "source": {},
+
+  "expectedWarnings": []
+}
+```
+
+Create a clean, extensible schema that can later map naturally to real ETABS API output.
+
+---
+
+# 4. Create at Least 30 Benchmark Models
+
+Create a minimum of 30 independent benchmark cases.
+
+Group them into categories.
+
+## Group A — Basic Frames
+
+Create:
+
+1. Single rectangular beam
+2. Single rectangular column
+3. Single circular column
+4. Two connected beams
+5. Beam-column frame
+6. Two-story column
+7. Sloped beam
+8. Inclined column
+
+Each case must have simple geometry and manually verifiable expected volume.
+
+---
+
+# 5. Slab Cases
+
+Create:
+
+9. Simple rectangular slab
+10. Irregular polygon slab
+11. Slab with one rectangular opening
+12. Slab with circular-equivalent opening
+13. Slab with two separate openings
+14. Slab with overlapping openings
+15. Opening partly outside slab boundary
+16. Opening completely outside slab
+17. Two slabs sharing an edge
+18. Two slabs overlapping incorrectly
+
+Expected outputs should distinguish:
+
+- gross area
+- opening area
+- union opening area
+- net area
+- gross volume
+- net volume
+- warnings
+
+---
+
+# 6. Wall Cases
+
+Create:
+
+19. Simple rectangular wall
+20. Wall with door opening
+21. Wall with two openings
+22. Wall with overlapping openings
+23. Wall with opening partly outside boundary
+24. Sloped/inclined wall
+25. Wall split across two stories
+26. Wall with changing thickness between stories
+
+Include expected concrete volumes.
+
+---
+
+# 7. Material Cases
+
+Create cases with:
+
+- multiple concrete grades
+- multiple steel grades
+- same geometry but different materials
+- material name aliases
+- material classification ambiguity
+
+For example:
+
+```text
+C30
+C30/37
+CONC30
+Concrete_30MPa
+```
+
+The tests should verify whether Quentra groups these separately or by explicit mapping.
+
+Do not silently normalize unless the test explicitly defines a mapping.
+
+---
+
+# 8. Units Cases
+
+Create identical structural models represented in different unit systems.
+
+At minimum:
+
+- m
+- mm
+- cm
+- ft
+- in
+
+For each equivalent model, the final physical quantities must be identical after conversion.
+
+Example:
+
+```text
+Beam:
+300 mm × 600 mm × 6000 mm
+```
+
+must produce the same volume as:
+
+```text
+0.3 m × 0.6 m × 6 m
+```
+
+Create dedicated expected-output comparisons.
+
+---
+
+# 9. Reinforcement Benchmark Cases
+
+Create reinforcement tests where the expected steel mass can be independently calculated.
+
+Use steel density:
+
+```text
+7850 kg/m³
+```
+
+unless a case explicitly defines another value.
+
+---
+
+# 10. Beam Longitudinal Reinforcement
+
+Create several cases.
+
+Example:
+
+4 × 20 mm bars
+
+Length:
+6.0 m
+
+Expected:
+
+```text
+Area of one bar =
+πd²/4
+
+Steel volume =
+bar area × number of bars × bar length
+
+Steel mass =
+volume × density
+```
+
+Provide all intermediate calculations.
+
+Create variations:
+
+- 2T16
+- 4T20
+- 6T25
+- different top and bottom reinforcement
+- bars with different lengths
+- additional support bars
+
+---
+
+# 11. Beam Stirrups
+
+Create cases with:
+
+- stirrup diameter
+- spacing
+- number of legs
+- member length
+- approximate stirrup perimeter
+
+Example:
+
+```text
+Beam:
+300 × 600 mm
+
+Stirrup:
+10 mm
+2-leg
+spacing = 150 mm
+```
+
+Calculate:
+
+- number of stirrups
+- length per stirrup
+- total bar length
+- volume
+- steel mass
+
+Clearly state detailing assumptions.
+
+---
+
+# 12. Column Reinforcement
+
+Create cases with:
+
+- 4 bars
+- 8 bars
+- 12 bars
+- ties
+- different story heights
+- different reinforcement by story
+
+Calculate longitudinal and tie steel separately.
+
+---
+
+# 13. Slab Reinforcement
+
+Create simplified deterministic slab reinforcement cases.
+
+For example:
+
+```text
+Slab:
+5 m × 4 m
+
+Bottom X:
+T12 @ 200
+
+Bottom Y:
+T12 @ 200
+```
+
+Calculate:
+
+- number of bars
+- bar lengths
+- total steel mass
+
+Then create cases with:
+
+- top reinforcement
+- different X/Y spacing
+- additional support strips
+- two reinforcement layers
+
+State clearly that these represent provided reinforcement benchmark cases, not ETABS design output unless later verified.
+
+---
+
+# 14. Wall Reinforcement
+
+Create cases with:
+
+- vertical reinforcement
+- horizontal reinforcement
+- two faces
+- different spacing
+- boundary-zone reinforcement
+
+Calculate each component separately.
+
+---
+
+# 15. Reinforcement Source Classification
+
+Every reinforcement result must have a source classification such as:
+
+```text
+ProvidedBars
+RequiredDesignArea
+EstimatedRatio
+ManualOverride
+Unavailable
+```
+
+Create tests that verify Quentra does not confuse these categories.
+
+Example:
+
+```json
+{
+  "reinforcementSource": "EstimatedRatio",
+  "exact": false
+}
+```
+
+must not be treated the same way as:
+
+```json
+{
+  "reinforcementSource": "ProvidedBars",
+  "exact": true
+}
+```
+
+---
+
+# 16. Required-Reinforcement Simulation
+
+Create realistic mock design-result cases resembling what structural design software might output.
+
+Examples:
+
+Beam stations:
+
+```text
+0.0 m
+1.5 m
+3.0 m
+4.5 m
+6.0 m
+```
+
+with:
+
+```text
+top_required_area
+bottom_required_area
+shear_required_area
+```
+
+Create multiple envelope strategies:
+
+- max of stations
+- integration along member
+- segment-based interpolation
+
+For each case, specify which method Quentra is expected to use.
+
+These are simulated design results.
+
+Do not label them as actual ETABS results.
+
+---
+
+# 17. Story Aggregation Tests
+
+Create models with several stories.
+
+Example:
+
+```text
+L1
+L2
+L3
+Roof
+```
+
+Verify:
+
+- beam totals by story
+- column totals by story
+- slab totals by story
+- wall totals by story
+- steel totals by story
+- whole-model totals
+
+Ensure that:
+
+```text
+Sum(story totals) = model total
+```
+
+within a defined tolerance.
+
+---
+
+# 18. Double-Counting Tests
+
+Create deliberate cases to test whether Quentra double-counts objects.
+
+Examples:
+
+- original beam plus analytical subdivision
+- original slab plus mesh elements
+- wall split into mesh objects
+- duplicate object IDs
+- duplicate geometry with different IDs
+- overlapping slabs
+- beam-column intersections
+- wall-column overlaps
+
+For each case state expected behavior:
+
+- include
+- exclude
+- warn
+- reject
+
+---
+
+# 19. Invalid and Dangerous Inputs
+
+Create intentionally bad test cases.
+
+At minimum:
+
+- beam width = 0
+- beam length = 0
+- negative thickness
+- slab thickness = 300 m
+- wall thickness = 250 m
+- coordinate = 1e300
+- steel density = 0
+- steel density = 15000 kg/m³
+- duplicate element ID
+- unknown material
+- missing story
+- story not found
+- opening outside host
+- invalid polygon
+- self-intersecting polygon
+- reinforcement spacing = 0
+- bar diameter = negative
+- unsupported element type
+
+For each define expected behavior:
+
+- reject
+- warn
+- skip
+- block finalization
+
+---
+
+# 20. Plausibility Rules
+
+Create configurable engineering plausibility checks.
+
+Do not treat these as universal truths.
+
+They should be warning bands, not hard-coded engineering law.
+
+For example:
+
+```text
+Beam width > 5 m → warning
+Slab thickness > 2 m → warning
+Wall thickness > 3 m → warning
+Column dimension > 5 m → warning
+Steel density > 9000 kg/m³ → error
+Steel rate > steel density → impossible
+```
+
+Provide:
+
+- rule
+- default threshold
+- severity
+- rationale
+- configurable flag
+
+---
+
+# 21. Expected Warning System
+
+Create warning codes for benchmark cases.
+
+Example:
+
+```text
+UNIT_PLAUSIBILITY
+OPENING_OUTSIDE_HOST
+OPENING_CLIPPED
+DUPLICATE_ELEMENT
+INVALID_GEOMETRY
+UNSUPPORTED_SECTION
+MISSING_REINFORCEMENT
+ESTIMATED_REINFORCEMENT
+STALE_DESIGN_RESULT
+STORY_REFERENCE_MISSING
+UNREALISTIC_DIMENSION
+UNREALISTIC_STEEL_RATE
+```
+
+Each test case should declare its expected warnings.
+
+---
+
+# 22. Golden Expected-Result File
+
+For every model create:
+
+```text
+snapshot.json
+expected.json
+README.md
+```
+
+The expected file should include:
+
+```json
+{
+  "modelTotals": {
+    "grossConcreteM3": 0,
+    "netConcreteM3": 0,
+    "steelKg": 0
+  },
+
+  "byStory": {},
+
+  "byElementType": {},
+
+  "elements": [],
+
+  "warnings": [],
+
+  "tolerance": {
+    "volumeM3": 0.000001,
+    "steelKg": 0.001
+  }
+}
+```
+
+---
+
+# 23. Manual Calculation File
+
+For each test case create a human-readable `README.md` explaining the expected answer.
+
+Example:
+
+```text
+Beam B1
+
+Width = 0.3 m
+Depth = 0.6 m
+Length = 6 m
+
+Volume:
+0.3 × 0.6 × 6
+= 1.08 m³
+```
+
+For steel include every formula.
+
+This is important because expected values should not be unexplained magic numbers.
+
+---
+
+# 24. Larger Realistic Synthetic Buildings
+
+After simple canonical models, create several larger synthetic buildings.
+
+At minimum:
+
+## Building A
+1-story RC frame
+
+## Building B
+5-story RC office building
+
+## Building C
+10-story wall-frame building
+
+## Building D
+Irregular multi-story building
+
+## Building E
+Model containing intentional data problems
+
+Each building should include:
+
+- beams
+- columns
+- slabs
+- walls
+- openings
+- multiple sections
+- multiple materials
+- reinforcement data
+- story aggregation
+
+Keep the geometry deterministic so expected values can still be calculated.
+
+---
+
+# 25. Realistic Object Naming
+
+Use realistic structural names.
+
+Examples:
+
+```text
+B1
+B2
+B3
+
+C1
+C2
+
+S1
+S2
+
+W1
+W2
+
+L1
+L2
+Roof
+```
+
+Also create cases with messy real-world naming:
+
+```text
+Beam_A12
+B-01
+COLUMN_CORE_3
+Wall Pier 02
+SLAB-L02-A
+```
+
+Quentra should not depend solely on naming conventions.
+
+---
+
+# 26. Mock ETABS Extraction Layer
+
+Create a simulated ETABS extractor interface.
+
+Example conceptual C# interface:
+
+```csharp
+public interface IStructuralModelSource
+{
+    ModelSnapshot Extract();
+}
+```
+
+Then define:
+
+```csharp
+SyntheticModelSource
+CapturedEtabsModelSource
+LiveEtabsModelSource
+```
+
+The goal is:
+
+```text
+Synthetic benchmark
+        ↓
+
+Captured ETABS JSON
+        ↓
+
+Live ETABS API
+        ↓
+
+same normalized ModelSnapshot
+        ↓
+
+Quentra engine
+```
+
+The calculation engine should not know which source produced the snapshot.
+
+---
+
+# 27. Captured ETABS Compatibility
+
+Design the schema so later real ETABS snapshots can be stored unchanged or with minimal transformation.
+
+Include source fields such as:
+
+```json
+{
+  "source": {
+    "application": "ETABS",
+    "version": null,
+    "objectName": null,
+    "objectGuid": null,
+    "apiMethod": null
+  }
+}
+```
+
+For synthetic tests these may remain null.
+
+Do not invent fake ETABS GUIDs or API methods.
+
+---
+
+# 28. Future Real-ETABS Validation Procedure
+
+Provide a procedure for when Windows + ETABS becomes available.
+
+For every golden case:
+
+1. Rebuild equivalent geometry in ETABS.
+2. Extract data through the actual API.
+3. Save captured snapshot.
+4. Compare captured snapshot against synthetic fixture.
+5. Run Quentra against both.
+6. Compare quantity results.
+7. Record differences.
+8. Decide whether the difference comes from:
+   - extraction
+   - ETABS modeling behavior
+   - Quentra normalization
+   - quantity algorithm
+
+Do not overwrite the original synthetic benchmark.
+
+Store both.
+
+Example:
+
+```text
+beam_rectangular/
+    synthetic_snapshot.json
+    expected.json
+
+    etabs_v22_snapshot.json
+    etabs_v23_snapshot.json
+```
+
+---
+
+# 29. ETABS Version Regression
+
+Prepare the test architecture for captured snapshots from:
+
+```text
+ETABS 20
+ETABS 21
+ETABS 22
+ETABS 23+
+```
+
+Do not assume they produce identical raw data.
+
+The normalized Quentra result, however, should remain consistent where the physical model is equivalent.
+
+---
+
+# 30. Property-Based Tests
+
+In addition to fixed fixtures, create property-based tests.
+
+Examples:
+
+If beam length doubles:
+
+```text
+concrete volume doubles
+```
+
+If slab thickness doubles:
+
+```text
+concrete volume doubles
+```
+
+If bar count doubles:
+
+```text
+steel mass doubles
+```
+
+If all model dimensions are converted from metres to millimetres correctly:
+
+```text
+physical volume remains identical
+```
+
+If an opening gets larger:
+
+```text
+net concrete volume cannot increase
+```
+
+If an element is excluded:
+
+```text
+its quantity cannot remain in model totals
+```
+
+---
+
+# 31. Invariant Tests
+
+Create global invariants such as:
+
+```text
+net volume ≤ gross volume
+```
+
+```text
+known quantity ≤ total potential quantity
+```
+
+where meaningful.
+
+```text
+all story totals sum to model total
+```
+
+```text
+all element-category totals sum to model total
+```
+
+```text
+steel mass cannot be negative
+```
+
+```text
+volume cannot be negative
+```
+
+```text
+excluded elements contribute zero
+```
+
+```text
+unknown does not silently become zero
+```
+
+---
+
+# 32. Regression Manifest
+
+Create an index like:
+
+```json
+{
+  "suiteVersion": "1.0",
+  "cases": [
+    {
+      "id": "BEAM-001",
+      "name": "Rectangular beam",
+      "category": "frame",
+      "expectedStatus": "pass"
+    }
+  ]
+}
+```
+
+This should allow automated execution of the entire suite.
+
+---
+
+# 33. Scoring
+
+Produce a test summary after the suite runs.
+
+Example:
+
+```text
+Total benchmarks: 42
+
+Passed: 40
+Failed: 1
+Warnings: 1
+
+Geometry: 10/10
+Concrete: 10/10
+Steel: 9/10
+Units: 10/10
+Warnings: 8/10
+Aggregation: 10/10
+```
+
+Any failed engineering calculation should make the overall build fail.
+
+---
+
+# 34. Required Deliverables
+
+Generate:
+
+1. Proposed folder structure
+2. Snapshot JSON schema
+3. Expected-result JSON schema
+4. Warning schema
+5. Minimum 30 benchmark test definitions
+6. Manual calculations for each
+7. C# model classes
+8. C# test fixture loader
+9. xUnit or NUnit tests
+10. Property-based tests
+11. Invalid-input tests
+12. Large synthetic building generator
+13. Regression-suite runner
+14. Future ETABS capture strategy
+15. Documentation explaining synthetic vs ETABS-verified data
+
+---
+
+# 35. Suggested Folder Layout
+
+Use something like:
+
+```text
+tests/
+    Quentra.Tests.Unit/
+
+    Quentra.Tests.Golden/
+
+    fixtures/
+        synthetic/
+            BEAM-001/
+            BEAM-002/
+            COLUMN-001/
+            SLAB-001/
+            WALL-001/
+
+        captured-etabs/
+            v22/
+            v23/
+
+        buildings/
+            OFFICE-001/
+            TOWER-001/
+
+        invalid/
+            INVALID-001/
+            INVALID-002/
+
+    schemas/
+        snapshot.schema.json
+        expected.schema.json
+
+    generators/
+```
+
+---
+
+# 36. Most Important Constraint
+
+The benchmark suite must not merely produce data that makes Quentra pass.
+
+Expected values must be calculated independently from first principles.
+
+Do not derive:
+
+```text
+expected result
+```
+
+from:
+
+```text
+Quentra result
+```
+
+That would make the test meaningless.
+
+The direction must always be:
+
+```text
+Engineering definition
+        ↓
+Independent hand/math calculation
+        ↓
+Expected result
+        ↓
+Quentra result
+        ↓
+Comparison
+```
+
+---
+
+# 37. Final Objective
+
+The finished suite should allow a developer on macOS to run:
+
+```bash
+dotnet test
+```
+
+and get strong confidence that Quentra's quantity engine behaves correctly even though ETABS itself is not installed.
+
+Later, real ETABS snapshots should be added as an additional integration layer rather than replacing the synthetic golden benchmarks.
+
+The final testing architecture should be:
+
+```text
+                  QUENTRA TESTING
+
+           ┌──────────────────────┐
+           │  Engineering Truth   │
+           └──────────┬───────────┘
+                      │
+              Golden Benchmarks
+                      │
+        ┌─────────────┴─────────────┐
+        │                           │
+        ▼                           ▼
+Synthetic Snapshot          Captured ETABS Snapshot
+        │                           │
+        └─────────────┬─────────────┘
+                      ▼
+             Normalized Model
+                      ▼
+             Quentra Engine
+                      ▼
+              Actual Result
+                      ▼
+           Expected Comparison
+                      ▼
+                 PASS / FAIL
+```
+
+The purpose is not to pretend synthetic data is ETABS.
+
+The purpose is to make Quentra's calculation engine testable, reproducible, and independently verifiable now, while making the same suite ready to accept genuine ETABS API captures later.
