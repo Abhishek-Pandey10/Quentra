@@ -16,7 +16,7 @@ Quentra does not redesign the building, does not make the analysis model a const
 
 ## 2. Where the work stands
 
-The calculations run today from saved model snapshots. Live connection to ETABS has not been built yet; it needs a Windows machine with licensed ETABS.
+The calculations run today from saved model snapshots. Live connection to ETABS has not been built yet; it needs a Windows machine with licensed ETABS. The first target version is **ETABS 22.7**.
 
 | Capability | State |
 |---|---|
@@ -114,7 +114,7 @@ The five highest-priority questions are marked ★. The full questionnaire is in
 | # | Question | Proposed answer | Decision |
 |---|---|---|---|
 | 1 ★ | What will the first reports be used for? | Design-stage estimate and model reconciliation | |
-| 2 ★ | Which ETABS version/build and design code/edition first? | Your current office standard | |
+| 2 ★ | Which ETABS version/build and design code/edition first? | ETABS 22.7 selected; please confirm the exact build number, license level and the concrete design code/edition used | |
 | 3 ★ | Does "steel" mean ETABS required, model-provided, drawing-based or estimated steel? | Demand and approved estimates, shown separately | |
 | 4 ★ | Which components are required for each element type? | Beams: top, bottom, ties. Columns: longitudinal, ties. Slabs: four layers. Walls: web; boundary if present. | |
 | 5 ★ | Who approves the policy and each issued report? | Named engineer; policy approval first | |

@@ -15,7 +15,7 @@ This covers the offline part of roadmap Phases 1 and 3–5. G0 is pending. None 
 
 | Roadmap area | State |
 |---|---|
-| Phase 0: build/code selection and Windows API experiments | Pending external environment and engineering decisions |
+| Phase 0: build/code selection and Windows API experiments | ETABS 22.7 selected; exact build, design code, Windows host and API experiments pending |
 | Phase 1: SI types, schemas, frame calculations, replay, CI | Implemented offline; policy decisions unapproved |
 | Phase 2: ETABS adapter, frame extraction, WPF | Not started (story allocation implemented offline) |
 | Phase 3: slab/wall geometry, openings, overlaps, summaries | Implemented offline; §33 fixtures A–E match; engineer review of fixtures pending |
@@ -53,7 +53,7 @@ These and the other policy questions are collected in the [engineer meeting brie
 
 ## Next tasks
 
-1. Record first Windows/ETABS build, code/edition and reviewer in Phase 0 decisions.
+1. Record the exact ETABS 22.7 build number, design code/edition, Windows host and reviewer in Phase 0 decisions.
 2. Obtain installed API help and approved fixture models; prove read-only attachment and per-field units.
 3. Add adapter contracts and raw-source capture from those verified signatures, producing schema 2 snapshots.
 4. Have the engineer review the A–E fixture modelling choices and the worksheet columns in §33, then rebuild the fixtures in ETABS for the live comparison.
