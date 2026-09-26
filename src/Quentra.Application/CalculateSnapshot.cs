@@ -48,10 +48,13 @@ public static class CalculateSnapshot
         if (snapshot.Frames.IsDefault)
             throw new ArgumentException("Frames must be an array, including for an empty snapshot.");
         var ids = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var frame in snapshot.Frames)
+        for (var i = 0; i < snapshot.Frames.Length; i++)
         {
-            if (frame is null || string.IsNullOrWhiteSpace(frame.ObjectId) || string.IsNullOrWhiteSpace(frame.SourceReference))
-                throw new ArgumentException("Every frame requires an object identity and source reference.");
+            var frame = snapshot.Frames[i];
+            if (frame is null || string.IsNullOrWhiteSpace(frame.ObjectId))
+                throw new ArgumentException($"Frame {i + 1}: objectId is required.");
+            if (string.IsNullOrWhiteSpace(frame.SourceReference))
+                throw new ArgumentException($"Frame {frame.ObjectId}: sourceReference is required.");
             if (!ids.Add(frame.ObjectId))
                 throw new ArgumentException($"Duplicate object identity: {frame.ObjectId}.");
             if (!Enum.IsDefined(frame.Kind) || !Enum.IsDefined(frame.Material) ||

@@ -16,6 +16,9 @@ public static class SteelCalculator
         SteelQuantity Unknown(string message) => new(input.ObjectId, input.Component, evidence, null, covers,
             input.SourceReference, "Not calculated", input.Assumption, input.ApprovedBy, input.ApprovedAt,
             [new("STEEL_UNAVAILABLE", message)]);
+        // Out-of-scope elements (excluded or non-concrete) need no steel, so they raise no warning to acknowledge.
+        if (element.Status == QuantityStatus.OutOfScope)
+            return Unknown("") with { Formula = "Not calculated: element is out of scope", Warnings = [] };
         if (element.Status != QuantityStatus.Quantified) return Unknown("Supported geometry is required for this steel component.");
         if (string.IsNullOrWhiteSpace(input.ApprovedBy) || input.ApprovedAt == default || string.IsNullOrWhiteSpace(input.Assumption))
             return Unknown("A named approval, date and measurement assumption are required.");
@@ -29,6 +32,9 @@ public static class SteelCalculator
                     var ratio = Nonnegative(input.Ratio);
                     if (input.Method == SteelMethod.VolumeFraction && ratio > 1)
                         throw new ArgumentException("A volumetric fraction must be between 0 and 1.");
+                    if (input.Method == SteelMethod.KgPerCubicMetre && ratio > policy.SteelDensityKgM3)
+                        throw new ArgumentException(string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                            $"A rate of {ratio:G6} kg/m³ exceeds the steel density of {policy.SteelDensityKgM3:G6} kg/m³. Check the rate and its units."));
                     var concrete = input.ConcreteBasis == ConcreteBasis.GrossModeled ? element.GrossM3 : element.OpeningAdjustedM3;
                     if (concrete is null) throw new ArgumentException("The estimate's concrete basis is unavailable.");
                     var mass = ratio * concrete.Value * (input.Method == SteelMethod.VolumeFraction ? policy.SteelDensityKgM3 : 1);

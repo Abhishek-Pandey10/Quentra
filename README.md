@@ -36,17 +36,24 @@ quentra replay    <saved-run.json> <new-run.json>
 quentra override  <run.json> <overrides.json> <new-run.json>
 quentra accept    <run.json> <new-run.json> --reviewer <name> --note <text> --acknowledge <CODE,...> [--partial]
 quentra export    <run.json> <new-directory>
+quentra --version
 ```
 
 - `calculate` and `replay` detect the schema: **1** is the frame-concrete format ([frames.json](fixtures/synthetic/frames.json)); **2** is the takeoff format ([takeoff.json](fixtures/synthetic/takeoff.json)). `override`, `accept` and `export` require schema 2 runs.
 - `replay` verifies the package hash, recomputes every quantity and checks that the stored results reproduce.
-- `override` applies a JSON array of recorded changes (dimension or thickness replacement, or exclusion). Each override names its author, reason and date, the original value, and the run's snapshot SHA256, which every command prints. Source values are retained; overrides apply to the effective model only, and an accepted run returns to Draft.
-- `accept` requires a named reviewer, a note, and every current warning code acknowledged. A partial run can only be accepted with `--partial` and is labelled `AcceptedPartial`. Acceptance is blocked until the measurement policy is approved.
-- `export` verifies the run, then writes a new directory containing `run.json`, one CSV per report table, `report.xlsx`, and `manifest.json` with SHA-256 hashes of every file.
+- `override` applies a JSON array of recorded changes (dimension or thickness replacement, or exclusion). Each override names its author, reason and date, the original value, and the run's snapshot SHA256, which every command prints. Source values are retained; overrides apply to the effective model only, and an accepted run returns to Draft. `field` is one of `FrameWidthM`, `FrameDepthM`, `FrameDiameterM`, `AreaThicknessM` (values in metres) or `Excluded` (0 = included, 1 = excluded):
+
+  ```json
+  [{ "id": "o1", "objectId": "W1", "field": "AreaThicknessM", "originalValue": 0.25, "replacementValue": 0.3,
+     "reason": "Field-verified thickness", "author": "A. Reviewer", "recordedAt": "2026-09-26T12:00:00Z",
+     "snapshotSha256": "<printed by calculate>" }]
+  ```
+- `accept` requires a named reviewer, a note, and every current warning code acknowledged, and no code the run does not raise. A partial run can only be accepted with `--partial` and is labelled `AcceptedPartial`. Acceptance is blocked until the measurement policy is approved.
+- `export` verifies the run, then writes a new directory containing `run.json`, one CSV per report table, `report.xlsx`, and `manifest.json` with SHA-256 hashes of every file. The "package seal" is a hash of the run's canonical content, not of the `run.json` file bytes.
 
 The synthetic takeoff fixture produces **18.408 m³** gross and **17.808 m³** opening-adjusted modeled concrete, and **1,297.505 kg** of known steel. Steel is partial because beam B1 declares a required transverse component with no source. The frame fixture produces **1.656 m³**. The design document's §33 validation fixtures are in [fixtures/validation](fixtures/validation/README.md) and all reproduce their hand-calculated values.
 
-Outputs must be new paths; existing runs and reports are never overwritten. Exit code 0 means the operation succeeded, including a valid draft with partial quantities. Inspect coverage and warnings; success does not mean engineering acceptance. Codes 1, 2 and 130 indicate input/IO/validation failure, usage error and cancellation respectively.
+Snapshots and override files are limited to 16 MiB and run files to 256 MiB. Outputs must be new paths; existing runs and reports are never overwritten. Exit code 0 means the operation succeeded, including a valid draft with partial quantities. Inspect coverage and warnings; success does not mean engineering acceptance. Codes 1, 2 and 130 indicate input/IO/validation failure, usage error and cancellation respectively.
 
 ## Implemented
 
@@ -56,7 +63,8 @@ Outputs must be new paths; existing runs and reports are never overwritten. Exit
 - Story allocation: sloped and vertical frames and walls are split by elevation band; slabs use their assigned story; anything outside declared bands is reported as `Unallocated`, never dropped.
 - Reinforcement only from supplied, approved inputs: verified longitudinal design demand (station integration over a declared domain), assigned straight bars, distributed area intensity, volume fraction, and kg/m³ estimates. Evidence types stay separate. No default ratios, laps, anchorage or waste are inferred.
 - Required steel components declared per element; complete steel is null while any component is missing. Demand requires verified current design evidence and is marked stale by dimension overrides.
-- Warnings for unverified areas, invalid geometry, coincident frames, overlapping coplanar areas, unallocated volume and unapproved policy.
+- Warnings for unverified areas, invalid geometry, coincident frames, overlapping coplanar areas, openings outside or crossing their host, unallocated volume and unapproved policy.
+- Plausibility warnings (`IMPLAUSIBLE_*`) for section sizes, thicknesses, lengths, steel intensity and steel density outside provisional review bands, to catch unit slips. Values are still quantified; the reviewer must acknowledge the warning. A kg/m³ rate above the steel density is rejected as impossible.
 - Metre, millimetre, foot and inch inputs; SI calculations.
 - Strict versioned JSON, unique identities, canonical ordering, SHA-256 integrity checks, replay, atomic writes, and formula-safe CSV/Excel text.
 

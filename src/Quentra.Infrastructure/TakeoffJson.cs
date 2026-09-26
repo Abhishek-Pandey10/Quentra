@@ -119,6 +119,8 @@ public static class TakeoffJson
         if (review.Status != (IsPartial(run) ? "AcceptedPartial" : "Accepted")) throw new ArgumentException("Review completeness label is inconsistent.");
         if (WarningCodes(run).Except(review.AcknowledgedWarningCodes, StringComparer.Ordinal).Any())
             throw new ArgumentException("Acknowledge all current warning codes before acceptance; acknowledgment does not resolve missing quantities.");
+        if (review.AcknowledgedWarningCodes.Except(WarningCodes(run), StringComparer.Ordinal).ToArray() is { Length: > 0 } unknown)
+            throw new ArgumentException("These acknowledged codes are not raised by this run: " + string.Join(",", unknown));
     }
 
     private static TakeoffRun Seal(TakeoffRun run) => run with { PackageSha256 = Hash(run with { PackageSha256 = "" }) };

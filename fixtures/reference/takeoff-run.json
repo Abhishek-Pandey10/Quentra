@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "snapshotSha256": "f8a882cbbc6341e19352b8c72106b772b4a6a8bc3e5a98b3ec7d49a8794e0897",
-  "calculationSha256": "ce0865bcf5c11b74740f5c21ce92d121a925ecd4ac7293c327f59cfdd4334955",
+  "calculationSha256": "211b7be349eecf990eaa0ee997b007208fa64d4ea0edb28eb15e7b58e131c8ba",
   "snapshot": {
     "schemaVersion": 2,
     "model": {
@@ -468,7 +468,7 @@
   },
   "overrides": [],
   "result": {
-    "calculationVersion": "takeoff/0.2.0",
+    "calculationVersion": "takeoff/0.3.0",
     "elements": [
       {
         "objectId": "B1",
@@ -829,5 +829,5 @@
     ]
   },
   "reviewHistory": [],
-  "packageSha256": "220bd5512df1d87e40b6ab510f35a0f1cba88a2057f103fb7430aaebd6ee1cf5"
+  "packageSha256": "049888882e71459348e5be0ee26df1911975c9c08709357e99f8f59e2ec7c36f"
 }

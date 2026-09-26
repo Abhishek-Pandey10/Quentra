@@ -13,7 +13,10 @@ public sealed record RunPackage(int SchemaVersion, string SnapshotSha256,
 
 public static class SnapshotJson
 {
-    public const long MaximumInputBytes = 16 * 1024 * 1024;
+    public const long MaximumSnapshotBytes = 16 * 1024 * 1024;
+    // A run embeds its snapshot plus per-element results and is several times larger, so a
+    // snapshot at the input limit must still produce a run that every later command can open.
+    public const long MaximumRunBytes = 256 * 1024 * 1024;
     private static readonly JsonSerializerOptions Compact = CreateOptions(false);
     private static readonly JsonSerializerOptions Indented = CreateOptions(true);
 
@@ -70,18 +73,19 @@ public static class SnapshotJson
 
     public static string Serialize(RunPackage package) => JsonSerializer.Serialize(package, Indented) + "\n";
 
-    public static async Task<string> ReadAsync(string path, CancellationToken cancellationToken = default)
+    public static async Task<string> ReadAsync(string path, long maximumBytes, CancellationToken cancellationToken = default)
     {
+        var tooLarge = $"{Path.GetFileName(path)} is larger than the {maximumBytes / (1024 * 1024)} MiB limit for this input.";
         await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        if (stream.Length > MaximumInputBytes)
-            throw new InvalidDataException("Input exceeds the initial 16 MiB snapshot limit.");
+        if (stream.Length > maximumBytes)
+            throw new InvalidDataException(tooLarge);
         using var buffer = new MemoryStream();
         var chunk = new byte[8192];
         int count;
         while ((count = await stream.ReadAsync(chunk, cancellationToken)) != 0)
         {
-            if (buffer.Length + count > MaximumInputBytes)
-                throw new InvalidDataException("Input exceeds the initial 16 MiB snapshot limit.");
+            if (buffer.Length + count > maximumBytes)
+                throw new InvalidDataException(tooLarge);
             buffer.Write(chunk, 0, count);
         }
         return new UTF8Encoding(false, true).GetString(buffer.ToArray()).TrimStart('\uFEFF');

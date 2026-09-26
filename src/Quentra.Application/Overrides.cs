@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Globalization;
 using Quentra.Core;
 
 namespace Quentra.Application;
@@ -19,21 +20,26 @@ public static class Overrides
         var ids = new HashSet<string>(StringComparer.Ordinal);
         foreach (var change in changes)
         {
-            if (change is null || string.IsNullOrWhiteSpace(change.Id) || !ids.Add(change.Id) ||
-                string.IsNullOrWhiteSpace(change.Author) || string.IsNullOrWhiteSpace(change.Reason) || change.RecordedAt == default ||
-                change.SnapshotSha256 != sourceHash || !Enum.IsDefined(change.Field) || !double.IsFinite(change.OriginalValue) || !double.IsFinite(change.ReplacementValue))
-                throw new ArgumentException("Overrides require unique IDs, finite values, reason, author, date and a matching source snapshot hash.");
+            if (change is null || string.IsNullOrWhiteSpace(change.Id)) throw new ArgumentException("Every override needs an id.");
+            var name = $"Override {change.Id}";
+            if (!ids.Add(change.Id)) throw new ArgumentException($"{name}: the id is used twice.");
+            if (string.IsNullOrWhiteSpace(change.Author) || string.IsNullOrWhiteSpace(change.Reason) || change.RecordedAt == default)
+                throw new ArgumentException($"{name}: author, reason and recordedAt are required.");
+            if (change.SnapshotSha256 != sourceHash)
+                throw new ArgumentException($"{name}: snapshotSha256 does not match this run's snapshot ({sourceHash}).");
+            if (!Enum.IsDefined(change.Field) || !double.IsFinite(change.OriginalValue) || !double.IsFinite(change.ReplacementValue))
+                throw new ArgumentException($"{name}: field must be one of {string.Join(", ", Enum.GetNames<OverrideField>())}, with finite originalValue and replacementValue.");
             var frame = effective.Model.Frames.FirstOrDefault(x => x.ObjectId == change.ObjectId);
             var area = effective.Areas.FirstOrDefault(x => x.ObjectId == change.ObjectId);
-            if (frame is null && area is null) throw new ArgumentException("Override refers to an unknown object.");
+            if (frame is null && area is null) throw new ArgumentException($"{name}: no frame or area has objectId '{change.ObjectId}'.");
             if (change.Field == OverrideField.Excluded)
             {
                 if (change.OriginalValue != (excluded.Contains(change.ObjectId) ? 1 : 0) || change.ReplacementValue is not (0 or 1))
-                    throw new ArgumentException("Exclusion override must match current state and use 0 or 1.");
+                    throw new ArgumentException($"{name}: an exclusion uses 0 (included) or 1 (excluded), and originalValue must be the current state ({(excluded.Contains(change.ObjectId) ? 1 : 0)}).");
                 if (change.ReplacementValue == 1) excluded.Add(change.ObjectId); else excluded.Remove(change.ObjectId);
                 continue;
             }
-            if (change.ReplacementValue <= 0) throw new ArgumentException("Replacement dimension must be positive.");
+            if (change.ReplacementValue <= 0) throw new ArgumentException($"{name}: replacementValue must be a positive dimension in metres.");
             SourceLength? current = change.Field switch
             {
                 OverrideField.FrameWidthM => frame?.Section?.Width,
@@ -42,8 +48,11 @@ public static class Overrides
                 OverrideField.AreaThicknessM => area?.Thickness,
                 _ => null
             };
-            if (current is null || Math.Abs(current.Metres - change.OriginalValue) > 1e-12)
-                throw new ArgumentException("Override original value does not match the current dimension in metres.");
+            if (current is null)
+                throw new ArgumentException($"{name}: {change.ObjectId} has no {change.Field} to replace.");
+            if (Math.Abs(current.Metres - change.OriginalValue) > 1e-12)
+                throw new ArgumentException(string.Create(CultureInfo.InvariantCulture,
+                    $"{name}: originalValue {change.OriginalValue} does not match the current {change.Field} of {change.ObjectId}, {current.Metres} m."));
             var replacement = new SourceLength { Value = change.ReplacementValue, Unit = LengthUnit.Metre };
             if (change.Field == OverrideField.AreaThicknessM)
                 effective = effective with { Areas = effective.Areas.Select(x => x.ObjectId == change.ObjectId ? x with { Thickness = replacement } : x).ToImmutableArray() };

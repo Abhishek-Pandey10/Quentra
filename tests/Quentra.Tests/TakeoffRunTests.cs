@@ -227,4 +227,37 @@ public class TakeoffRunTests
         var csv = ReportExporter.Csv(new("T", ["A", "B"], [["say \"hi\"", 1.5], [null, -0.25]]));
         Assert.Equal("\"A\",\"B\"\r\n\"say \"\"hi\"\"\",\"1.5\"\r\n\"\",\"-0.25\"\r\n", csv);
     }
+
+    [Fact]
+    public void ExcludedElementsRaiseNoSteelWarning()
+    {
+        var run = TakeoffJson.Calculate(Fixture());
+        var excluded = TakeoffJson.AddOverrides(run, [Override(run, "C2", OverrideField.Excluded, 0, 1)]);
+        var steel = excluded.Result.Steel.Single(x => x.ObjectId == "C2");
+        Assert.Null(steel.MassKg);
+        Assert.Empty(steel.Warnings);
+        Assert.Contains("USER_EXCLUDED", TakeoffJson.WarningCodes(excluded));
+    }
+
+    [Fact]
+    public void AcknowledgingCodesTheRunDoesNotRaiseIsRejected()
+    {
+        var run = TakeoffJson.Calculate(Fixture());
+        var codes = TakeoffJson.WarningCodes(run).Append("MADE_UP").ToImmutableArray();
+        var e = Assert.Throws<ArgumentException>(() => TakeoffJson.Accept(run, "Synthetic Reviewer", "note", true, codes, At));
+        Assert.EndsWith("MADE_UP", e.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RunsLargerThanTheSnapshotLimitCanBeRead()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"quentra-{Guid.NewGuid():N}.json");
+        try
+        {
+            await File.WriteAllTextAsync(path, new string(' ', (int)SnapshotJson.MaximumSnapshotBytes + 1));
+            await Assert.ThrowsAsync<InvalidDataException>(() => SnapshotJson.ReadAsync(path, SnapshotJson.MaximumSnapshotBytes));
+            Assert.Equal(SnapshotJson.MaximumSnapshotBytes + 1, (await SnapshotJson.ReadAsync(path, SnapshotJson.MaximumRunBytes)).Length);
+        }
+        finally { File.Delete(path); }
+    }
 }

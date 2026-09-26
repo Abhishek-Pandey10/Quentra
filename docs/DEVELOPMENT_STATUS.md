@@ -25,7 +25,7 @@ This covers the offline part of roadmap Phases 1 and 3–5. G0 is pending. None 
 
 ## Evidence and limits
 
-Local verification on macOS arm64 with SDK 10.0.401: Release solution build succeeded with zero warnings/errors; all 120 xUnit tests passed.
+Local verification on macOS arm64 with SDK 10.0.401: Release solution build succeeded with zero warnings/errors; all 131 xUnit tests passed.
 
 - **Schema 1:** fixture calculates 1.656 m³.
 - **Schema 2:** fixture calculates 18.408 m³ gross and 17.808 m³ opening-adjusted concrete, and 1,297.505 kg of known steel, all matching hand calculations. Replay is byte-identical.
@@ -40,13 +40,15 @@ The tests cover:
 - **Stories and overlaps:** story splits and volume conservation, and overlap/coincidence warnings.
 - **Steel:** each steel method, and stale, check-mode, gapped or partial-domain demand.
 - **Validation:** rejection rules for invalid snapshots and invalid overrides.
-- **Runs:** review states, export integrity and cancellation, CSV formula safety, strict JSON parsing, replay integrity, and atomic writes.
+- **Input checks:** plausibility bands, openings outside or crossing their host, steel rates above steel density, and object-specific validation messages.
+- **Runs:** review states, unknown acknowledgement codes, run files above the snapshot size limit, export integrity and cancellation, CSV formula safety, strict JSON parsing, replay integrity, and atomic writes.
 
 Reports remain Draft until accepted. Complete quantities mean every in-scope object and required component in this input was quantified, not a complete building. Planar areas are rounded to 1 µm in their local plane. Axis-aligned polygons are exact; rotated polygons carry errors of order 10⁻⁶ m².
 
 ## Open decisions
 
 - **Beam story convention:** a horizontal beam at a level is assigned to the story interval (lower, upper] that the level tops; one at the base level is `Unallocated` unless metadata assigns a story. This matches the design specification's proposed default (§31.4, CQ-004), but the engineer has not yet confirmed it.
+- **Plausibility bands:** the "check the units" ranges in `Plausibility.cs` are provisional (brief question 16).
 - **Measurement policy:** density, tolerances, required steel components per element type and intended report use are fixture values, not approved policy.
 
 These and the other policy questions are collected in the [engineer meeting brief](ETABS_Structural_Engineer_Meeting_Brief.md).

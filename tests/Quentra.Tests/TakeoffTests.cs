@@ -328,4 +328,78 @@ public class TakeoffTests
         };
         Assert.Throws<ArgumentException>(() => TakeoffEngine.Run(invalid));
     }
+
+    [Fact]
+    public void UnitSlipsAreWarnedButStillQuantified()
+    {
+        // 250 typed with a metre unit instead of millimetres.
+        var r = TakeoffEngine.Run(WithArea(Fixture(), "W1", a => a with { Thickness = new() { Value = 250, Unit = LengthUnit.Metre } }));
+        var wall = Element(r, "W1");
+        Assert.Equal(QuantityStatus.Quantified, wall.Status);
+        Assert.Contains(wall.Warnings, x => x.Code == "IMPLAUSIBLE_DIMENSION" && x.Message.Contains("Thickness 250 m"));
+        Assert.DoesNotContain(Element(r, "S1").Warnings, x => x.Code.StartsWith("IMPLAUSIBLE", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void FrameSectionOutsideTheReviewBandIsWarned()
+    {
+        var s = Fixture();
+        s = s with { Model = s.Model with { Frames = s.Model.Frames.Select(f => f.ObjectId == "B1"
+            ? f with { Section = f.Section! with { Width = new() { Value = 300, Unit = LengthUnit.Inch } } } : f).ToImmutableArray() } };
+        Assert.Contains(Element(TakeoffEngine.Run(s), "B1").Warnings, x => x.Code == "IMPLAUSIBLE_DIMENSION" && x.Message.StartsWith("Width 7.62 m", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void SteelRateAboveSteelDensityIsUnknown()
+    {
+        var r = TakeoffEngine.Run(WithSteel(Fixture(), "C1", "AllIn", x => x with { Ratio = 15000 }));
+        var steel = Steel(r, "C1", "AllIn");
+        Assert.Null(steel.MassKg);
+        Assert.Contains("exceeds the steel density", Assert.Single(steel.Warnings).Message);
+    }
+
+    [Fact]
+    public void HighSteelIntensityIsWarned()
+    {
+        var r = TakeoffEngine.Run(WithSteel(Fixture(), "W1", "AllIn", x => x with { Ratio = 700 }));
+        Assert.Equal(700 * 10.55, Steel(r, "W1", "AllIn").MassKg!.Value, 6);
+        Assert.Contains(Element(r, "W1").Warnings, x => x.Code == "IMPLAUSIBLE_STEEL_INTENSITY");
+    }
+
+    [Fact]
+    public void ImplausibleSteelDensityPolicyIsWarned()
+    {
+        var s = Fixture();
+        var r = TakeoffEngine.Run(s with { Policy = s.Policy with { SteelDensityKgM3 = 78500 } });
+        Assert.Contains(r.Warnings, x => x.Code == "IMPLAUSIBLE_POLICY");
+    }
+
+    [Fact]
+    public void OpeningsOutsideOrAcrossTheHostAreWarned()
+    {
+        var outside = TakeoffEngine.Run(WithArea(Fixture(), "S1", a => a with { Openings = [Rect(7, 1, 8, 2, 3.6)] }));
+        Assert.Equal(0, Element(outside, "S1").OpeningDeductionM3!.Value, ClipTolerance);
+        Assert.Equal("OPENING_OUTSIDE_HOST", Assert.Single(Element(outside, "S1").Warnings).Code);
+        var crossing = TakeoffEngine.Run(WithArea(Fixture(), "S1", a => a with { Openings = [Rect(5.5, 3.5, 6.5, 4.5, 3.6)] }));
+        Assert.Equal("OPENING_CROSSES_HOST", Assert.Single(Element(crossing, "S1").Warnings).Code);
+        // A notch sharing two edges with the host lies inside it.
+        var notch = TakeoffEngine.Run(WithArea(Fixture(), "S1", a => a with { Openings = [Rect(5, 0, 6, 1, 3.6)] }));
+        Assert.Empty(Element(notch, "S1").Warnings);
+    }
+
+    [Fact]
+    public void EmptyScopeSteelWarningDoesNotClaimMissingComponents()
+    {
+        var s = Fixture();
+        var empty = s with { Model = s.Model with { Frames = [] }, Areas = [], Metadata = [], Reinforcement = [] };
+        var warning = TakeoffEngine.Run(empty).Warnings.Single(x => x.Code == "PARTIAL_STEEL");
+        Assert.StartsWith("Steel scope is empty", warning.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ValidationErrorsNameTheFailingObject()
+    {
+        var e = Assert.Throws<ArgumentException>(() => TakeoffEngine.Validate(WithMetadata(Fixture(), "W1", m => m with { RequiredSteelComponents = ["Hoops"] })));
+        Assert.StartsWith("Metadata for W1: unknown steel component 'Hoops'", e.Message, StringComparison.Ordinal);
+    }
 }

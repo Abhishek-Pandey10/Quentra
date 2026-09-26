@@ -21,7 +21,7 @@ public static class ReportExporter
                 ["Model", run.Snapshot.Model.ModelId, ""], ["Origin", run.Snapshot.Model.Origin.ToString(), ""],
                 ["Source", run.Snapshot.Model.SourceDescription, ""], ["Captured at", run.Snapshot.Model.CapturedAt.ToString("O"), ""],
                 ["Calculation version", r.CalculationVersion, ""], ["Snapshot SHA256", run.SnapshotSha256, ""],
-                ["Calculation SHA256", run.CalculationSha256, ""], ["Package SHA256", run.PackageSha256, ""],
+                ["Calculation SHA256", run.CalculationSha256, ""], ["Package seal SHA256 (run content, not a file hash)", run.PackageSha256, ""],
                 ["Review status", TakeoffJson.ReviewStatus(run), ""], ["Intended use", run.Snapshot.Policy.IntendedUse, ""],
                 ["Basis", "Modeled volumes; intersections retained; net/BOQ unavailable", ""],
                 ["Found", s.Found, "count"], ["In scope", s.InScope, "count"], ["Quantified", s.Quantified, "count"],

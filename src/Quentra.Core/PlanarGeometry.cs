@@ -14,6 +14,9 @@ public sealed class PlanarGeometry
     public PathsD Remaining { get; }
     public double GrossArea => Math.Abs(Clipper.Area(Gross));
     public double RemainingArea => Math.Abs(Clipper.Area(Remaining));
+    // Zero-based opening indices, in source order, that deduct nothing or only partly.
+    public IReadOnlyList<int> OpeningsOutsideHost { get; }
+    public IReadOnlyList<int> OpeningsCrossingHost { get; }
 
     public PlanarGeometry(AreaSnapshot source, LengthUnit unit, TakeoffPolicy policy)
     {
@@ -34,6 +37,17 @@ public sealed class PlanarGeometry
         Gross = [ProjectRing(source.Boundary, factor, policy)];
         var holes = new PathsD();
         foreach (var ring in source.Openings) holes.Add(ProjectRing(ring, factor, policy));
+        var outside = new List<int>(); var crossing = new List<int>();
+        for (var i = 0; i < holes.Count; i++)
+        {
+            // Edges shared with the host boundary clip only by rounding, so the tolerance scales with perimeter.
+            var hole = holes[i];
+            var tolerance = policy.LinearToleranceM * hole.Select((p, k) => Distance(p, hole[(k + 1) % hole.Count])).Sum();
+            var inside = Math.Abs(Clipper.Area(Clipper.Intersect(Gross, [hole], FillRule.NonZero, Precision)));
+            if (inside <= tolerance) outside.Add(i);
+            else if (Math.Abs(Clipper.Area(hole)) - inside > tolerance) crossing.Add(i);
+        }
+        OpeningsOutsideHost = outside; OpeningsCrossingHost = crossing;
         var union = holes.Count == 0 ? holes : Clipper.BooleanOp(ClipType.Union, holes, null, FillRule.NonZero, Precision);
         Remaining = holes.Count == 0 ? Gross : Clipper.Difference(Gross, union, FillRule.NonZero, Precision);
         if (!double.IsFinite(GrossArea) || GrossArea <= policy.LinearToleranceM * policy.LinearToleranceM ||
