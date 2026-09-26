@@ -46,8 +46,10 @@ Reports remain Draft until accepted. Complete quantities mean every in-scope obj
 
 ## Open decisions
 
-- **Beam story convention:** a horizontal beam lying exactly on a story's lower elevation is assigned to the story below it, or to `Unallocated` at the lowest level, unless metadata assigns a story. The engineer should confirm this convention.
+- **Beam story convention:** a horizontal beam at a level is assigned to the story interval (lower, upper] that the level tops; one at the base level is `Unallocated` unless metadata assigns a story. This matches the design specification's proposed default (§31.4, CQ-004), but the engineer has not yet confirmed it.
 - **Measurement policy:** density, tolerances, required steel components per element type and intended report use are fixture values, not approved policy.
+
+These and the other policy questions are collected in the [engineer meeting brief](ETABS_Structural_Engineer_Meeting_Brief.md).
 
 ## Next tasks
 

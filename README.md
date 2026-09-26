@@ -85,5 +85,6 @@ Schema 2 snapshots contain the frame model plus areas, story bands, per-element 
 - [Design specification](quentradesigndoc.md)
 - [Roadmap and acceptance gates](QUENTRA_ROADMAP.md)
 - [Development status and next tasks](docs/DEVELOPMENT_STATUS.md)
+- [Structural engineer meeting brief](docs/ETABS_Structural_Engineer_Meeting_Brief.md)
 
 The next step is Windows API exploration alongside further offline development. Synthetic test success does not complete the live ETABS compatibility gate.
