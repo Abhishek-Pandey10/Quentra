@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/brand/quentra-logo-copper.png" alt="Quentra" width="480"></p>
+
 # Quentra
 
 Traceable concrete and reinforcing-steel quantity takeoff from ETABS. Development has started with a portable .NET 10 calculation core and a command-line snapshot workflow.
