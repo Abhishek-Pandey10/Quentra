@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "modelId": "synthetic-beam-column-v1",
+  "origin": "Synthetic",
+  "sourceDescription": "Illustrative fixtures A and B from quentradesigndoc.md section 33; not extracted ETABS data.",
+  "capturedAt": "2026-09-26T00:00:00+00:00",
+  "coordinateUnit": "Metre",
+  "frames": [
+    {
+      "objectId": "B1",
+      "sourceReference": "quentradesigndoc.md#fixture-A",
+      "kind": "Beam",
+      "material": "Concrete",
+      "isStraight": true,
+      "isPrismatic": true,
+      "start": { "x": 0, "y": 0, "z": 3.6 },
+      "end": { "x": 6, "y": 0, "z": 3.6 },
+      "section": {
+        "shape": "Rectangle",
+        "width": { "value": 300, "unit": "Millimetre" },
+        "depth": { "value": 600, "unit": "Millimetre" }
+      }
+    },
+    {
+      "objectId": "C1",
+      "sourceReference": "quentradesigndoc.md#fixture-B",
+      "kind": "Column",
+      "material": "Concrete",
+      "isStraight": true,
+      "isPrismatic": true,
+      "start": { "x": 0, "y": 0, "z": 0 },
+      "end": { "x": 0, "y": 0, "z": 3.6 },
+      "section": {
+        "shape": "Rectangle",
+        "width": { "value": 400, "unit": "Millimetre" },
+        "depth": { "value": 400, "unit": "Millimetre" }
+      }
+    }
+  ]
+}

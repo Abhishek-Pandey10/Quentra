@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.1" />
+    <ProjectReference Include="../Quentra.Application/Quentra.Application.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Quentra.Infrastructure/Quentra.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

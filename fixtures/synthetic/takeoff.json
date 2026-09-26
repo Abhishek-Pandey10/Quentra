@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 2,
+  "model": {
+    "schemaVersion": 1,
+    "modelId": "synthetic-takeoff-v2",
+    "origin": "Synthetic",
+    "sourceDescription": "Illustrative two-storey frame, slab and wall with hand-calculated expectations; not extracted ETABS data.",
+    "capturedAt": "2026-09-26T00:00:00+00:00",
+    "coordinateUnit": "Metre",
+    "frames": [
+      {
+        "objectId": "B1",
+        "sourceReference": "synthetic#B1",
+        "kind": "Beam",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 0, "y": 0, "z": 3.6 },
+        "end": { "x": 6, "y": 0, "z": 3.6 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 300, "unit": "Millimetre" },
+          "depth": { "value": 600, "unit": "Millimetre" }
+        }
+      },
+      {
+        "objectId": "C1",
+        "sourceReference": "synthetic#C1",
+        "kind": "Column",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 0, "y": 0, "z": 0 },
+        "end": { "x": 0, "y": 0, "z": 3.6 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 400, "unit": "Millimetre" },
+          "depth": { "value": 400, "unit": "Millimetre" }
+        }
+      },
+      {
+        "objectId": "C2",
+        "sourceReference": "synthetic#C2",
+        "kind": "Column",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 6, "y": 0, "z": 0 },
+        "end": { "x": 6, "y": 0, "z": 7.2 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 400, "unit": "Millimetre" },
+          "depth": { "value": 400, "unit": "Millimetre" }
+        }
+      }
+    ]
+  },
+  "areas": [
+    {
+      "objectId": "S1",
+      "sourceReference": "synthetic#S1",
+      "kind": "Slab",
+      "material": "Concrete",
+      "boundary": [
+        { "x": 0, "y": 0, "z": 3.6 }, { "x": 6, "y": 0, "z": 3.6 },
+        { "x": 6, "y": 4, "z": 3.6 }, { "x": 0, "y": 4, "z": 3.6 }
+      ],
+      "openings": [
+        [
+          { "x": 1, "y": 1, "z": 3.6 }, { "x": 2, "y": 1, "z": 3.6 },
+          { "x": 2, "y": 2, "z": 3.6 }, { "x": 1, "y": 2, "z": 3.6 }
+        ],
+        [
+          { "x": 1.5, "y": 1.5, "z": 3.6 }, { "x": 2.5, "y": 1.5, "z": 3.6 },
+          { "x": 2.5, "y": 2.5, "z": 3.6 }, { "x": 1.5, "y": 2.5, "z": 3.6 }
+        ]
+      ],
+      "openingsVerified": true,
+      "physicalThicknessVerified": true,
+      "thickness": { "value": 200, "unit": "Millimetre" }
+    },
+    {
+      "objectId": "W1",
+      "sourceReference": "synthetic#W1",
+      "kind": "Wall",
+      "material": "Concrete",
+      "boundary": [
+        { "x": 0, "y": 4, "z": 0 }, { "x": 6, "y": 4, "z": 0 },
+        { "x": 6, "y": 4, "z": 7.2 }, { "x": 0, "y": 4, "z": 7.2 }
+      ],
+      "openings": [
+        [
+          { "x": 2, "y": 4, "z": 1 }, { "x": 3, "y": 4, "z": 1 },
+          { "x": 3, "y": 4, "z": 2 }, { "x": 2, "y": 4, "z": 2 }
+        ]
+      ],
+      "openingsVerified": true,
+      "physicalThicknessVerified": true,
+      "thickness": { "value": 250, "unit": "Millimetre" }
+    }
+  ],
+  "stories": [
+    { "id": "L1", "lowerElevationM": 0, "upperElevationM": 3.6 },
+    { "id": "L2", "lowerElevationM": 3.6, "upperElevationM": 7.2 }
+  ],
+  "metadata": [
+    { "objectId": "B1", "materialName": "C30", "sectionName": "B300x600", "assignedStoryId": null, "requiredSteelComponents": ["LongitudinalTop", "LongitudinalBottom", "Transverse"] },
+    { "objectId": "C1", "materialName": "C40", "sectionName": "C400x400", "assignedStoryId": null, "requiredSteelComponents": ["Longitudinal", "Transverse"] },
+    { "objectId": "C2", "materialName": "C40", "sectionName": "C400x400", "assignedStoryId": null, "requiredSteelComponents": ["Longitudinal", "Transverse"] },
+    { "objectId": "S1", "materialName": "C30", "sectionName": "SLAB200", "assignedStoryId": "L1", "requiredSteelComponents": ["XBottom"] },
+    { "objectId": "W1", "materialName": "C40", "sectionName": "WALL250", "assignedStoryId": null, "requiredSteelComponents": ["Web"] }
+  ],
+  "reinforcement": [
+    {
+      "objectId": "B1", "component": "LongitudinalTop", "method": "DemandEquivalent",
+      "sourceReference": "synthetic#B1-demand", "approvedBy": "Synthetic Reviewer", "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Top longitudinal demand at three stations", "designEvidence": "VerifiedCurrent", "designCode": "ACI 318-19",
+      "domainStartM": 0, "domainEndM": 6, "maximumStationGapM": 3,
+      "stations": [
+        { "positionM": 0, "areaM2": 0.0012 }, { "positionM": 3, "areaM2": 0.0006 }, { "positionM": 6, "areaM2": 0.0012 }
+      ]
+    },
+    {
+      "objectId": "B1", "component": "LongitudinalBottom", "method": "AssignedBars",
+      "sourceReference": "synthetic#B1-bars", "approvedBy": "Synthetic Reviewer", "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Three straight bottom bars, full length",
+      "bars": [ { "count": 3, "areaM2": 0.0003, "lengthM": 6 } ]
+    },
+    {
+      "objectId": "C1", "component": "AllIn", "method": "KgPerCubicMetre", "ratio": 150,
+      "coversComponents": ["Longitudinal", "Transverse"], "concreteBasis": "GrossModeled",
+      "sourceReference": "synthetic#C1-estimate", "approvedBy": "Synthetic Reviewer", "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Illustrative all-in column rate"
+    },
+    {
+      "objectId": "C2", "component": "AllIn", "method": "VolumeFraction", "ratio": 0.02,
+      "coversComponents": ["Longitudinal", "Transverse"], "concreteBasis": "GrossModeled",
+      "sourceReference": "synthetic#C2-estimate", "approvedBy": "Synthetic Reviewer", "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Illustrative two percent volumetric ratio"
+    },
+    {
+      "objectId": "S1", "component": "XBottom", "method": "DistributedIntensity", "intensityM2PerM": 0.0005,
+      "sourceReference": "synthetic#S1-mesh", "approvedBy": "Synthetic Reviewer", "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Bottom X mesh over opening-adjusted area"
+    },
+    {
+      "objectId": "W1", "component": "AllIn", "method": "KgPerCubicMetre", "ratio": 80,
+      "coversComponents": ["Web"],
+      "sourceReference": "synthetic#W1-estimate", "approvedBy": "Synthetic Reviewer", "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Illustrative wall rate on opening-adjusted volume"
+    }
+  ],
+  "policy": {
+    "id": "synthetic-policy-1",
+    "intendedUse": "Development testing",
+    "approvedBy": "Synthetic Reviewer",
+    "approvedAt": "2026-09-26T00:00:00+00:00",
+    "steelDensityKgM3": 7850,
+    "linearToleranceM": 0.0001,
+    "planarityToleranceM": 0.001
+  }
+}

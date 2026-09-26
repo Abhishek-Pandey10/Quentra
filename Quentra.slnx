@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Quentra.Application/Quentra.Application.csproj" />
+    <Project Path="src/Quentra.Cli/Quentra.Cli.csproj" />
+    <Project Path="src/Quentra.Core/Quentra.Core.csproj" />
+    <Project Path="src/Quentra.Infrastructure/Quentra.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Quentra.Tests/Quentra.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,28 @@
+name: Quentra core and CLI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet restore Quentra.slnx
+      - run: dotnet build Quentra.slnx --configuration Release --no-restore
+      - run: dotnet test Quentra.slnx --configuration Release --no-build
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- calculate fixtures/synthetic/frames.json output/frames-run.json
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- replay output/frames-run.json output/frames-replayed.json
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- calculate fixtures/synthetic/takeoff.json output/takeoff-run.json
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- replay output/takeoff-run.json output/takeoff-replayed.json
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- export output/takeoff-run.json output/takeoff-report

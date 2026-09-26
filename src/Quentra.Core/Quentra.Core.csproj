@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup><PackageReference Include="Clipper2" Version="2.0.0" /></ItemGroup>
+</Project>
