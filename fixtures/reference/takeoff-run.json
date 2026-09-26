@@ -1,0 +1,833 @@
+{
+  "schemaVersion": 2,
+  "snapshotSha256": "f8a882cbbc6341e19352b8c72106b772b4a6a8bc3e5a98b3ec7d49a8794e0897",
+  "calculationSha256": "ce0865bcf5c11b74740f5c21ce92d121a925ecd4ac7293c327f59cfdd4334955",
+  "snapshot": {
+    "schemaVersion": 2,
+    "model": {
+      "schemaVersion": 1,
+      "modelId": "synthetic-takeoff-v2",
+      "origin": "Synthetic",
+      "sourceDescription": "Illustrative two-storey frame, slab and wall with hand-calculated expectations; not extracted ETABS data.",
+      "capturedAt": "2026-09-26T00:00:00+00:00",
+      "coordinateUnit": "Metre",
+      "frames": [
+        {
+          "objectId": "B1",
+          "sourceReference": "synthetic#B1",
+          "kind": "Beam",
+          "material": "Concrete",
+          "isStraight": true,
+          "isPrismatic": true,
+          "start": {
+            "x": 0,
+            "y": 0,
+            "z": 3.6
+          },
+          "end": {
+            "x": 6,
+            "y": 0,
+            "z": 3.6
+          },
+          "section": {
+            "shape": "Rectangle",
+            "width": {
+              "value": 300,
+              "unit": "Millimetre"
+            },
+            "depth": {
+              "value": 600,
+              "unit": "Millimetre"
+            },
+            "diameter": null
+          }
+        },
+        {
+          "objectId": "C1",
+          "sourceReference": "synthetic#C1",
+          "kind": "Column",
+          "material": "Concrete",
+          "isStraight": true,
+          "isPrismatic": true,
+          "start": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "end": {
+            "x": 0,
+            "y": 0,
+            "z": 3.6
+          },
+          "section": {
+            "shape": "Rectangle",
+            "width": {
+              "value": 400,
+              "unit": "Millimetre"
+            },
+            "depth": {
+              "value": 400,
+              "unit": "Millimetre"
+            },
+            "diameter": null
+          }
+        },
+        {
+          "objectId": "C2",
+          "sourceReference": "synthetic#C2",
+          "kind": "Column",
+          "material": "Concrete",
+          "isStraight": true,
+          "isPrismatic": true,
+          "start": {
+            "x": 6,
+            "y": 0,
+            "z": 0
+          },
+          "end": {
+            "x": 6,
+            "y": 0,
+            "z": 7.2
+          },
+          "section": {
+            "shape": "Rectangle",
+            "width": {
+              "value": 400,
+              "unit": "Millimetre"
+            },
+            "depth": {
+              "value": 400,
+              "unit": "Millimetre"
+            },
+            "diameter": null
+          }
+        }
+      ]
+    },
+    "areas": [
+      {
+        "objectId": "S1",
+        "sourceReference": "synthetic#S1",
+        "kind": "Slab",
+        "material": "Concrete",
+        "boundary": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 3.6
+          },
+          {
+            "x": 6,
+            "y": 0,
+            "z": 3.6
+          },
+          {
+            "x": 6,
+            "y": 4,
+            "z": 3.6
+          },
+          {
+            "x": 0,
+            "y": 4,
+            "z": 3.6
+          }
+        ],
+        "openings": [
+          [
+            {
+              "x": 1,
+              "y": 1,
+              "z": 3.6
+            },
+            {
+              "x": 2,
+              "y": 1,
+              "z": 3.6
+            },
+            {
+              "x": 2,
+              "y": 2,
+              "z": 3.6
+            },
+            {
+              "x": 1,
+              "y": 2,
+              "z": 3.6
+            }
+          ],
+          [
+            {
+              "x": 1.5,
+              "y": 1.5,
+              "z": 3.6
+            },
+            {
+              "x": 2.5,
+              "y": 1.5,
+              "z": 3.6
+            },
+            {
+              "x": 2.5,
+              "y": 2.5,
+              "z": 3.6
+            },
+            {
+              "x": 1.5,
+              "y": 2.5,
+              "z": 3.6
+            }
+          ]
+        ],
+        "openingsVerified": true,
+        "physicalThicknessVerified": true,
+        "thickness": {
+          "value": 200,
+          "unit": "Millimetre"
+        }
+      },
+      {
+        "objectId": "W1",
+        "sourceReference": "synthetic#W1",
+        "kind": "Wall",
+        "material": "Concrete",
+        "boundary": [
+          {
+            "x": 0,
+            "y": 4,
+            "z": 0
+          },
+          {
+            "x": 6,
+            "y": 4,
+            "z": 0
+          },
+          {
+            "x": 6,
+            "y": 4,
+            "z": 7.2
+          },
+          {
+            "x": 0,
+            "y": 4,
+            "z": 7.2
+          }
+        ],
+        "openings": [
+          [
+            {
+              "x": 2,
+              "y": 4,
+              "z": 1
+            },
+            {
+              "x": 3,
+              "y": 4,
+              "z": 1
+            },
+            {
+              "x": 3,
+              "y": 4,
+              "z": 2
+            },
+            {
+              "x": 2,
+              "y": 4,
+              "z": 2
+            }
+          ]
+        ],
+        "openingsVerified": true,
+        "physicalThicknessVerified": true,
+        "thickness": {
+          "value": 250,
+          "unit": "Millimetre"
+        }
+      }
+    ],
+    "stories": [
+      {
+        "id": "L1",
+        "lowerElevationM": 0,
+        "upperElevationM": 3.6
+      },
+      {
+        "id": "L2",
+        "lowerElevationM": 3.6,
+        "upperElevationM": 7.2
+      }
+    ],
+    "metadata": [
+      {
+        "objectId": "B1",
+        "materialName": "C30",
+        "sectionName": "B300x600",
+        "assignedStoryId": null,
+        "requiredSteelComponents": [
+          "LongitudinalBottom",
+          "LongitudinalTop",
+          "Transverse"
+        ]
+      },
+      {
+        "objectId": "C1",
+        "materialName": "C40",
+        "sectionName": "C400x400",
+        "assignedStoryId": null,
+        "requiredSteelComponents": [
+          "Longitudinal",
+          "Transverse"
+        ]
+      },
+      {
+        "objectId": "C2",
+        "materialName": "C40",
+        "sectionName": "C400x400",
+        "assignedStoryId": null,
+        "requiredSteelComponents": [
+          "Longitudinal",
+          "Transverse"
+        ]
+      },
+      {
+        "objectId": "S1",
+        "materialName": "C30",
+        "sectionName": "SLAB200",
+        "assignedStoryId": "L1",
+        "requiredSteelComponents": [
+          "XBottom"
+        ]
+      },
+      {
+        "objectId": "W1",
+        "materialName": "C40",
+        "sectionName": "WALL250",
+        "assignedStoryId": null,
+        "requiredSteelComponents": [
+          "Web"
+        ]
+      }
+    ],
+    "reinforcement": [
+      {
+        "objectId": "B1",
+        "component": "LongitudinalBottom",
+        "method": "AssignedBars",
+        "sourceReference": "synthetic#B1-bars",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "assumption": "Three straight bottom bars, full length",
+        "coversComponents": [],
+        "concreteBasis": "OpeningAdjusted",
+        "ratio": null,
+        "designEvidence": "Missing",
+        "designCode": null,
+        "domainStartM": null,
+        "domainEndM": null,
+        "maximumStationGapM": null,
+        "stations": [],
+        "bars": [
+          {
+            "count": 3,
+            "areaM2": 0.0003,
+            "lengthM": 6
+          }
+        ],
+        "intensityM2PerM": null
+      },
+      {
+        "objectId": "B1",
+        "component": "LongitudinalTop",
+        "method": "DemandEquivalent",
+        "sourceReference": "synthetic#B1-demand",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "assumption": "Top longitudinal demand at three stations",
+        "coversComponents": [],
+        "concreteBasis": "OpeningAdjusted",
+        "ratio": null,
+        "designEvidence": "VerifiedCurrent",
+        "designCode": "ACI 318-19",
+        "domainStartM": 0,
+        "domainEndM": 6,
+        "maximumStationGapM": 3,
+        "stations": [
+          {
+            "positionM": 0,
+            "areaM2": 0.0012
+          },
+          {
+            "positionM": 3,
+            "areaM2": 0.0006
+          },
+          {
+            "positionM": 6,
+            "areaM2": 0.0012
+          }
+        ],
+        "bars": [],
+        "intensityM2PerM": null
+      },
+      {
+        "objectId": "C1",
+        "component": "AllIn",
+        "method": "KgPerCubicMetre",
+        "sourceReference": "synthetic#C1-estimate",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "assumption": "Illustrative all-in column rate",
+        "coversComponents": [
+          "Longitudinal",
+          "Transverse"
+        ],
+        "concreteBasis": "GrossModeled",
+        "ratio": 150,
+        "designEvidence": "Missing",
+        "designCode": null,
+        "domainStartM": null,
+        "domainEndM": null,
+        "maximumStationGapM": null,
+        "stations": [],
+        "bars": [],
+        "intensityM2PerM": null
+      },
+      {
+        "objectId": "C2",
+        "component": "AllIn",
+        "method": "VolumeFraction",
+        "sourceReference": "synthetic#C2-estimate",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "assumption": "Illustrative two percent volumetric ratio",
+        "coversComponents": [
+          "Longitudinal",
+          "Transverse"
+        ],
+        "concreteBasis": "GrossModeled",
+        "ratio": 0.02,
+        "designEvidence": "Missing",
+        "designCode": null,
+        "domainStartM": null,
+        "domainEndM": null,
+        "maximumStationGapM": null,
+        "stations": [],
+        "bars": [],
+        "intensityM2PerM": null
+      },
+      {
+        "objectId": "S1",
+        "component": "XBottom",
+        "method": "DistributedIntensity",
+        "sourceReference": "synthetic#S1-mesh",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "assumption": "Bottom X mesh over opening-adjusted area",
+        "coversComponents": [],
+        "concreteBasis": "OpeningAdjusted",
+        "ratio": null,
+        "designEvidence": "Missing",
+        "designCode": null,
+        "domainStartM": null,
+        "domainEndM": null,
+        "maximumStationGapM": null,
+        "stations": [],
+        "bars": [],
+        "intensityM2PerM": 0.0005
+      },
+      {
+        "objectId": "W1",
+        "component": "AllIn",
+        "method": "KgPerCubicMetre",
+        "sourceReference": "synthetic#W1-estimate",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "assumption": "Illustrative wall rate on opening-adjusted volume",
+        "coversComponents": [
+          "Web"
+        ],
+        "concreteBasis": "OpeningAdjusted",
+        "ratio": 80,
+        "designEvidence": "Missing",
+        "designCode": null,
+        "domainStartM": null,
+        "domainEndM": null,
+        "maximumStationGapM": null,
+        "stations": [],
+        "bars": [],
+        "intensityM2PerM": null
+      }
+    ],
+    "policy": {
+      "id": "synthetic-policy-1",
+      "intendedUse": "Development testing",
+      "approvedBy": "Synthetic Reviewer",
+      "approvedAt": "2026-09-26T00:00:00+00:00",
+      "steelDensityKgM3": 7850,
+      "linearToleranceM": 0.0001,
+      "planarityToleranceM": 0.001
+    }
+  },
+  "overrides": [],
+  "result": {
+    "calculationVersion": "takeoff/0.2.0",
+    "elements": [
+      {
+        "objectId": "B1",
+        "category": "Beam",
+        "materialName": "C30",
+        "sectionName": "B300x600",
+        "status": "Quantified",
+        "sourceReference": "synthetic#B1",
+        "grossM3": 1.08,
+        "openingDeductionM3": 0,
+        "openingAdjustedM3": 1.08,
+        "surfaceAreaM2": null,
+        "axisLengthM": 6,
+        "formula": "section area \u00D7 3D modeled axis length",
+        "warnings": []
+      },
+      {
+        "objectId": "C1",
+        "category": "Column",
+        "materialName": "C40",
+        "sectionName": "C400x400",
+        "status": "Quantified",
+        "sourceReference": "synthetic#C1",
+        "grossM3": 0.5760000000000002,
+        "openingDeductionM3": 0,
+        "openingAdjustedM3": 0.5760000000000002,
+        "surfaceAreaM2": null,
+        "axisLengthM": 3.6,
+        "formula": "section area \u00D7 3D modeled axis length",
+        "warnings": []
+      },
+      {
+        "objectId": "C2",
+        "category": "Column",
+        "materialName": "C40",
+        "sectionName": "C400x400",
+        "status": "Quantified",
+        "sourceReference": "synthetic#C2",
+        "grossM3": 1.1520000000000004,
+        "openingDeductionM3": 0,
+        "openingAdjustedM3": 1.1520000000000004,
+        "surfaceAreaM2": null,
+        "axisLengthM": 7.2,
+        "formula": "section area \u00D7 3D modeled axis length",
+        "warnings": []
+      },
+      {
+        "objectId": "S1",
+        "category": "Slab",
+        "materialName": "C30",
+        "sectionName": "SLAB200",
+        "status": "Quantified",
+        "sourceReference": "synthetic#S1",
+        "grossM3": 4.800000000000001,
+        "openingDeductionM3": 0.35000000000000003,
+        "openingAdjustedM3": 4.45,
+        "surfaceAreaM2": 22.25,
+        "axisLengthM": null,
+        "formula": "true planar area minus union of clipped openings, multiplied by uniform normal thickness",
+        "warnings": []
+      },
+      {
+        "objectId": "W1",
+        "category": "Wall",
+        "materialName": "C40",
+        "sectionName": "WALL250",
+        "status": "Quantified",
+        "sourceReference": "synthetic#W1",
+        "grossM3": 10.8,
+        "openingDeductionM3": 0.2500000000000018,
+        "openingAdjustedM3": 10.549999999999999,
+        "surfaceAreaM2": 42.199999999999996,
+        "axisLengthM": null,
+        "formula": "true planar area minus union of clipped openings, multiplied by uniform normal thickness",
+        "warnings": []
+      }
+    ],
+    "storyAllocations": [
+      {
+        "objectId": "B1",
+        "storyId": "L1",
+        "grossM3": 1.08,
+        "openingAdjustedM3": 1.08
+      },
+      {
+        "objectId": "C1",
+        "storyId": "L1",
+        "grossM3": 0.5760000000000002,
+        "openingAdjustedM3": 0.5760000000000002
+      },
+      {
+        "objectId": "C2",
+        "storyId": "L1",
+        "grossM3": 0.5760000000000002,
+        "openingAdjustedM3": 0.5760000000000002
+      },
+      {
+        "objectId": "C2",
+        "storyId": "L2",
+        "grossM3": 0.5760000000000002,
+        "openingAdjustedM3": 0.5760000000000002
+      },
+      {
+        "objectId": "S1",
+        "storyId": "L1",
+        "grossM3": 4.800000000000001,
+        "openingAdjustedM3": 4.45
+      },
+      {
+        "objectId": "W1",
+        "storyId": "L1",
+        "grossM3": 5.3999999999999995,
+        "openingAdjustedM3": 5.1499999999999995
+      },
+      {
+        "objectId": "W1",
+        "storyId": "L2",
+        "grossM3": 5.3999999999999995,
+        "openingAdjustedM3": 5.3999999999999995
+      }
+    ],
+    "steel": [
+      {
+        "objectId": "B1",
+        "component": "LongitudinalBottom",
+        "evidence": "ModelAssignedEquivalent",
+        "massKg": 42.39,
+        "coversComponents": [
+          "LongitudinalBottom"
+        ],
+        "sourceReference": "synthetic#B1-bars",
+        "formula": "sum(count \u00D7 bar area \u00D7 declared straight length) \u00D7 density",
+        "assumption": "Three straight bottom bars, full length",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "warnings": []
+      },
+      {
+        "objectId": "B1",
+        "component": "LongitudinalTop",
+        "evidence": "DesignDemandEquivalent",
+        "massKg": 56.519999999999996,
+        "coversComponents": [
+          "LongitudinalTop"
+        ],
+        "sourceReference": "synthetic#B1-demand",
+        "formula": "sum(max(endpoint As) \u00D7 interval length) \u00D7 density; declared domain only",
+        "assumption": "Top longitudinal demand at three stations",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "warnings": [
+          {
+            "code": "DEMAND_EQUIVALENT",
+            "message": "Sample-based demand equivalent; unsampled peaks, end zones outside the declared domain, laps, anchorage and transverse bars are not inferred."
+          }
+        ]
+      },
+      {
+        "objectId": "C1",
+        "component": "AllIn",
+        "evidence": "Estimated",
+        "massKg": 86.40000000000002,
+        "coversComponents": [
+          "Longitudinal",
+          "Transverse"
+        ],
+        "sourceReference": "synthetic#C1-estimate",
+        "formula": "kg/m\u00B3 \u00D7 declared concrete volume",
+        "assumption": "Illustrative all-in column rate",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "warnings": []
+      },
+      {
+        "objectId": "C2",
+        "component": "AllIn",
+        "evidence": "Estimated",
+        "massKg": 180.86400000000006,
+        "coversComponents": [
+          "Longitudinal",
+          "Transverse"
+        ],
+        "sourceReference": "synthetic#C2-estimate",
+        "formula": "volume fraction \u00D7 declared concrete volume \u00D7 steel density",
+        "assumption": "Illustrative two percent volumetric ratio",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "warnings": []
+      },
+      {
+        "objectId": "S1",
+        "component": "XBottom",
+        "evidence": "ModelAssignedEquivalent",
+        "massKg": 87.33125,
+        "coversComponents": [
+          "XBottom"
+        ],
+        "sourceReference": "synthetic#S1-mesh",
+        "formula": "declared face/direction intensity sum \u00D7 opening-adjusted surface area \u00D7 density",
+        "assumption": "Bottom X mesh over opening-adjusted area",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "warnings": []
+      },
+      {
+        "objectId": "W1",
+        "component": "AllIn",
+        "evidence": "Estimated",
+        "massKg": 843.9999999999999,
+        "coversComponents": [
+          "Web"
+        ],
+        "sourceReference": "synthetic#W1-estimate",
+        "formula": "kg/m\u00B3 \u00D7 declared concrete volume",
+        "assumption": "Illustrative wall rate on opening-adjusted volume",
+        "approvedBy": "Synthetic Reviewer",
+        "approvedAt": "2026-09-26T00:00:00+00:00",
+        "warnings": []
+      }
+    ],
+    "steelCoverage": [
+      {
+        "objectId": "B1",
+        "required": [
+          "LongitudinalBottom",
+          "LongitudinalTop",
+          "Transverse"
+        ],
+        "missing": [
+          "Transverse"
+        ],
+        "knownMassKg": 98.91,
+        "completeMassKg": null
+      },
+      {
+        "objectId": "C1",
+        "required": [
+          "Longitudinal",
+          "Transverse"
+        ],
+        "missing": [],
+        "knownMassKg": 86.40000000000002,
+        "completeMassKg": 86.40000000000002
+      },
+      {
+        "objectId": "C2",
+        "required": [
+          "Longitudinal",
+          "Transverse"
+        ],
+        "missing": [],
+        "knownMassKg": 180.86400000000006,
+        "completeMassKg": 180.86400000000006
+      },
+      {
+        "objectId": "S1",
+        "required": [
+          "XBottom"
+        ],
+        "missing": [],
+        "knownMassKg": 87.33125,
+        "completeMassKg": 87.33125
+      },
+      {
+        "objectId": "W1",
+        "required": [
+          "Web"
+        ],
+        "missing": [],
+        "knownMassKg": 843.9999999999999,
+        "completeMassKg": 843.9999999999999
+      }
+    ],
+    "summary": {
+      "found": 5,
+      "inScope": 5,
+      "quantified": 5,
+      "unsupported": 0,
+      "invalid": 0,
+      "outOfScope": 0,
+      "knownGrossM3": 18.408,
+      "knownOpeningAdjustedM3": 17.808,
+      "completeGrossM3": 18.408,
+      "completeOpeningAdjustedM3": 17.808,
+      "knownSteelKg": 1297.50525,
+      "completeSteelKg": null,
+      "missingSteelComponents": 1
+    },
+    "byCategory": [
+      {
+        "group": "Beam",
+        "count": 1,
+        "quantifiedCount": 1,
+        "knownGrossM3": 1.08,
+        "knownOpeningAdjustedM3": 1.08,
+        "completeOpeningAdjustedM3": 1.08
+      },
+      {
+        "group": "Column",
+        "count": 2,
+        "quantifiedCount": 2,
+        "knownGrossM3": 1.7280000000000006,
+        "knownOpeningAdjustedM3": 1.7280000000000006,
+        "completeOpeningAdjustedM3": 1.7280000000000006
+      },
+      {
+        "group": "Slab",
+        "count": 1,
+        "quantifiedCount": 1,
+        "knownGrossM3": 4.800000000000001,
+        "knownOpeningAdjustedM3": 4.45,
+        "completeOpeningAdjustedM3": 4.45
+      },
+      {
+        "group": "Wall",
+        "count": 1,
+        "quantifiedCount": 1,
+        "knownGrossM3": 10.8,
+        "knownOpeningAdjustedM3": 10.549999999999999,
+        "completeOpeningAdjustedM3": 10.549999999999999
+      }
+    ],
+    "byMaterial": [
+      {
+        "group": "C30",
+        "count": 2,
+        "quantifiedCount": 2,
+        "knownGrossM3": 5.880000000000001,
+        "knownOpeningAdjustedM3": 5.53,
+        "completeOpeningAdjustedM3": 5.53
+      },
+      {
+        "group": "C40",
+        "count": 3,
+        "quantifiedCount": 3,
+        "knownGrossM3": 12.528000000000002,
+        "knownOpeningAdjustedM3": 12.277999999999999,
+        "completeOpeningAdjustedM3": 12.277999999999999
+      }
+    ],
+    "warnings": [
+      {
+        "code": "MODELED_BASIS",
+        "message": "Gross and opening-adjusted modeled volumes retain member intersections. Net, BOQ and procurement quantities are unavailable."
+      },
+      {
+        "code": "DECLARED_SCOPE",
+        "message": "Completeness applies only to the declared snapshot scope and required steel components. Unmodeled elements and bars are not inferred."
+      },
+      {
+        "code": "SYNTHETIC_INPUT",
+        "message": "Illustrative source data; no ETABS compatibility or engineering approval is established."
+      },
+      {
+        "code": "PARTIAL_STEEL",
+        "message": "Required steel components are missing. Known steel is only a subtotal."
+      }
+    ]
+  },
+  "reviewHistory": [],
+  "packageSha256": "220bd5512df1d87e40b6ab510f35a0f1cba88a2057f103fb7430aaebd6ee1cf5"
+}

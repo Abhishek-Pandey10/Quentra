@@ -25,13 +25,13 @@ This covers the offline part of roadmap Phases 1 and 3–5. G0 is pending. None 
 
 ## Evidence and limits
 
-Local verification on macOS arm64 with SDK 10.0.401: Release solution build succeeded with zero warnings/errors; all 117 xUnit tests passed.
+Local verification on macOS arm64 with SDK 10.0.401: Release solution build succeeded with zero warnings/errors; all 120 xUnit tests passed.
 
 - **Schema 1:** fixture calculates 1.656 m³.
 - **Schema 2:** fixture calculates 18.408 m³ gross and 17.808 m³ opening-adjusted concrete, and 1,297.505 kg of known steel, all matching hand calculations. Replay is byte-identical.
 - **Validation fixtures:** [A–E](../fixtures/validation/README.md) from design document §33 reproduce every stated gross, opening-adjusted and steel value. They also do so in millimetre/inch units and when C and D are split across their openings. The modelling choices made to build them are listed for engineer review.
 - **CLI:** override, accept (including missing-acknowledgment and partial-scope refusals), export, tamper detection, schema mismatch and usage exit codes were exercised manually.
-- **CI:** GitHub Actions is configured for Linux and Windows core/CLI checks, including the schema 2 calculate/replay/export flow. It has not been run remotely and does not test ETABS.
+- **CI:** GitHub Actions is configured for Linux and Windows core/CLI checks, including the schema 2 calculate/replay/export flow. It also replays the committed [reference runs](../fixtures/reference/) from macOS arm64, to check that calculation hashes are the same on every platform. It has not been run remotely and does not test ETABS.
 
 The tests cover:
 

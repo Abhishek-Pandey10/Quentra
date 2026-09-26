@@ -225,6 +225,6 @@ public class TakeoffRunTests
     public void CsvQuotesAndKeepsNumbersInvariant()
     {
         var csv = ReportExporter.Csv(new("T", ["A", "B"], [["say \"hi\"", 1.5], [null, -0.25]]));
-        Assert.Equal("\"A\",\"B\"\n\"say \"\"hi\"\"\",\"1.5\"\n\"\",\"-0.25\"\n", csv.ReplaceLineEndings("\n"));
+        Assert.Equal("\"A\",\"B\"\r\n\"say \"\"hi\"\"\",\"1.5\"\r\n\"\",\"-0.25\"\r\n", csv);
     }
 }

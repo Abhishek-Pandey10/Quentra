@@ -20,6 +20,7 @@
     <None Include="../../fixtures/synthetic/frames.json" Link="fixtures/frames.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../fixtures/synthetic/takeoff.json" Link="fixtures/takeoff.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../fixtures/validation/*.json" LinkBase="fixtures/validation" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../fixtures/reference/*.json" LinkBase="fixtures/reference" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

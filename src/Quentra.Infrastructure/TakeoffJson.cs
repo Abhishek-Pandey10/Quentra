@@ -20,7 +20,7 @@ public static class TakeoffJson
     {
         var options = new JsonSerializerOptions
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = indented,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = indented, NewLine = "\n",
             UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
             RespectRequiredConstructorParameters = true, RespectNullableAnnotations = true,
             MaxDepth = 64

@@ -112,12 +112,13 @@ public static class ReportExporter
     public static string Csv(ReportTable table)
     {
         var builder = new StringBuilder();
-        builder.AppendLine(string.Join(",", table.Headers.Select(x => Quote(SafeText(x)))));
+        // RFC 4180 CRLF regardless of platform, so export hashes match across operating systems.
+        builder.Append(string.Join(",", table.Headers.Select(x => Quote(SafeText(x))))).Append("\r\n");
         foreach (var row in table.Rows)
-            builder.AppendLine(string.Join(",", row.Select(x => Quote(x switch
+            builder.Append(string.Join(",", row.Select(x => Quote(x switch
             {
                 null => "", string text => SafeText(text), IFormattable value => value.ToString(null, CultureInfo.InvariantCulture), _ => SafeText(x.ToString() ?? "")
-            }))));
+            })))).Append("\r\n");
         return builder.ToString();
     }
 

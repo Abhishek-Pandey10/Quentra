@@ -23,6 +23,7 @@ public static class SnapshotJson
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = indented,
+            NewLine = "\n", // Identical file bytes on every platform.
             UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
             RespectRequiredConstructorParameters = true,
             MaxDepth = 32

@@ -27,3 +27,7 @@ jobs:
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- replay output/takeoff-run.json output/takeoff-replayed.json
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- export output/takeoff-run.json output/takeoff-report
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- calculate fixtures/validation/E-bay.json output/e-bay-run.json
+      # Runs committed from macOS arm64 must replay unchanged on Linux and Windows x64.
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- replay fixtures/reference/frames-run.json output/reference-frames-replayed.json
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- replay fixtures/reference/takeoff-run.json output/reference-takeoff-replayed.json
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- replay fixtures/reference/E-bay-run.json output/reference-e-bay-replayed.json

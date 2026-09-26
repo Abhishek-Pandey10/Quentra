@@ -108,7 +108,7 @@ public sealed class PlanarGeometry
         return result;
     }
 
-    private static double Distance(PointD a, PointD b) => Math.Sqrt(Math.Pow(a.x - b.x, 2) + Math.Pow(a.y - b.y, 2));
+    private static double Distance(PointD a, PointD b) => Math.Sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
     private static bool Intersects(PointD a, PointD b, PointD c, PointD d, double tolerance)
     {
         static double Turn(PointD p, PointD q, PointD r) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);

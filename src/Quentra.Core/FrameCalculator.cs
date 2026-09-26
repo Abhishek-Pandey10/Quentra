@@ -34,7 +34,7 @@ public static class FrameCalculator
             var area = frame.Section.Shape switch
             {
                 SectionShape.Rectangle => new Area(RequiredLength(frame.Section.Width) * RequiredLength(frame.Section.Depth)),
-                SectionShape.Circle => new Area(Math.PI * Math.Pow(RequiredLength(frame.Section.Diameter), 2) / 4),
+                SectionShape.Circle => new Area(Math.PI * Square(RequiredLength(frame.Section.Diameter)) / 4),
                 _ => throw new ArgumentOutOfRangeException(nameof(frame), "Unknown section shape.")
             };
             var volumeValue = area.SquareMetres * length.Metres;
@@ -50,6 +50,10 @@ public static class FrameCalculator
             return Missing(frame, QuantityStatus.Invalid, "INVALID_GEOMETRY", "Finite positive section dimensions and a nonzero finite axis length are required. Review source geometry.");
         }
     }
+
+    // x * x is exact IEEE arithmetic; Math.Pow defers to the platform C runtime, which can differ in the last bit
+    // and would break cross-platform replay hashes.
+    private static double Square(double x) => x * x;
 
     private static double RequiredLength(SourceLength? length) =>
         new Length(length?.Metres ?? double.NaN).Metres;

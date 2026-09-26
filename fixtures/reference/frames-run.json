@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "snapshotSha256": "023690c2351fbca18ef8b849171f3c5c7b810cf31fb79527c0aa6f0418cae516",
+  "calculationSha256": "a18b71758c04e5deec6219d7c1b6785b946f40df5984ccad2532d50c477b4462",
+  "snapshot": {
+    "schemaVersion": 1,
+    "modelId": "synthetic-beam-column-v1",
+    "origin": "Synthetic",
+    "sourceDescription": "Illustrative fixtures A and B from quentradesigndoc.md section 33; not extracted ETABS data.",
+    "capturedAt": "2026-09-26T00:00:00+00:00",
+    "coordinateUnit": "Metre",
+    "frames": [
+      {
+        "objectId": "B1",
+        "sourceReference": "quentradesigndoc.md#fixture-A",
+        "kind": "Beam",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 3.6
+        },
+        "end": {
+          "x": 6,
+          "y": 0,
+          "z": 3.6
+        },
+        "section": {
+          "shape": "Rectangle",
+          "width": {
+            "value": 300,
+            "unit": "Millimetre"
+          },
+          "depth": {
+            "value": 600,
+            "unit": "Millimetre"
+          },
+          "diameter": null
+        }
+      },
+      {
+        "objectId": "C1",
+        "sourceReference": "quentradesigndoc.md#fixture-B",
+        "kind": "Column",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "end": {
+          "x": 0,
+          "y": 0,
+          "z": 3.6
+        },
+        "section": {
+          "shape": "Rectangle",
+          "width": {
+            "value": 400,
+            "unit": "Millimetre"
+          },
+          "depth": {
+            "value": 400,
+            "unit": "Millimetre"
+          },
+          "diameter": null
+        }
+      }
+    ]
+  },
+  "result": {
+    "calculationVersion": "frame-concrete/0.1.0",
+    "concreteBasis": "GrossModeledFrameVolume",
+    "reviewStatus": "Draft",
+    "frames": [
+      {
+        "objectId": "B1",
+        "sourceReference": "quentradesigndoc.md#fixture-A",
+        "status": "Quantified",
+        "grossModeledVolume": {
+          "cubicMetres": 1.08
+        },
+        "steelMassKg": null,
+        "trace": {
+          "startMetres": {
+            "x": 0,
+            "y": 0,
+            "z": 3.6
+          },
+          "endMetres": {
+            "x": 6,
+            "y": 0,
+            "z": 3.6
+          },
+          "axisLength": {
+            "metres": 6
+          },
+          "sectionArea": {
+            "squareMetres": 0.18
+          },
+          "formula": "section area \u00D7 3D modeled axis length"
+        },
+        "warnings": [
+          {
+            "code": "STEEL_UNKNOWN",
+            "message": "No reinforcement source was supplied; steel mass is unknown."
+          }
+        ]
+      },
+      {
+        "objectId": "C1",
+        "sourceReference": "quentradesigndoc.md#fixture-B",
+        "status": "Quantified",
+        "grossModeledVolume": {
+          "cubicMetres": 0.5760000000000002
+        },
+        "steelMassKg": null,
+        "trace": {
+          "startMetres": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "endMetres": {
+            "x": 0,
+            "y": 0,
+            "z": 3.6
+          },
+          "axisLength": {
+            "metres": 3.6
+          },
+          "sectionArea": {
+            "squareMetres": 0.16000000000000003
+          },
+          "formula": "section area \u00D7 3D modeled axis length"
+        },
+        "warnings": [
+          {
+            "code": "STEEL_UNKNOWN",
+            "message": "No reinforcement source was supplied; steel mass is unknown."
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "foundCount": 2,
+      "inScopeCount": 2,
+      "quantifiedCount": 2,
+      "unsupportedCount": 0,
+      "invalidCount": 0,
+      "outOfScopeCount": 0,
+      "knownGrossModeledVolume": {
+        "cubicMetres": 1.6560000000000001
+      },
+      "completeGrossModeledVolume": {
+        "cubicMetres": 1.6560000000000001
+      },
+      "knownSteelMassKg": 0,
+      "completeSteelMassKg": null,
+      "unknownSteelElementCount": 2
+    },
+    "warnings": [
+      {
+        "code": "GROSS_BASIS",
+        "message": "Gross modeled frame volumes retain member intersections. No net physical or BOQ quantity is calculated."
+      },
+      {
+        "code": "FRAME_ONLY_SCOPE",
+        "message": "This snapshot calculation covers frames only. Slabs, walls, foundations, story allocation and steel calculation are not implemented."
+      },
+      {
+        "code": "SYNTHETIC_INPUT",
+        "message": "These are illustrative inputs, not extracted or verified ETABS results."
+      }
+    ]
+  }
+}
