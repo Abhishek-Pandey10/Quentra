@@ -18,7 +18,7 @@ if (args.Length == 1 && args[0] is "--version")
     Console.WriteLine($"Quentra {version} (engines {TakeoffEngine.Version}, {CalculateSnapshot.Version})");
     return 0;
 }
-if (UsageError(args, out var positional, out var options) is { } usageError)
+if (UsageError(args, out var positional, out var options, out var edits) is { } usageError)
 {
     Console.Error.WriteLine($"Quentra: {usageError}");
     Help();
@@ -37,6 +37,16 @@ try
             throw new ArgumentException("Inputs and output must use different paths.");
     if (File.Exists(outputPath) || Directory.Exists(outputPath))
         throw new IOException("Output already exists. Choose a new path to preserve the previous run.");
+    if (args[0] == "template")
+    {
+        await using var resource = typeof(Program).Assembly.GetManifestResourceStream("Quentra.Templates.snapshot.json")!;
+        var template = await new StreamReader(resource).ReadToEndAsync(cancellation.Token);
+        await File.WriteAllTextAsync(outputPath, template.ReplaceLineEndings("\n"), new System.Text.UTF8Encoding(false), cancellation.Token);
+        Console.WriteLine($"Snapshot template: {outputPath}");
+        Console.WriteLine("It is a small synthetic model (beam, columns, slab, wall, steel). Replace its contents with your model;");
+        Console.WriteLine("docs/SNAPSHOT_FORMAT.md describes every field. Run 'quentra calculate' on it to check it.");
+        return 0;
+    }
     var json = await SnapshotJson.ReadAsync(inputPath,
         args[0] == "calculate" ? SnapshotJson.MaximumSnapshotBytes : SnapshotJson.MaximumRunBytes, cancellation.Token);
     var isRun = IsRun(json);
@@ -69,11 +79,30 @@ try
         case "override":
             RequireTakeoffRun(json, args[0], reading);
             var current = TakeoffJson.Replay(json, cancellation.Token);
-            reading = positional[1];
-            var changes = TakeoffJson.Parse<ImmutableArray<QuantityOverride>>(
-                await SnapshotJson.ReadAsync(Path.GetFullPath(positional[1]), SnapshotJson.MaximumSnapshotBytes, cancellation.Token));
-            if (changes.IsDefaultOrEmpty) throw new ArgumentException("The override file must contain at least one override.");
+            ImmutableArray<QuantityOverride> changes;
+            if (edits.Count > 0)
+            {
+                var at = DateTimeOffset.UtcNow;
+                var built = ImmutableArray.CreateBuilder<QuantityOverride>();
+                foreach (var (option, value) in edits)
+                {
+                    var (objectId, field, replacement) = ParseEdit(option, value);
+                    built.Add(Overrides.Prepare(current.Snapshot, current.SnapshotSha256, current.Overrides.AddRange(built),
+                        objectId, field, replacement, options["--reason"], options["--author"], at));
+                }
+                changes = built.ToImmutable();
+            }
+            else
+            {
+                reading = positional[1];
+                changes = TakeoffJson.Parse<ImmutableArray<QuantityOverride>>(
+                    await SnapshotJson.ReadAsync(Path.GetFullPath(positional[1]), SnapshotJson.MaximumSnapshotBytes, cancellation.Token));
+                if (changes.IsDefaultOrEmpty) throw new ArgumentException("The override file must contain at least one override.");
+            }
             run = TakeoffJson.AddOverrides(current, changes);
+            foreach (var change in changes)
+                Console.WriteLine(string.Create(CultureInfo.InvariantCulture,
+                    $"Override {change.Id}: {change.ObjectId} {change.Field} {change.OriginalValue:G6} -> {change.ReplacementValue:G6}"));
             break;
         case "accept":
             RequireTakeoffRun(json, args[0], reading);
@@ -111,33 +140,68 @@ catch (Exception e) when (e is IOException or InvalidDataException or Unauthoriz
     return 1;
 }
 
-static string? UsageError(string[] args, out string[] positional, out Dictionary<string, string> options)
+static string? UsageError(string[] args, out string[] positional, out Dictionary<string, string> options, out List<(string Option, string Value)> edits)
 {
-    positional = []; options = new(StringComparer.Ordinal);
+    positional = []; options = new(StringComparer.Ordinal); edits = [];
     if (args.Length == 0) return "No command given.";
-    if (args[0] is not ("calculate" or "replay" or "override" or "accept" or "export")) return $"Unknown command '{args[0]}'.";
+    if (args[0] is not ("calculate" or "replay" or "override" or "accept" or "export" or "template")) return $"Unknown command '{args[0]}'.";
+    string[] allowed = args[0] switch
+    {
+        "accept" => ["--reviewer", "--note", "--acknowledge", "--partial"],
+        "override" => ["--set", "--exclude", "--include", "--reason", "--author"],
+        _ => []
+    };
     var list = new List<string>();
     for (var i = 1; i < args.Length; i++)
     {
         if (!args[i].StartsWith("--", StringComparison.Ordinal)) { list.Add(args[i]); continue; }
-        if (args[0] != "accept") return $"'{args[0]}' takes no options; '{args[i]}' is not recognised.";
+        if (!allowed.Contains(args[i])) return allowed.Length == 0 ? $"'{args[0]}' takes no options; '{args[i]}' is not recognised." : $"Unknown option '{args[i]}' for '{args[0]}'.";
         if (args[i] == "--partial") { if (!options.TryAdd("--partial", "")) return "--partial is given twice."; continue; }
-        if (args[i] is not ("--reviewer" or "--note" or "--acknowledge")) return $"Unknown option '{args[i]}'.";
         if (i + 1 >= args.Length) return $"{args[i]} needs a value.";
+        if (args[i] is "--set" or "--exclude" or "--include") { edits.Add((args[i], args[++i])); continue; }
         if (!options.TryAdd(args[i], args[++i])) return $"{args[i - 1]} is given twice.";
     }
     positional = [.. list];
-    var expected = args[0] == "override" ? 3 : 2;
+    if (args[0] == "template")
+    {
+        if (positional is not ["snapshot", var target]) return "Usage: quentra template snapshot <new-snapshot.json>";
+        positional = [target];
+        return null;
+    }
+    var expected = args[0] == "override" && edits.Count == 0 ? 3 : 2;
     if (positional.Length != expected)
         return $"'{args[0]}' takes {expected} file paths; {positional.Length} given.";
-    if (args[0] == "accept")
+    string[] required = args[0] switch
     {
-        var given = options;
-        var missing = new[] { "--reviewer", "--note", "--acknowledge" }.Where(x => !given.ContainsKey(x)).ToArray();
-        if (missing.Length > 0)
-            return $"accept is missing {string.Join(", ", missing)}. List the warning codes printed by the run in --acknowledge.";
-    }
+        "accept" => ["--reviewer", "--note", "--acknowledge"],
+        "override" when edits.Count > 0 => ["--reason", "--author"],
+        "override" when options.Count > 0 => ["--set, --exclude or --include"],
+        _ => []
+    };
+    var given = options;
+    var missing = required.Where(x => !given.ContainsKey(x)).ToArray();
+    if (missing.Length > 0)
+        return $"{args[0]} is missing {string.Join(", ", missing)}." + (args[0] == "accept" ? " List the warning codes printed by the run in --acknowledge." : "");
     return null;
+}
+
+// --set ID.field=value[unit], --exclude ID, --include ID. Values without a unit are metres.
+static (string ObjectId, OverrideField Field, double Value) ParseEdit(string option, string text)
+{
+    if (option == "--exclude") return (text, OverrideField.Excluded, 1);
+    if (option == "--include") return (text, OverrideField.Excluded, 0);
+    var match = Regex.Match(text, @"^(?<id>.+)\.(?<field>[A-Za-z]+)=(?<value>[-+0-9.eE]+)(?<unit>mm|m|in|ft)?$");
+    if (!match.Success) throw new ArgumentException($"--set '{text}' must look like W1.thickness=0.3 (metres) or W1.thickness=300mm.");
+    OverrideField field = match.Groups["field"].Value.ToLowerInvariant() switch
+    {
+        "width" => OverrideField.FrameWidthM, "depth" => OverrideField.FrameDepthM,
+        "diameter" => OverrideField.FrameDiameterM, "thickness" => OverrideField.AreaThicknessM,
+        var other => throw new ArgumentException($"--set field '{other}' is not one of width, depth, diameter, thickness.")
+    };
+    if (!double.TryParse(match.Groups["value"].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
+        throw new ArgumentException($"--set '{text}' has an invalid number.");
+    var unit = match.Groups["unit"].Value switch { "mm" => LengthUnit.Millimetre, "in" => LengthUnit.Inch, "ft" => LengthUnit.Foot, _ => LengthUnit.Metre };
+    return (match.Groups["id"].Value, field, value * Units.MetresPerUnit(unit));
 }
 
 static bool IsRun(string json)
@@ -227,15 +291,20 @@ Quentra — concrete and steel takeoff development CLI
   quentra calculate <snapshot.json> <new-run.json>
   quentra replay    <saved-run.json> <new-run.json>
   quentra override  <run.json> <overrides.json> <new-run.json>
+  quentra override  <run.json> <new-run.json> --reason <text> --author <name>
+                    [--set ID.width|depth|diameter|thickness=VALUE[mm|m|in|ft]]
+                    [--exclude ID] [--include ID]   (options repeatable)
   quentra accept    <run.json> <new-run.json> --reviewer <name> --note <text>
                     --acknowledge <CODE,CODE,...> [--partial]
   quentra export    <run.json> <new-directory>
+  quentra template  snapshot <new-snapshot.json>
   quentra --version | --help
 
 calculate/replay detect the schema: 1 = frame concrete only, 2 = takeoff with
 slabs, walls, stories and steel. override, accept and export need schema 2 runs.
 overrides.json is an array of recorded overrides bound to the run's snapshot SHA256
-(fields are listed in the README).
+(fields are listed in the README); --set/--exclude fill in original values and the hash.
+'template snapshot' writes a starter snapshot; docs/SNAPSHOT_FORMAT.md describes it.
 Acceptance lists every current warning code; --partial is required for partial runs.
 Input is a saved snapshot, not an ETABS model file. Live ETABS is not implemented.
 Null quantities are unknown, not zero. Existing files are never overwritten.

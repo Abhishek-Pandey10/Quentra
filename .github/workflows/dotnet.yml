@@ -26,6 +26,9 @@ jobs:
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- calculate fixtures/synthetic/takeoff.json output/takeoff-run.json
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- replay output/takeoff-run.json output/takeoff-replayed.json
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- export output/takeoff-run.json output/takeoff-report
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- override output/takeoff-run.json output/takeoff-overridden.json --set W1.thickness=300mm --exclude C2 --reason CI --author CI
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- template snapshot output/template.json
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- calculate output/template.json output/template-run.json
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- calculate fixtures/validation/E-bay.json output/e-bay-run.json
       # Runs committed from macOS arm64 must replay unchanged on Linux and Windows x64.
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- replay fixtures/reference/frames-run.json output/reference-frames-replayed.json

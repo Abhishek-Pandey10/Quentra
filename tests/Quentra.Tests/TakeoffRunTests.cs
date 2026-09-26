@@ -260,4 +260,53 @@ public class TakeoffRunTests
         }
         finally { File.Delete(path); }
     }
+
+    [Fact]
+    public async Task RepeatedExportsAreByteIdenticalAndReadable()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "quentra-test-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var run = TakeoffJson.Calculate(Fixture());
+            await ReportExporter.ExportAsync(run, Path.Combine(root, "a"));
+            await Task.Delay(2100); // Zip timestamps have two-second resolution.
+            await ReportExporter.ExportAsync(run, Path.Combine(root, "b"));
+            foreach (var file in Directory.GetFiles(Path.Combine(root, "a")).Select(Path.GetFileName))
+                Assert.Equal(await File.ReadAllBytesAsync(Path.Combine(root, "a", file!)), await File.ReadAllBytesAsync(Path.Combine(root, "b", file!)));
+            using var workbook = new ClosedXML.Excel.XLWorkbook(Path.Combine(root, "a", "report.xlsx"));
+            Assert.Equal(ReportExporter.Tables(run).Count, workbook.Worksheets.Count);
+            Assert.Equal(run.Snapshot.Model.CapturedAt.UtcDateTime, workbook.Properties.Created.ToUniversalTime());
+            Assert.Equal(0.576, workbook.Worksheet("Elements").Cell(3, 6).GetDouble());
+        }
+        finally { if (Directory.Exists(root)) Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void ReportQuantitiesAreRoundedAndSteelRollUpsMatchTheSummary()
+    {
+        var run = TakeoffJson.Calculate(Fixture());
+        var tables = ReportExporter.Tables(run).ToDictionary(x => x.Name);
+        var csv = ReportExporter.Csv(tables["Elements"]);
+        Assert.Contains("\"C1\",\"Column\",\"C40\",\"C400x400\",\"Quantified\",\"0.576\"", csv);
+        Assert.DoesNotContain("0000000", csv);
+        foreach (var name in new[] { "Steel By Category", "Steel By Material", "Steel By Story", "Steel By Evidence" })
+        {
+            var column = Array.IndexOf(tables[name].Headers, "Known steel (kg)");
+            Assert.Equal(run.Result.Summary.KnownSteelKg, tables[name].Rows.Sum(x => ((Rounded)x[column]!).Value), 6);
+        }
+        Assert.Equal("1297.5", ReportExporter.Csv(tables["Summary"]).Split("\r\n").Single(x => x.StartsWith("\"Known steel\"")).Split(',')[1].Trim('"'));
+    }
+
+    [Fact]
+    public void PreparedOverridesReadOriginalValuesFromTheCurrentRun()
+    {
+        var run = TakeoffJson.Calculate(Fixture());
+        var first = Overrides.Prepare(run.Snapshot, run.SnapshotSha256, run.Overrides, "W1", OverrideField.AreaThicknessM, .3, "Site check", "A. Reviewer", At);
+        Assert.Equal((.25, "o1"), (first.OriginalValue, first.Id));
+        var second = Overrides.Prepare(run.Snapshot, run.SnapshotSha256, [first], "W1", OverrideField.AreaThicknessM, .35, "Site check", "A. Reviewer", At);
+        Assert.Equal((.3, "o2"), (second.OriginalValue, second.Id));
+        var changed = TakeoffJson.AddOverrides(run, [first, second]);
+        Assert.Equal(10.8 / .25 * .35, changed.Result.Elements.Single(x => x.ObjectId == "W1").GrossM3!.Value, 9);
+        Assert.Throws<ArgumentException>(() => Overrides.Prepare(run.Snapshot, run.SnapshotSha256, [], "W1", OverrideField.FrameWidthM, .3, "r", "a", At));
+    }
 }

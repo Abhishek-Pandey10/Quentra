@@ -34,14 +34,19 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 quentra calculate <snapshot.json> <new-run.json>
 quentra replay    <saved-run.json> <new-run.json>
 quentra override  <run.json> <overrides.json> <new-run.json>
+quentra override  <run.json> <new-run.json> --reason <text> --author <name> [--set W1.thickness=0.3] [--exclude C2] [--include C2]
 quentra accept    <run.json> <new-run.json> --reviewer <name> --note <text> --acknowledge <CODE,...> [--partial]
 quentra export    <run.json> <new-directory>
+quentra template  snapshot <new-snapshot.json>
 quentra --version
 ```
 
+- `template snapshot` writes a working example snapshot to start from. [docs/SNAPSHOT_FORMAT.md](docs/SNAPSHOT_FORMAT.md) describes every field.
+
 - `calculate` and `replay` detect the schema: **1** is the frame-concrete format ([frames.json](fixtures/synthetic/frames.json)); **2** is the takeoff format ([takeoff.json](fixtures/synthetic/takeoff.json)). `override`, `accept` and `export` require schema 2 runs.
 - `replay` verifies the package hash, recomputes every quantity and checks that the stored results reproduce.
-- `override` applies a JSON array of recorded changes (dimension or thickness replacement, or exclusion). Each override names its author, reason and date, the original value, and the run's snapshot SHA256, which every command prints. Source values are retained; overrides apply to the effective model only, and an accepted run returns to Draft. `field` is one of `FrameWidthM`, `FrameDepthM`, `FrameDiameterM`, `AreaThicknessM` (values in metres) or `Excluded` (0 = included, 1 = excluded):
+- `override` with `--set ID.width|depth|diameter|thickness=VALUE` (metres, or suffix `mm`, `in`, `ft`), `--exclude ID` or `--include ID` records overrides directly; original values and the snapshot hash are read from the run. Options can be repeated.
+- `override` with a file applies a JSON array of recorded changes (dimension or thickness replacement, or exclusion). Each override names its author, reason and date, the original value, and the run's snapshot SHA256, which every command prints. Source values are retained; overrides apply to the effective model only, and an accepted run returns to Draft. `field` is one of `FrameWidthM`, `FrameDepthM`, `FrameDiameterM`, `AreaThicknessM` (values in metres) or `Excluded` (0 = included, 1 = excluded):
 
   ```json
   [{ "id": "o1", "objectId": "W1", "field": "AreaThicknessM", "originalValue": 0.25, "replacementValue": 0.3,
@@ -49,7 +54,7 @@ quentra --version
      "snapshotSha256": "<printed by calculate>" }]
   ```
 - `accept` requires a named reviewer, a note, and every current warning code acknowledged, and no code the run does not raise. A partial run can only be accepted with `--partial` and is labelled `AcceptedPartial`. Acceptance is blocked until the measurement policy is approved.
-- `export` verifies the run, then writes a new directory containing `run.json`, one CSV per report table, `report.xlsx`, and `manifest.json` with SHA-256 hashes of every file. The "package seal" is a hash of the run's canonical content, not of the `run.json` file bytes.
+- `export` verifies the run, then writes a new directory containing `run.json`, one CSV per report table, `report.xlsx`, and `manifest.json` with SHA-256 hashes of every file. Report quantities are rounded (m³, m² and m to 0.001, kg to 0.1); `run.json` keeps full precision. Steel is also totalled by category, material, story and evidence type. Exporting the same run twice produces identical files. The "package seal" is a hash of the run's canonical content, not of the `run.json` file bytes.
 
 The synthetic takeoff fixture produces **18.408 m³** gross and **17.808 m³** opening-adjusted modeled concrete, and **1,297.505 kg** of known steel. Steel is partial because beam B1 declares a required transverse component with no source. The frame fixture produces **1.656 m³**. The design document's §33 validation fixtures are in [fixtures/validation](fixtures/validation/README.md) and all reproduce their hand-calculated values.
 

@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
   <ItemGroup>
+    <!-- The synthetic takeoff fixture doubles as the starter snapshot for 'quentra template snapshot'. -->
+    <EmbeddedResource Include="../../fixtures/synthetic/takeoff.json" LogicalName="Quentra.Templates.snapshot.json" />
     <ProjectReference Include="../Quentra.Infrastructure/Quentra.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

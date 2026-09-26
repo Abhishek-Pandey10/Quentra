@@ -77,4 +77,27 @@ public static class Overrides
             ? x with { DesignEvidence = DesignEvidence.Stale } : x).ToImmutableArray() };
         return (effective, excluded);
     }
+
+    // Builds an override from the run's current effective state, so users never type hashes or original values.
+    public static QuantityOverride Prepare(TakeoffSnapshot source, string sourceHash, ImmutableArray<QuantityOverride> existing,
+        string objectId, OverrideField field, double replacement, string reason, string author, DateTimeOffset at)
+    {
+        var (effective, excluded) = Apply(source, existing, sourceHash);
+        var frame = effective.Model.Frames.FirstOrDefault(x => x.ObjectId == objectId);
+        var area = effective.Areas.FirstOrDefault(x => x.ObjectId == objectId);
+        if (frame is null && area is null) throw new ArgumentException($"No frame or area has objectId '{objectId}'.");
+        var original = field switch
+        {
+            OverrideField.Excluded => excluded.Contains(objectId) ? 1 : 0,
+            OverrideField.FrameWidthM => frame?.Section?.Width?.Metres,
+            OverrideField.FrameDepthM => frame?.Section?.Depth?.Metres,
+            OverrideField.FrameDiameterM => frame?.Section?.Diameter?.Metres,
+            OverrideField.AreaThicknessM => area?.Thickness.Metres,
+            _ => null
+        } ?? throw new ArgumentException($"{objectId} has no {field} to replace.");
+        var ids = existing.Select(x => x.Id).ToHashSet(StringComparer.Ordinal);
+        var n = existing.Length + 1;
+        while (ids.Contains("o" + n)) n++;
+        return new("o" + n, objectId, field, original, replacement, reason, author, at, sourceHash);
+    }
 }
