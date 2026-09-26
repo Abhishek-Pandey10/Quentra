@@ -42,7 +42,7 @@ quentra export    <run.json> <new-directory>
 - `accept` requires a named reviewer, a note, and every current warning code acknowledged. A partial run can only be accepted with `--partial` and is labelled `AcceptedPartial`. Acceptance is blocked until the measurement policy is approved.
 - `export` verifies the run, then writes a new directory containing `run.json`, one CSV per report table, `report.xlsx`, and `manifest.json` with SHA-256 hashes of every file.
 
-The synthetic takeoff fixture produces **18.408 m³** gross and **17.808 m³** opening-adjusted modeled concrete, and **1,297.505 kg** of known steel. Steel is partial because beam B1 declares a required transverse component with no source. The frame fixture produces **1.656 m³**.
+The synthetic takeoff fixture produces **18.408 m³** gross and **17.808 m³** opening-adjusted modeled concrete, and **1,297.505 kg** of known steel. Steel is partial because beam B1 declares a required transverse component with no source. The frame fixture produces **1.656 m³**. The design document's §33 validation fixtures are in [fixtures/validation](fixtures/validation/README.md) and all reproduce their hand-calculated values.
 
 Outputs must be new paths; existing runs and reports are never overwritten. Exit code 0 means the operation succeeded, including a valid draft with partial quantities. Inspect coverage and warnings; success does not mean engineering acceptance. Codes 1, 2 and 130 indicate input/IO/validation failure, usage error and cancellation respectively.
 

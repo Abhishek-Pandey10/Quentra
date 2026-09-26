@@ -26,3 +26,4 @@ jobs:
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- calculate fixtures/synthetic/takeoff.json output/takeoff-run.json
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- replay output/takeoff-run.json output/takeoff-replayed.json
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- export output/takeoff-run.json output/takeoff-report
+      - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- calculate fixtures/validation/E-bay.json output/e-bay-run.json

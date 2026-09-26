@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 2,
+  "model": {
+    "schemaVersion": 1,
+    "modelId": "section33-E-bay",
+    "origin": "Synthetic",
+    "sourceDescription": "Fixture E: typical bay with columns, perimeter beams, slab and interior wall with door. Illustrative inputs from design document section 33; not extracted ETABS data.",
+    "capturedAt": "2026-09-26T00:00:00+00:00",
+    "coordinateUnit": "Metre",
+    "frames": [
+      {
+        "objectId": "E-C1",
+        "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (E-C1)",
+        "kind": "Column",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 0, "y": 0, "z": 0 },
+        "end": { "x": 0, "y": 0, "z": 3 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 0.4, "unit": "Metre" },
+          "depth": { "value": 0.4, "unit": "Metre" }
+        }
+      },
+      {
+        "objectId": "E-C2",
+        "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (E-C2)",
+        "kind": "Column",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 6, "y": 0, "z": 0 },
+        "end": { "x": 6, "y": 0, "z": 3 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 0.4, "unit": "Metre" },
+          "depth": { "value": 0.4, "unit": "Metre" }
+        }
+      },
+      {
+        "objectId": "E-C3",
+        "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (E-C3)",
+        "kind": "Column",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 6, "y": 5, "z": 0 },
+        "end": { "x": 6, "y": 5, "z": 3 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 0.4, "unit": "Metre" },
+          "depth": { "value": 0.4, "unit": "Metre" }
+        }
+      },
+      {
+        "objectId": "E-C4",
+        "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (E-C4)",
+        "kind": "Column",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 0, "y": 5, "z": 0 },
+        "end": { "x": 0, "y": 5, "z": 3 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 0.4, "unit": "Metre" },
+          "depth": { "value": 0.4, "unit": "Metre" }
+        }
+      },
+      {
+        "objectId": "E-B1",
+        "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (E-B1)",
+        "kind": "Beam",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 0, "y": 0, "z": 2.7 },
+        "end": { "x": 6, "y": 0, "z": 2.7 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 0.3, "unit": "Metre" },
+          "depth": { "value": 0.6, "unit": "Metre" }
+        }
+      },
+      {
+        "objectId": "E-B2",
+        "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (E-B2)",
+        "kind": "Beam",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 6, "y": 0, "z": 2.7 },
+        "end": { "x": 6, "y": 5, "z": 2.7 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 0.3, "unit": "Metre" },
+          "depth": { "value": 0.6, "unit": "Metre" }
+        }
+      },
+      {
+        "objectId": "E-B3",
+        "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (E-B3)",
+        "kind": "Beam",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 6, "y": 5, "z": 2.7 },
+        "end": { "x": 0, "y": 5, "z": 2.7 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 0.3, "unit": "Metre" },
+          "depth": { "value": 0.6, "unit": "Metre" }
+        }
+      },
+      {
+        "objectId": "E-B4",
+        "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (E-B4)",
+        "kind": "Beam",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 0, "y": 5, "z": 2.7 },
+        "end": { "x": 0, "y": 0, "z": 2.7 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 0.3, "unit": "Metre" },
+          "depth": { "value": 0.6, "unit": "Metre" }
+        }
+      }
+    ]
+  },
+  "areas": [
+    {
+      "objectId": "E-S1",
+      "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (E-S1)",
+      "kind": "Slab",
+      "material": "Concrete",
+      "boundary": [
+        { "x": -0.2, "y": -0.2, "z": 2.9 },
+        { "x": 6.2, "y": -0.2, "z": 2.9 },
+        { "x": 6.2, "y": 5.2, "z": 2.9 },
+        { "x": -0.2, "y": 5.2, "z": 2.9 }
+      ],
+      "openings": [],
+      "openingsVerified": true,
+      "physicalThicknessVerified": true,
+      "thickness": { "value": 0.2, "unit": "Metre" }
+    },
+    {
+      "objectId": "E-W1",
+      "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (E-W1)",
+      "kind": "Wall",
+      "material": "Concrete",
+      "boundary": [
+        { "x": 1, "y": 2.5, "z": 0 },
+        { "x": 5, "y": 2.5, "z": 0 },
+        { "x": 5, "y": 2.5, "z": 3 },
+        { "x": 1, "y": 2.5, "z": 3 }
+      ],
+      "openings": [
+        [
+          { "x": 2.5, "y": 2.5, "z": 0 },
+          { "x": 3.5, "y": 2.5, "z": 0 },
+          { "x": 3.5, "y": 2.5, "z": 2.1 },
+          { "x": 2.5, "y": 2.5, "z": 2.1 }
+        ]
+      ],
+      "openingsVerified": true,
+      "physicalThicknessVerified": true,
+      "thickness": { "value": 0.2, "unit": "Metre" }
+    }
+  ],
+  "stories": [
+    {
+      "id": "L1",
+      "lowerElevationM": 0,
+      "upperElevationM": 3
+    }
+  ],
+  "metadata": [
+    {
+      "objectId": "E-C1",
+      "materialName": "C40",
+      "sectionName": "C400x400",
+      "assignedStoryId": null,
+      "requiredSteelComponents": ["Longitudinal", "Transverse"]
+    },
+    {
+      "objectId": "E-C2",
+      "materialName": "C40",
+      "sectionName": "C400x400",
+      "assignedStoryId": null,
+      "requiredSteelComponents": ["Longitudinal", "Transverse"]
+    },
+    {
+      "objectId": "E-C3",
+      "materialName": "C40",
+      "sectionName": "C400x400",
+      "assignedStoryId": null,
+      "requiredSteelComponents": ["Longitudinal", "Transverse"]
+    },
+    {
+      "objectId": "E-C4",
+      "materialName": "C40",
+      "sectionName": "C400x400",
+      "assignedStoryId": null,
+      "requiredSteelComponents": ["Longitudinal", "Transverse"]
+    },
+    {
+      "objectId": "E-B1",
+      "materialName": "C30",
+      "sectionName": "B300x600",
+      "assignedStoryId": null,
+      "requiredSteelComponents": ["LongitudinalBottom", "LongitudinalTop", "Transverse"]
+    },
+    {
+      "objectId": "E-B2",
+      "materialName": "C30",
+      "sectionName": "B300x600",
+      "assignedStoryId": null,
+      "requiredSteelComponents": ["LongitudinalBottom", "LongitudinalTop", "Transverse"]
+    },
+    {
+      "objectId": "E-B3",
+      "materialName": "C30",
+      "sectionName": "B300x600",
+      "assignedStoryId": null,
+      "requiredSteelComponents": ["LongitudinalBottom", "LongitudinalTop", "Transverse"]
+    },
+    {
+      "objectId": "E-B4",
+      "materialName": "C30",
+      "sectionName": "B300x600",
+      "assignedStoryId": null,
+      "requiredSteelComponents": ["LongitudinalBottom", "LongitudinalTop", "Transverse"]
+    },
+    {
+      "objectId": "E-S1",
+      "materialName": "C30",
+      "sectionName": "SLAB200",
+      "assignedStoryId": "L1",
+      "requiredSteelComponents": ["XBottom", "XTop", "YBottom", "YTop"]
+    },
+    {
+      "objectId": "E-W1",
+      "materialName": "C40",
+      "sectionName": "WALL200",
+      "assignedStoryId": null,
+      "requiredSteelComponents": ["Web"]
+    }
+  ],
+  "reinforcement": [],
+  "policy": {
+    "id": "section-33-draft",
+    "intendedUse": "Validation fixture; policy awaiting engineer approval",
+    "approvedBy": null,
+    "approvedAt": null,
+    "steelDensityKgM3": 7850,
+    "linearToleranceM": 0.0001,
+    "planarityToleranceM": 0.001
+  }
+}

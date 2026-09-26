@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 2,
+  "model": {
+    "schemaVersion": 1,
+    "modelId": "section33-D-wall",
+    "origin": "Synthetic",
+    "sourceDescription": "Fixture D: wall with a door at its base. Illustrative inputs from design document section 33; not extracted ETABS data.",
+    "capturedAt": "2026-09-26T00:00:00+00:00",
+    "coordinateUnit": "Metre",
+    "frames": []
+  },
+  "areas": [
+    {
+      "objectId": "D1",
+      "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (D1)",
+      "kind": "Wall",
+      "material": "Concrete",
+      "boundary": [
+        { "x": 0, "y": 0, "z": 0 },
+        { "x": 4, "y": 0, "z": 0 },
+        { "x": 4, "y": 0, "z": 3 },
+        { "x": 0, "y": 0, "z": 3 }
+      ],
+      "openings": [
+        [
+          { "x": 1.5, "y": 0, "z": 0 },
+          { "x": 2.5, "y": 0, "z": 0 },
+          { "x": 2.5, "y": 0, "z": 2.1 },
+          { "x": 1.5, "y": 0, "z": 2.1 }
+        ]
+      ],
+      "openingsVerified": true,
+      "physicalThicknessVerified": true,
+      "thickness": { "value": 0.2, "unit": "Metre" }
+    }
+  ],
+  "stories": [
+    {
+      "id": "L1",
+      "lowerElevationM": 0,
+      "upperElevationM": 3
+    }
+  ],
+  "metadata": [
+    {
+      "objectId": "D1",
+      "materialName": "C40",
+      "sectionName": "WALL200",
+      "assignedStoryId": null,
+      "requiredSteelComponents": ["Web"]
+    }
+  ],
+  "reinforcement": [
+    {
+      "objectId": "D1",
+      "component": "Web",
+      "method": "DistributedIntensity",
+      "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (D1 Web)",
+      "approvedBy": "Synthetic fixture author",
+      "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Illustrative both faces: vertical 600 + horizontal 400 mm²/m each; no boundary, edge or lap steel",
+      "intensityM2PerM": 0.002
+    }
+  ],
+  "policy": {
+    "id": "section-33-draft",
+    "intendedUse": "Validation fixture; policy awaiting engineer approval",
+    "approvedBy": null,
+    "approvedAt": null,
+    "steelDensityKgM3": 7850,
+    "linearToleranceM": 0.0001,
+    "planarityToleranceM": 0.001
+  }
+}

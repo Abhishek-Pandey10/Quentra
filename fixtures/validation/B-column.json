@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 2,
+  "model": {
+    "schemaVersion": 1,
+    "modelId": "section33-B-column",
+    "origin": "Synthetic",
+    "sourceDescription": "Fixture B: single column. Illustrative inputs from design document section 33; not extracted ETABS data.",
+    "capturedAt": "2026-09-26T00:00:00+00:00",
+    "coordinateUnit": "Metre",
+    "frames": [
+      {
+        "objectId": "B1",
+        "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (B1)",
+        "kind": "Column",
+        "material": "Concrete",
+        "isStraight": true,
+        "isPrismatic": true,
+        "start": { "x": 0, "y": 0, "z": 0 },
+        "end": { "x": 0, "y": 0, "z": 3.6 },
+        "section": {
+          "shape": "Rectangle",
+          "width": { "value": 0.4, "unit": "Metre" },
+          "depth": { "value": 0.4, "unit": "Metre" }
+        }
+      }
+    ]
+  },
+  "areas": [],
+  "stories": [
+    {
+      "id": "L1",
+      "lowerElevationM": 0,
+      "upperElevationM": 3.6
+    }
+  ],
+  "metadata": [
+    {
+      "objectId": "B1",
+      "materialName": "C40",
+      "sectionName": "C400x400",
+      "assignedStoryId": null,
+      "requiredSteelComponents": ["Longitudinal"]
+    }
+  ],
+  "reinforcement": [
+    {
+      "objectId": "B1",
+      "component": "Longitudinal",
+      "method": "AssignedBars",
+      "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (B1 Longitudinal)",
+      "approvedBy": "Synthetic fixture author",
+      "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Illustrative 8-D20 straight bars over the column length; ties and laps excluded",
+      "bars": [
+        {
+          "count": 8,
+          "areaM2": 0.0003141592653589793,
+          "lengthM": 3.6
+        }
+      ]
+    }
+  ],
+  "policy": {
+    "id": "section-33-draft",
+    "intendedUse": "Validation fixture; policy awaiting engineer approval",
+    "approvedBy": null,
+    "approvedAt": null,
+    "steelDensityKgM3": 7850,
+    "linearToleranceM": 0.0001,
+    "planarityToleranceM": 0.001
+  }
+}

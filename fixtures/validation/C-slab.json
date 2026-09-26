@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 2,
+  "model": {
+    "schemaVersion": 1,
+    "modelId": "section33-C-slab",
+    "origin": "Synthetic",
+    "sourceDescription": "Fixture C: slab with one opening. Illustrative inputs from design document section 33; not extracted ETABS data.",
+    "capturedAt": "2026-09-26T00:00:00+00:00",
+    "coordinateUnit": "Metre",
+    "frames": []
+  },
+  "areas": [
+    {
+      "objectId": "C1",
+      "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (C1)",
+      "kind": "Slab",
+      "material": "Concrete",
+      "boundary": [
+        { "x": 0, "y": 0, "z": 3 },
+        { "x": 6, "y": 0, "z": 3 },
+        { "x": 6, "y": 5, "z": 3 },
+        { "x": 0, "y": 5, "z": 3 }
+      ],
+      "openings": [
+        [
+          { "x": 2.5, "y": 2, "z": 3 },
+          { "x": 3.5, "y": 2, "z": 3 },
+          { "x": 3.5, "y": 3, "z": 3 },
+          { "x": 2.5, "y": 3, "z": 3 }
+        ]
+      ],
+      "openingsVerified": true,
+      "physicalThicknessVerified": true,
+      "thickness": { "value": 0.2, "unit": "Metre" }
+    }
+  ],
+  "stories": [
+    {
+      "id": "L1",
+      "lowerElevationM": 0,
+      "upperElevationM": 3
+    }
+  ],
+  "metadata": [
+    {
+      "objectId": "C1",
+      "materialName": "C30",
+      "sectionName": "SLAB200",
+      "assignedStoryId": "L1",
+      "requiredSteelComponents": ["XBottom", "XTop", "YBottom", "YTop"]
+    }
+  ],
+  "reinforcement": [
+    {
+      "objectId": "C1",
+      "component": "XBottom",
+      "method": "DistributedIntensity",
+      "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (C1 XBottom)",
+      "approvedBy": "Synthetic fixture author",
+      "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Illustrative 500 mm²/m layer over the opening-adjusted area; no opening trimmers",
+      "intensityM2PerM": 0.0005
+    },
+    {
+      "objectId": "C1",
+      "component": "XTop",
+      "method": "DistributedIntensity",
+      "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (C1 XTop)",
+      "approvedBy": "Synthetic fixture author",
+      "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Illustrative 500 mm²/m layer over the opening-adjusted area; no opening trimmers",
+      "intensityM2PerM": 0.0005
+    },
+    {
+      "objectId": "C1",
+      "component": "YBottom",
+      "method": "DistributedIntensity",
+      "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (C1 YBottom)",
+      "approvedBy": "Synthetic fixture author",
+      "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Illustrative 500 mm²/m layer over the opening-adjusted area; no opening trimmers",
+      "intensityM2PerM": 0.0005
+    },
+    {
+      "objectId": "C1",
+      "component": "YTop",
+      "method": "DistributedIntensity",
+      "sourceReference": "quentradesigndoc.md#33-engineering-validation-before-coding (C1 YTop)",
+      "approvedBy": "Synthetic fixture author",
+      "approvedAt": "2026-09-26T00:00:00+00:00",
+      "assumption": "Illustrative 500 mm²/m layer over the opening-adjusted area; no opening trimmers",
+      "intensityM2PerM": 0.0005
+    }
+  ],
+  "policy": {
+    "id": "section-33-draft",
+    "intendedUse": "Validation fixture; policy awaiting engineer approval",
+    "approvedBy": null,
+    "approvedAt": null,
+    "steelDensityKgM3": 7850,
+    "linearToleranceM": 0.0001,
+    "planarityToleranceM": 0.001
+  }
+}

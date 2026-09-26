@@ -18,17 +18,18 @@ This covers the offline part of roadmap Phases 1 and 3–5. G0 is pending. None 
 | Phase 0: build/code selection and Windows API experiments | Pending external environment and engineering decisions |
 | Phase 1: SI types, schemas, frame calculations, replay, CI | Implemented offline; policy decisions unapproved |
 | Phase 2: ETABS adapter, frame extraction, WPF | Not started (story allocation implemented offline) |
-| Phase 3: slab/wall geometry, openings, overlaps, summaries | Implemented offline; A–E engineer fixtures not yet supplied |
+| Phase 3: slab/wall geometry, openings, overlaps, summaries | Implemented offline; §33 fixtures A–E match; engineer review of fixtures pending |
 | Phase 4: reinforcement integration, ratios, coverage | Calculation implemented for supplied inputs; ETABS result extraction not started |
 | Phase 5: overrides, review, reports | Implemented in core/CLI; WPF review tables not started |
 | Phase 6: qualification and packaging | Not started |
 
 ## Evidence and limits
 
-Local verification on macOS arm64 with SDK 10.0.401: Release solution build succeeded with zero warnings/errors; all 90 xUnit tests passed.
+Local verification on macOS arm64 with SDK 10.0.401: Release solution build succeeded with zero warnings/errors; all 115 xUnit tests passed.
 
 - **Schema 1:** fixture calculates 1.656 m³.
 - **Schema 2:** fixture calculates 18.408 m³ gross and 17.808 m³ opening-adjusted concrete, and 1,297.505 kg of known steel, all matching hand calculations. Replay is byte-identical.
+- **Validation fixtures:** [A–E](../fixtures/validation/README.md) from design document §33 reproduce every stated gross, opening-adjusted and steel value. They also do so in millimetre/inch units and when C and D are split across their openings. The modelling choices made to build them are listed for engineer review.
 - **CLI:** override, accept (including missing-acknowledgment and partial-scope refusals), export, tamper detection, schema mismatch and usage exit codes were exercised manually.
 - **CI:** GitHub Actions is configured for Linux and Windows core/CLI checks, including the schema 2 calculate/replay/export flow. It has not been run remotely and does not test ETABS.
 
@@ -53,7 +54,7 @@ Reports remain Draft until accepted. Complete quantities mean every in-scope obj
 1. Record first Windows/ETABS build, code/edition and reviewer in Phase 0 decisions.
 2. Obtain installed API help and approved fixture models; prove read-only attachment and per-field units.
 3. Add adapter contracts and raw-source capture from those verified signatures, producing schema 2 snapshots.
-4. Obtain the engineer's A–E worksheets and replace synthetic expectations with reviewed fixtures.
+4. Have the engineer review the A–E fixture modelling choices and the worksheet columns in §33, then rebuild the fixtures in ETABS for the live comparison.
 5. Begin the WPF review flow on Windows over the existing run/review/export contracts.
 
 Continue pure-core development with synthetic inputs while Windows verification is pending. Do not claim ETABS compatibility based on offline fixtures.
