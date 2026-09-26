@@ -25,7 +25,7 @@ This covers the offline part of roadmap Phases 1 and 3–5. G0 is pending. None 
 
 ## Evidence and limits
 
-Local verification on macOS arm64 with SDK 10.0.401: Release solution build succeeded with zero warnings/errors; all 115 xUnit tests passed.
+Local verification on macOS arm64 with SDK 10.0.401: Release solution build succeeded with zero warnings/errors; all 117 xUnit tests passed.
 
 - **Schema 1:** fixture calculates 1.656 m³.
 - **Schema 2:** fixture calculates 18.408 m³ gross and 17.808 m³ opening-adjusted concrete, and 1,297.505 kg of known steel, all matching hand calculations. Replay is byte-identical.

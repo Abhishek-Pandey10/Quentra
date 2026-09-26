@@ -131,6 +131,25 @@ public class TakeoffTests
     }
 
     [Fact]
+    public void BeamAtALevelInFeetStaysInTheStoryBelow()
+    {
+        // 12 ft × 0.3048 evaluates to 3.6576000000000004 m, one ulp above the declared level.
+        static Point3 Feet(Point3 p) => p with { Z = p.Z switch { 3.6 => 12, 7.2 => 24, _ => p.Z } };
+        var s = Fixture();
+        s = s with
+        {
+            Model = s.Model with { CoordinateUnit = LengthUnit.Foot, Frames = s.Model.Frames.Select(f => f with { Start = Feet(f.Start), End = Feet(f.End) }).ToImmutableArray() },
+            Areas = s.Areas.Select(a => a with
+            {
+                Boundary = a.Boundary.Select(Feet).ToImmutableArray(),
+                Openings = a.Openings.Select(o => o.Select(Feet).ToImmutableArray()).ToImmutableArray()
+            }).ToImmutableArray(),
+            Stories = [new("L1", 0, 3.6576), new("L2", 3.6576, 7.3152)]
+        };
+        Assert.Equal("L1", TakeoffEngine.Run(s).StoryAllocations.Single(x => x.ObjectId == "B1").StoryId);
+    }
+
+    [Fact]
     public void EachSteelMethodMatchesHandCalculation()
     {
         var r = TakeoffEngine.Run(Fixture());
@@ -255,6 +274,22 @@ public class TakeoffTests
         Assert.Contains(r.Warnings, x => x.Code == "AREA_OVERLAP" && x.Message.Contains("S1") && x.Message.Contains("S2"));
         Assert.Contains(r.Warnings, x => x.Code == "COINCIDENT_FRAMES" && x.Message.Contains("B1") && x.Message.Contains("B2"));
         Assert.Equal(18.408 + 1.08 + 4.8, r.Summary.KnownGrossM3, 9);
+    }
+
+    [Fact]
+    public void NearlyCoplanarLargeAreaIsFlaggedNotFatal()
+    {
+        // Tilted 1e-5 rad from S1: the normals pass the parallel test, but the far edge is 10 mm off S1's plane.
+        var s = Fixture();
+        var tilted = s.Areas[0] with
+        {
+            ObjectId = "S2", SourceReference = "synthetic#S2", Openings = [],
+            Boundary = [new(1, 0, 3.6), new(1001, 0, 3.61), new(1001, 10, 3.61), new(1, 10, 3.6)]
+        };
+        s = s with { Areas = s.Areas.Add(tilted), Metadata = s.Metadata.Add(s.Metadata[3] with { ObjectId = "S2" }) };
+        var r = TakeoffEngine.Run(s);
+        Assert.Equal(QuantityStatus.Quantified, Element(r, "S2").Status);
+        Assert.Contains(r.Warnings, x => x.Code == "OVERLAP_UNCHECKED" && x.Message.Contains("S1") && x.Message.Contains("S2"));
     }
 
     [Fact]

@@ -93,6 +93,9 @@ public class TakeoffRunTests
         Assert.True(TakeoffJson.IsPartial(excluded));
         var restored = TakeoffJson.AddOverrides(excluded, [Override(excluded, "W1", OverrideField.Excluded, 1, 0, "o2")]);
         Assert.Equal(complete.Result.Summary, restored.Result.Summary);
+        // A reversed exclusion leaves nothing excluded, so the run is complete again.
+        Assert.False(TakeoffJson.IsPartial(restored));
+        Assert.Equal("Accepted", TakeoffJson.ReviewStatus(AcceptAll(restored, partial: false)));
     }
 
     [Theory]

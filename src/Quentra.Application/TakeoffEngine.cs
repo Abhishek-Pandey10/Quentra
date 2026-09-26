@@ -116,9 +116,11 @@ public static class TakeoffEngine
     {
         var factor = Units.MetresPerUnit(snapshot.Model.CoordinateUnit);
         var z0 = source.Start.Z * factor; var z1 = source.End.Z * factor;
-        if (Math.Abs(z1 - z0) <= snapshot.Policy.LinearToleranceM)
+        var tolerance = snapshot.Policy.LinearToleranceM;
+        if (Math.Abs(z1 - z0) <= tolerance)
         {
-            var story = metadata.AssignedStoryId ?? snapshot.Stories.FirstOrDefault(s => z0 > s.LowerElevationM && z0 <= s.UpperElevationM)?.Id ?? "Unallocated";
+            // Unit conversion can place a beam a rounding error above its level; it still tops the story below.
+            var story = metadata.AssignedStoryId ?? snapshot.Stories.FirstOrDefault(s => z0 > s.LowerElevationM + tolerance && z0 <= s.UpperElevationM + tolerance)?.Id ?? "Unallocated";
             output.Add(new(element.ObjectId, story, element.GrossM3!.Value, element.OpeningAdjustedM3!.Value));
             return;
         }
@@ -194,7 +196,14 @@ public static class TakeoffEngine
                 var a = valid[i]; var b = valid[j];
                 if (Math.Abs(PlanarGeometry.Dot(a.Plane.Normal, b.Plane.Normal)) < 1 - 1e-10 ||
                     Math.Abs(PlanarGeometry.Dot(PlanarGeometry.Sub(b.Plane.Origin, a.Plane.Origin), a.Plane.Normal)) > snapshot.Policy.PlanarityToleranceM) continue;
-                var ring = a.Plane.ProjectRing(b.Source.Boundary, factor, snapshot.Policy);
+                // Near-parallel planes pass the origin test yet can diverge beyond tolerance across a large polygon.
+                Clipper2Lib.PathD ring;
+                try { ring = a.Plane.ProjectRing(b.Source.Boundary, factor, snapshot.Policy); }
+                catch (ArgumentException)
+                {
+                    warnings.Add(new("OVERLAP_UNCHECKED", $"{a.Source.ObjectId} and {b.Source.ObjectId} are nearly coplanar but could not be compared in one plane; review for layering/duplication."));
+                    continue;
+                }
                 var overlap = Math.Abs(Clipper2Lib.Clipper.Area(Clipper2Lib.Clipper.Intersect(a.Plane.Gross, [ring], Clipper2Lib.FillRule.NonZero, PlanarGeometry.Precision)));
                 if (overlap > snapshot.Policy.LinearToleranceM * snapshot.Policy.LinearToleranceM)
                     warnings.Add(new("AREA_OVERLAP", $"Coplanar footprint overlap between {a.Source.ObjectId} and {b.Source.ObjectId}; confirm layering/duplication. Modeled quantities are retained."));

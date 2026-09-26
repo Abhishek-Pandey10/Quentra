@@ -103,7 +103,7 @@ public static class TakeoffJson
     public static string ReviewStatus(TakeoffRun run) => run.ReviewHistory.LastOrDefault()?.CalculationSha256 == run.CalculationSha256
         ? run.ReviewHistory[^1].Status : "Draft";
     public static bool IsPartial(TakeoffRun run) => run.Result.Summary.CompleteOpeningAdjustedM3 is null || run.Result.Summary.CompleteSteelKg is null ||
-        run.Overrides.Any(x => x.Field == OverrideField.Excluded && x.ReplacementValue == 1);
+        run.Result.Elements.Any(x => x.Warnings.Any(w => w.Code == "USER_EXCLUDED"));
     public static IEnumerable<string> WarningCodes(TakeoffRun run) => run.Result.Warnings
         .Concat(run.Result.Elements.SelectMany(x => x.Warnings)).Concat(run.Result.Steel.SelectMany(x => x.Warnings)).Select(x => x.Code).Distinct(StringComparer.Ordinal);
 
