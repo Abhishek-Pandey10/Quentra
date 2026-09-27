@@ -2,7 +2,7 @@
 
 A snapshot is the JSON input to `quentra calculate`. It describes the model: frames, slabs and walls, stories, reinforcement sources, and the measurement policy. `quentra template snapshot <file>` writes a working example ([fixtures/synthetic/takeoff.json](../fixtures/synthetic/takeoff.json)) to start from. This reference is built into the tool: `quentra help format` prints it.
 
-Schema 2 is a development format. The ETABS adapter will eventually produce it; until then it is written by hand or by script.
+Schema 2 is written by `quentra etabs extract` from a running ETABS 22.7 (see [ETABS_INTEGRATION.md](ETABS_INTEGRATION.md)), or by hand or script.
 
 ## Rules for every field
 
@@ -25,6 +25,18 @@ A **length** is `{ "value": 300, "unit": "Millimetre" }`, with unit `Metre`, `Mi
 | `metadata` | required | One entry per frame and area |
 | `reinforcement` | required | Steel sources; may be `[]` |
 | `policy` | required | Measurement policy |
+| `source` | optional | Where an extracted snapshot came from (below). Written by the ETABS adapter; not used in calculation |
+| `sourceWarnings` | optional | Conditions the extractor found (below). Reported with their element, or with the run, and acknowledged at acceptance |
+
+A snapshot without `source` and `sourceWarnings` has the same hash as before these fields existed.
+
+## `source`
+
+`program`, `programVersion`, `programBuild` (e.g. ETABS, 22.7.0, 22.7.0.4095), `apiAssembly` and `apiAssemblyVersion` (the ETABSv1.dll actually loaded), `modelPath`, `modelFileSha256` and `modelFileModifiedAt` (the last saved file; nullable), `modelLocked`, `presentUnits` (the ETABS units values were converted from), `extractor`, `extractorVersion`, `extractedAt`, and `rawCaptureSha256` (the SHA-256 of the raw capture file written beside the snapshot).
+
+## `sourceWarnings[]`
+
+`{ "objectId": "B12@L3", "code": "ETABS_SECTION_UNSUPPORTED", "message": "..." }`. `objectId` is a frame or area, or `null` for the whole run. `code` is upper case with underscores. `quentra codes` explains every ETABS code.
 
 ## `model`
 
@@ -78,7 +90,7 @@ Exactly one entry for every frame and area.
 | `objectId` | required | The frame or area |
 | `materialName`, `sectionName` | required | Names used for grouping in reports |
 | `assignedStoryId` | nullable | Story for slabs and horizontal members; overrides elevation-based allocation |
-| `requiredSteelComponents` | required | The steel components that must be supplied for complete steel. `[]` declares that the element needs no steel: its steel is complete at 0 kg, it takes no `reinforcement` entries, and the run raises `NO_STEEL_REQUIRED` naming it, which the reviewer acknowledges. Otherwise any of: `Longitudinal`, `LongitudinalTop`, `LongitudinalBottom`, `Transverse`, `Web`, `Boundary`, `XTop`, `XBottom`, `YTop`, `YBottom`, `Detailing`, `Accessories`. `Longitudinal` cannot be combined with `LongitudinalTop` or `LongitudinalBottom`. |
+| `requiredSteelComponents` | required | The steel components that must be supplied for complete steel. `[]` declares that the element needs no steel: its steel is complete at 0 kg, it takes no `reinforcement` entries, and the run raises `NO_STEEL_REQUIRED` naming it, which the reviewer acknowledges. Otherwise any of: `Longitudinal`, `LongitudinalTop`, `LongitudinalBottom`, `LongitudinalTorsion`, `Transverse`, `Web`, `Boundary`, `XTop`, `XBottom`, `YTop`, `YBottom`, `Detailing`, `Accessories`. `Longitudinal` cannot be combined with `LongitudinalTop` or `LongitudinalBottom`. |
 
 ## `reinforcement[]`
 
@@ -90,7 +102,7 @@ Each entry supplies one component of one element (or `AllIn`, which covers all o
 | `VolumeFraction` | `ratio` (0–1), `concreteBasis` | ratio × concrete volume × density |
 | `AssignedBars` | `bars: [{ "count", "areaM2", "lengthM" }]` | Σ count × area × length × density |
 | `DistributedIntensity` | `intensityM2PerM` (areas only) | intensity × opening-adjusted surface area × density |
-| `DemandEquivalent` | `designEvidence: "VerifiedCurrent"`, `designCode`, `domainStartM`, `domainEndM`, `maximumStationGapM`, `stations: [{ "positionM", "areaM2" }]` (longitudinal components only) | Σ max(endpoint areas) × interval × density |
+| `DemandEquivalent` | `designEvidence: "VerifiedCurrent"`, `designCode`, `domainStartM`, `domainEndM`, `maximumStationGapM`, `stations: [{ "positionM", "areaM2" }]` (longitudinal components only: `Longitudinal`, `LongitudinalTop`, `LongitudinalBottom`, `LongitudinalTorsion`) | Σ max(endpoint areas) × interval × density |
 
 `concreteBasis` is `GrossModeled` or `OpeningAdjusted` (the default). An `AllIn` entry must use `KgPerCubicMetre` or `VolumeFraction` and list exactly the element's required components in `coversComponents`. Other entries leave `coversComponents` empty.
 

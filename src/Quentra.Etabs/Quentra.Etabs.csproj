@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The ETABS adapter contracts, raw capture format and ETABS-to-snapshot mapping. No CSI assembly is referenced here:
+       the live API implementation is in Quentra.Etabs.Api, so this mapping is tested on any platform. -->
+  <ItemGroup>
+    <ProjectReference Include="../Quentra.Infrastructure/Quentra.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

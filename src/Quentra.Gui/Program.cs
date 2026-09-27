@@ -5,13 +5,16 @@ using Quentra.Infrastructure;
 // A local, single-user web GUI over the same engine as the CLI. It listens on this machine only.
 var port = 5178;
 var openBrowser = true;
+// Accepted runs and ETABS extractions are written here as they are made, so nothing reviewed exists only in memory.
+var dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Quentra");
 for (var i = 0; i < args.Length; i++)
 {
     if (args[i] == "--no-browser") openBrowser = false;
     else if (args[i] == "--port" && i + 1 < args.Length && int.TryParse(args[++i], out var p) && p is > 0 and < 65536) port = p;
+    else if (args[i] == "--data-dir" && i + 1 < args.Length) dataDirectory = Path.GetFullPath(args[++i]);
     else
     {
-        Console.Error.WriteLine("Usage: Quentra.Gui [--port <number>] [--no-browser]");
+        Console.Error.WriteLine("Usage: Quentra.Gui [--port <number>] [--no-browser] [--data-dir <folder>]");
         return 2;
     }
 }
@@ -27,7 +30,7 @@ var app = builder.Build();
 string page;
 await using (var stream = typeof(GuiSession).Assembly.GetManifestResourceStream("Quentra.Gui.index.html")!)
     page = await new StreamReader(stream).ReadToEndAsync();
-var session = new GuiSession();
+var session = new GuiSession(dataDirectory, new LiveEtabsGateway());
 
 app.MapGet("/", () => Results.Content(page, "text/html; charset=utf-8"));
 app.MapGet("/api/template", () => Results.Json(new { snapshot = GuiSession.Template() }));
@@ -56,6 +59,20 @@ app.MapPost("/api/export", async (RunIdRequest r, CancellationToken t) =>
     }
     catch (Exception e) when (IsInputError(e)) { return Results.BadRequest(new { error = e.Message }); }
 });
+app.MapGet("/api/saved", () => Results.Json(new { folder = session.RunsDirectory, runs = session.SavedRuns() }));
+app.MapPost("/api/saved/open", (SavedRunRequest r, CancellationToken t) => Handle(() => session.OpenSaved(r.Name, t)));
+// ETABS calls block while ETABS works, so they run off the request thread; ETABS itself is only read.
+app.MapGet("/api/etabs/status", async (int? pid) => Results.Json(await Task.Run(() => session.EtabsStatus(pid))));
+app.MapPost("/api/etabs/extract", async (EtabsExtractRequest r, CancellationToken t) =>
+{
+    try { return Results.Json(await Task.Run(() => session.EtabsExtract(r, t), t)); }
+    catch (Exception e) when (IsInputError(e)) { return Results.BadRequest(new { error = e.Message }); }
+});
+app.MapPost("/api/etabs/check", async (EtabsCheckRequest r, CancellationToken t) =>
+{
+    try { return Results.Json(await Task.Run(() => session.EtabsCheck(r, t), t)); }
+    catch (Exception e) when (IsInputError(e)) { return Results.BadRequest(new { error = e.Message }); }
+});
 
 try { await app.StartAsync(); }
 catch (IOException e)
@@ -65,7 +82,8 @@ catch (IOException e)
 }
 var url = $"http://127.0.0.1:{port}/";
 Console.WriteLine($"Quentra GUI: {url}");
-Console.WriteLine("Runs are kept in memory while this runs; download run.json to keep one. Press Ctrl+C to stop.");
+Console.WriteLine($"Accepted runs are saved in {session.RunsDirectory}; ETABS extractions in {session.ExtractionsDirectory}.");
+Console.WriteLine("Draft runs are kept in memory while this runs; download run.json to keep one. Press Ctrl+C to stop.");
 if (openBrowser)
 {
     try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); }

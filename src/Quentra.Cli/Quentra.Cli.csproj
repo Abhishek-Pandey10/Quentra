@@ -6,5 +6,6 @@
     <!-- The field reference ships inside the tool: 'quentra help format'. -->
     <EmbeddedResource Include="../../docs/SNAPSHOT_FORMAT.md" LogicalName="Quentra.Docs.SNAPSHOT_FORMAT.md" />
     <ProjectReference Include="../Quentra.Infrastructure/Quentra.Infrastructure.csproj" />
+    <ProjectReference Include="../Quentra.Etabs.Api/Quentra.Etabs.Api.csproj" />
   </ItemGroup>
 </Project>

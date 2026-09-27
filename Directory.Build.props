@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Deterministic>true</Deterministic>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
   </PropertyGroup>
   <!-- A build from uncommitted source must not carry a clean commit id: its version reads 0.1.0+<commit>.dirty. -->
   <Target Name="QuentraMarkDirtySource" AfterTargets="InitializeSourceControlInformation" Condition="'$(SourceRevisionId)' != ''">

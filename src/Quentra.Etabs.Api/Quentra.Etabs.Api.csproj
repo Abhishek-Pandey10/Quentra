@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The live ETABS implementation of the Quentra.Etabs readers. It compiles against the ETABSv1.dll of the tested ETABS
+       version (22.7) when that is installed, and to a stub that reports the API as unavailable otherwise, so the rest of
+       the solution builds and tests on any machine. ETABSv1.dll is never copied to the output: at run time it is loaded
+       from the chosen ETABS installation folder (EtabsApiLoader), so Quentra always uses that version's API. -->
+  <PropertyGroup>
+    <EtabsApiDirectory Condition="'$(EtabsApiDirectory)' == ''">C:\Program Files\Computers and Structures\ETABS 22\</EtabsApiDirectory>
+    <DefineConstants Condition="Exists('$(EtabsApiDirectory)ETABSv1.dll')">$(DefineConstants);ETABS_API</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(EtabsApiDirectory)ETABSv1.dll')">
+    <Reference Include="ETABSv1">
+      <HintPath>$(EtabsApiDirectory)ETABSv1.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Quentra.Etabs/Quentra.Etabs.csproj" />
+  </ItemGroup>
+</Project>

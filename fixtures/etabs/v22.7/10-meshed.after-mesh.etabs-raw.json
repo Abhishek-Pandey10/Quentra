@@ -1,0 +1,950 @@
+{
+  "format": "quentra-etabs-raw/1",
+  "extractorVersion": "0.1.0",
+  "extractedAt": "2026-09-27T06:46:35.2193891+00:00",
+  "model": {
+    "program": "ETABS",
+    "programVersion": "22.7.0",
+    "programBuild": "22.7.0.4095",
+    "programPath": "C:\\Program Files\\Computers and Structures\\ETABS 22\\ETABS.exe",
+    "apiAssembly": "C:\\Program Files\\Computers and Structures\\ETABS 22\\ETABSv1.dll",
+    "apiAssemblyVersion": "2.10.0.0",
+    "processId": 4760,
+    "modelPath": "C:\\Quentra\\fixtures\\etabs\\v22.7\\models\\10-meshed.$et",
+    "modelFileSha256": "4138baed523dded5f5a09b6a94cfbb5fbf1215e06efc67900f63a91c30f406ad",
+    "modelFileModifiedAt": "2026-09-27T06:46:32.140459+00:00",
+    "modelLocked": false,
+    "presentUnits": {
+      "force": "kN",
+      "length": "m",
+      "temperature": "C"
+    },
+    "databaseUnits": {
+      "force": "N",
+      "length": "mm",
+      "temperature": "C"
+    },
+    "towers": [
+      "T1"
+    ]
+  },
+  "stories": {
+    "baseElevation": 0,
+    "stories": [
+      {
+        "name": "Story1",
+        "elevation": 3.5,
+        "height": 3.5,
+        "isMaster": true,
+        "similarTo": ""
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "4000Psi",
+      "type": "Concrete",
+      "concreteStrength": 27579.031558063118,
+      "rebarYield": null,
+      "weightPerVolume": 23.563121616185445,
+      "massPerVolume": 2.402769605589257
+    },
+    {
+      "name": "A416Gr270",
+      "type": "Tendon",
+      "concreteStrength": null,
+      "rebarYield": null,
+      "weightPerVolume": 76.97286394226482,
+      "massPerVolume": 7.849047379959922
+    },
+    {
+      "name": "A615Gr60",
+      "type": "Rebar",
+      "concreteStrength": null,
+      "rebarYield": 413685.4733709468,
+      "weightPerVolume": 76.97286394226482,
+      "massPerVolume": 7.849047379959922
+    },
+    {
+      "name": "A992Fy50",
+      "type": "Steel",
+      "concreteStrength": null,
+      "rebarYield": null,
+      "weightPerVolume": 76.97286394226482,
+      "massPerVolume": 7.849047379959922
+    },
+    {
+      "name": "B500",
+      "type": "Rebar",
+      "concreteStrength": null,
+      "rebarYield": 500000,
+      "weightPerVolume": 76.97286394226482,
+      "massPerVolume": 7.849047379959922
+    },
+    {
+      "name": "C30",
+      "type": "Concrete",
+      "concreteStrength": 30000,
+      "rebarYield": null,
+      "weightPerVolume": 25,
+      "massPerVolume": 2.5492904805560506
+    },
+    {
+      "name": "S355",
+      "type": "Steel",
+      "concreteStrength": null,
+      "rebarYield": null,
+      "weightPerVolume": 76.97286394226482,
+      "massPerVolume": 7.849047379959922
+    }
+  ],
+  "frameSections": [
+    {
+      "name": "A-CompBm",
+      "type": "Auto",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.15,
+      "columnRebar": null
+    },
+    {
+      "name": "A-GravBm",
+      "type": "Auto",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.15,
+      "columnRebar": null
+    },
+    {
+      "name": "A-GravCol",
+      "type": "Auto",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.15,
+      "columnRebar": null
+    },
+    {
+      "name": "A-LatBm",
+      "type": "Auto",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.15,
+      "columnRebar": null
+    },
+    {
+      "name": "A-LatCol",
+      "type": "Auto",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.15,
+      "columnRebar": null
+    },
+    {
+      "name": "B300x400",
+      "type": "Rectangular",
+      "material": "C30",
+      "depth": 0.4,
+      "width": 0.3,
+      "diameter": null,
+      "area": 0.12,
+      "columnRebar": null
+    },
+    {
+      "name": "B300x500",
+      "type": "Rectangular",
+      "material": "C30",
+      "depth": 0.5,
+      "width": 0.3,
+      "diameter": null,
+      "area": 0.15,
+      "columnRebar": null
+    },
+    {
+      "name": "B300x600",
+      "type": "Rectangular",
+      "material": "C30",
+      "depth": 0.6,
+      "width": 0.3,
+      "diameter": null,
+      "area": 0.18,
+      "columnRebar": null
+    },
+    {
+      "name": "C400x400",
+      "type": "Rectangular",
+      "material": "C30",
+      "depth": 0.4,
+      "width": 0.4,
+      "diameter": null,
+      "area": 0.16,
+      "columnRebar": {
+        "longitudinalMaterial": "B500",
+        "pattern": 1,
+        "cover": 0.04,
+        "numberCBars": 0,
+        "numberR3Bars": 3,
+        "numberR2Bars": 3,
+        "rebarSize": "20",
+        "barArea": 0.0003142000122070312,
+        "toBeDesigned": true
+      }
+    },
+    {
+      "name": "C400x400-CHECK",
+      "type": "Rectangular",
+      "material": "C30",
+      "depth": 0.4,
+      "width": 0.4,
+      "diameter": null,
+      "area": 0.16,
+      "columnRebar": {
+        "longitudinalMaterial": "B500",
+        "pattern": 1,
+        "cover": 0.04,
+        "numberCBars": 0,
+        "numberR3Bars": 3,
+        "numberR2Bars": 3,
+        "rebarSize": "20",
+        "barArea": 0.0003142000122070312,
+        "toBeDesigned": false
+      }
+    },
+    {
+      "name": "C400x600",
+      "type": "Rectangular",
+      "material": "C30",
+      "depth": 0.6,
+      "width": 0.4,
+      "diameter": null,
+      "area": 0.24,
+      "columnRebar": {
+        "longitudinalMaterial": "B500",
+        "pattern": 1,
+        "cover": 0.04,
+        "numberCBars": 0,
+        "numberR3Bars": 3,
+        "numberR2Bars": 3,
+        "rebarSize": "20",
+        "barArea": 0.0003142000122070312,
+        "toBeDesigned": true
+      }
+    },
+    {
+      "name": "C500D",
+      "type": "Circle",
+      "material": "C30",
+      "depth": null,
+      "width": null,
+      "diameter": 0.5,
+      "area": 0.19634954084936204,
+      "columnRebar": {
+        "longitudinalMaterial": "B500",
+        "pattern": 2,
+        "cover": 0.04,
+        "numberCBars": 8,
+        "numberR3Bars": 0,
+        "numberR2Bars": 0,
+        "rebarSize": "20",
+        "barArea": 0.0003142000122070312,
+        "toBeDesigned": true
+      }
+    },
+    {
+      "name": "ConcBm",
+      "type": "Rectangular",
+      "material": "4000Psi",
+      "depth": 0.5,
+      "width": 0.375,
+      "diameter": null,
+      "area": 0.18749999999999997,
+      "columnRebar": null
+    },
+    {
+      "name": "ConcCol",
+      "type": "Rectangular",
+      "material": "4000Psi",
+      "depth": 0.375,
+      "width": 0.375,
+      "diameter": null,
+      "area": 0.140625,
+      "columnRebar": {
+        "longitudinalMaterial": "A615Gr60",
+        "pattern": 1,
+        "cover": 0.04,
+        "numberCBars": 0,
+        "numberR3Bars": 3,
+        "numberR2Bars": 5,
+        "rebarSize": "20",
+        "barArea": 0.0003142000122070312,
+        "toBeDesigned": true
+      }
+    },
+    {
+      "name": "HW200X200X8X12",
+      "type": "I",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.006353,
+      "columnRebar": null
+    },
+    {
+      "name": "HW250X250X9X14",
+      "type": "I",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.009143,
+      "columnRebar": null
+    },
+    {
+      "name": "HW300X300X10X15",
+      "type": "I",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.011845,
+      "columnRebar": null
+    },
+    {
+      "name": "HW350X350X10X16",
+      "type": "I",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.014400999999999999,
+      "columnRebar": null
+    },
+    {
+      "name": "HW400X400X13X21",
+      "type": "I",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.021869,
+      "columnRebar": null
+    },
+    {
+      "name": "HW500X500X15X20",
+      "type": "I",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.025795,
+      "columnRebar": null
+    },
+    {
+      "name": "NP-BEAM",
+      "type": "Variable",
+      "material": "C30",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.5399999999999999,
+      "columnRebar": null
+    },
+    {
+      "name": "STEEL-I",
+      "type": "I",
+      "material": "S355",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.007808,
+      "columnRebar": null
+    },
+    {
+      "name": "SteelBm",
+      "type": "I",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.007135416666666667,
+      "columnRebar": null
+    },
+    {
+      "name": "SteelCol",
+      "type": "I",
+      "material": "A992Fy50",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.030625000000000003,
+      "columnRebar": null
+    },
+    {
+      "name": "T-BEAM",
+      "type": "ConcreteTee",
+      "material": "C30",
+      "depth": null,
+      "width": null,
+      "diameter": null,
+      "area": 0.285,
+      "columnRebar": null
+    }
+  ],
+  "areaProperties": [
+    {
+      "name": "DECK",
+      "kind": "Deck",
+      "subType": "Filled",
+      "shellType": "Membrane",
+      "material": "4000Psi",
+      "thickness": 0.15
+    },
+    {
+      "name": "Deck1",
+      "kind": "Deck",
+      "subType": "Filled",
+      "shellType": "Membrane",
+      "material": "4000Psi",
+      "thickness": 0.08750000000000001
+    },
+    {
+      "name": "Plank1",
+      "kind": "Slab",
+      "subType": "Slab",
+      "shellType": "Membrane",
+      "material": "4000Psi",
+      "thickness": 0.2
+    },
+    {
+      "name": "RIBBED",
+      "kind": "Slab",
+      "subType": "Ribbed",
+      "shellType": "ShellThin",
+      "material": "C30",
+      "thickness": 0.1
+    },
+    {
+      "name": "S200",
+      "kind": "Slab",
+      "subType": "Slab",
+      "shellType": "ShellThin",
+      "material": "C30",
+      "thickness": 0.2
+    },
+    {
+      "name": "Slab1",
+      "kind": "Slab",
+      "subType": "Slab",
+      "shellType": "ShellThin",
+      "material": "4000Psi",
+      "thickness": 0.2
+    },
+    {
+      "name": "W200",
+      "kind": "Wall",
+      "subType": "Specified",
+      "shellType": "ShellThin",
+      "material": "C30",
+      "thickness": 0.2
+    },
+    {
+      "name": "W250",
+      "kind": "Wall",
+      "subType": "Specified",
+      "shellType": "ShellThin",
+      "material": "C30",
+      "thickness": 0.25
+    },
+    {
+      "name": "Wall1",
+      "kind": "Wall",
+      "subType": "Specified",
+      "shellType": "ShellThin",
+      "material": "4000Psi",
+      "thickness": 0.25
+    }
+  ],
+  "frames": [
+    {
+      "name": "1",
+      "label": "B1",
+      "story": "Story1",
+      "guid": "5194090a-8b23-4fc5-9e95-7f411c71bfc1",
+      "section": "B300x600",
+      "point1": {
+        "x": 0,
+        "y": 12,
+        "z": 3.5
+      },
+      "point2": {
+        "x": 3,
+        "y": 12,
+        "z": 3.5
+      },
+      "offset1": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "offset2": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "cardinalPoint": 10,
+      "angle": 0,
+      "designOrientation": "Beam",
+      "designProcedure": 2,
+      "materialOverwrite": null,
+      "curveType": 0
+    },
+    {
+      "name": "2",
+      "label": "B2",
+      "story": "Story1",
+      "guid": "d973249b-347e-4d33-9ed2-fff46bc5b6c9",
+      "section": "B300x600",
+      "point1": {
+        "x": 3,
+        "y": 12,
+        "z": 3.5
+      },
+      "point2": {
+        "x": 6,
+        "y": 12,
+        "z": 3.5
+      },
+      "offset1": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "offset2": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "cardinalPoint": 10,
+      "angle": 0,
+      "designOrientation": "Beam",
+      "designProcedure": 2,
+      "materialOverwrite": null,
+      "curveType": 0
+    },
+    {
+      "name": "3",
+      "label": "B3",
+      "story": "Story1",
+      "guid": "41b6584b-50a8-43d5-b78c-126f787ac7b7",
+      "section": "B300x600",
+      "point1": {
+        "x": 1.5,
+        "y": 10,
+        "z": 3.5
+      },
+      "point2": {
+        "x": 1.5,
+        "y": 14,
+        "z": 3.5
+      },
+      "offset1": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "offset2": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "cardinalPoint": 10,
+      "angle": 0,
+      "designOrientation": "Beam",
+      "designProcedure": 2,
+      "materialOverwrite": null,
+      "curveType": 0
+    }
+  ],
+  "areas": [
+    {
+      "name": "1",
+      "label": "F1",
+      "story": "Story1",
+      "guid": "276e1666-3f0c-491a-a25c-e40cc68ba428",
+      "property": "S200",
+      "designOrientation": "Floor",
+      "isOpening": false,
+      "boundary": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 3.5
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "z": 3.5
+        },
+        {
+          "x": 6,
+          "y": 8,
+          "z": 3.5
+        },
+        {
+          "x": 0,
+          "y": 8,
+          "z": 3.5
+        }
+      ],
+      "materialOverwrite": null,
+      "hasCurvedEdges": false
+    },
+    {
+      "name": "11",
+      "label": "W3",
+      "story": "Story1",
+      "guid": "4e40346c-3def-4899-b0d1-63a0471ec976",
+      "property": "W250",
+      "designOrientation": "Wall",
+      "isOpening": false,
+      "boundary": [
+        {
+          "x": 2,
+          "y": 0,
+          "z": 2.1
+        },
+        {
+          "x": 3,
+          "y": 0,
+          "z": 2.1
+        },
+        {
+          "x": 3,
+          "y": 0,
+          "z": 3.5
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "z": 3.5
+        }
+      ],
+      "materialOverwrite": null,
+      "hasCurvedEdges": false
+    },
+    {
+      "name": "12",
+      "label": "W4",
+      "story": "Story1",
+      "guid": "e80b6bb7-606c-4cb4-a1a9-80312d0be7d3",
+      "property": "W250",
+      "designOrientation": "Wall",
+      "isOpening": false,
+      "boundary": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 2.1
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "z": 2.1
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "z": 3.5
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 3.5
+        }
+      ],
+      "materialOverwrite": null,
+      "hasCurvedEdges": false
+    },
+    {
+      "name": "13",
+      "label": "W5",
+      "story": "Story1",
+      "guid": "41f018cf-59e0-423d-b4d4-66cc92687085",
+      "property": "W250",
+      "designOrientation": "Wall",
+      "isOpening": false,
+      "boundary": [
+        {
+          "x": 3,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "z": 2.1
+        },
+        {
+          "x": 3,
+          "y": 0,
+          "z": 2.1
+        }
+      ],
+      "materialOverwrite": null,
+      "hasCurvedEdges": false
+    },
+    {
+      "name": "14",
+      "label": "W6",
+      "story": "Story1",
+      "guid": "f779cd16-4939-4238-9858-0199f4f37835",
+      "property": "W250",
+      "designOrientation": "Wall",
+      "isOpening": false,
+      "boundary": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "z": 2.1
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 2.1
+        }
+      ],
+      "materialOverwrite": null,
+      "hasCurvedEdges": false
+    },
+    {
+      "name": "2",
+      "label": "A2",
+      "story": "Story1",
+      "guid": "8b044102-b103-4594-b166-f2fc732c4e1d",
+      "property": "None",
+      "designOrientation": "Null",
+      "isOpening": true,
+      "boundary": [
+        {
+          "x": 1,
+          "y": 1,
+          "z": 3.5
+        },
+        {
+          "x": 3,
+          "y": 1,
+          "z": 3.5
+        },
+        {
+          "x": 3,
+          "y": 2.5,
+          "z": 3.5
+        },
+        {
+          "x": 1,
+          "y": 2.5,
+          "z": 3.5
+        }
+      ],
+      "materialOverwrite": null,
+      "hasCurvedEdges": false
+    },
+    {
+      "name": "5",
+      "label": "F2",
+      "story": "Story1",
+      "guid": "ac3a2601-07d8-442a-bd6c-86216836a027",
+      "property": "S200",
+      "designOrientation": "Floor",
+      "isOpening": false,
+      "boundary": [
+        {
+          "x": 10,
+          "y": 0,
+          "z": 3.5
+        },
+        {
+          "x": 13,
+          "y": 0,
+          "z": 3.5
+        },
+        {
+          "x": 13,
+          "y": 4,
+          "z": 3.5
+        },
+        {
+          "x": 10,
+          "y": 4,
+          "z": 3.5
+        }
+      ],
+      "materialOverwrite": null,
+      "hasCurvedEdges": false
+    },
+    {
+      "name": "6",
+      "label": "F3",
+      "story": "Story1",
+      "guid": "da87e5a8-c5db-463c-a316-7087b78c6324",
+      "property": "S200",
+      "designOrientation": "Floor",
+      "isOpening": false,
+      "boundary": [
+        {
+          "x": 13,
+          "y": 0,
+          "z": 3.5
+        },
+        {
+          "x": 16,
+          "y": 0,
+          "z": 3.5
+        },
+        {
+          "x": 16,
+          "y": 4,
+          "z": 3.5
+        },
+        {
+          "x": 13,
+          "y": 4,
+          "z": 3.5
+        }
+      ],
+      "materialOverwrite": null,
+      "hasCurvedEdges": false
+    },
+    {
+      "name": "7",
+      "label": "F4",
+      "story": "Story1",
+      "guid": "5866e235-4e22-439a-aa11-a0ee63989718",
+      "property": "S200",
+      "designOrientation": "Floor",
+      "isOpening": false,
+      "boundary": [
+        {
+          "x": 10,
+          "y": 4,
+          "z": 3.5
+        },
+        {
+          "x": 13,
+          "y": 4,
+          "z": 3.5
+        },
+        {
+          "x": 13,
+          "y": 8,
+          "z": 3.5
+        },
+        {
+          "x": 10,
+          "y": 8,
+          "z": 3.5
+        }
+      ],
+      "materialOverwrite": null,
+      "hasCurvedEdges": false
+    },
+    {
+      "name": "8",
+      "label": "F5",
+      "story": "Story1",
+      "guid": "a7950a5f-4318-4773-8e4d-2a6429db393a",
+      "property": "S200",
+      "designOrientation": "Floor",
+      "isOpening": false,
+      "boundary": [
+        {
+          "x": 13,
+          "y": 4,
+          "z": 3.5
+        },
+        {
+          "x": 16,
+          "y": 4,
+          "z": 3.5
+        },
+        {
+          "x": 16,
+          "y": 8,
+          "z": 3.5
+        },
+        {
+          "x": 13,
+          "y": 8,
+          "z": 3.5
+        }
+      ],
+      "materialOverwrite": null,
+      "hasCurvedEdges": false
+    },
+    {
+      "name": "9",
+      "label": "W2",
+      "story": "Story1",
+      "guid": "c7e4cd15-dd33-4138-82c1-9c2db13f7fcd",
+      "property": "W250",
+      "designOrientation": "Wall",
+      "isOpening": false,
+      "boundary": [
+        {
+          "x": 3,
+          "y": 0,
+          "z": 2.1
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "z": 2.1
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "z": 3.5
+        },
+        {
+          "x": 3,
+          "y": 0,
+          "z": 3.5
+        }
+      ],
+      "materialOverwrite": null,
+      "hasCurvedEdges": false
+    }
+  ],
+  "design": {
+    "resultsAvailable": false,
+    "code": "Chinese 2010",
+    "beams": [],
+    "columns": []
+  },
+  "issues": []
+}

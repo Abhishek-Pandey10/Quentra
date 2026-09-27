@@ -4,10 +4,12 @@ using Quentra.Core;
 
 namespace Quentra.Application;
 
-public static class TakeoffEngine
+public static partial class TakeoffEngine
 {
     public const string Version = "takeoff/0.5.0";
-    public static readonly string[] ComponentNames = ["Longitudinal", "LongitudinalTop", "LongitudinalBottom", "Transverse", "Web", "Boundary", "XTop", "XBottom", "YTop", "YBottom", "Detailing", "Accessories"];
+    public static readonly string[] ComponentNames = ["Longitudinal", "LongitudinalTop", "LongitudinalBottom", "LongitudinalTorsion", "Transverse", "Web", "Boundary", "XTop", "XBottom", "YTop", "YBottom", "Detailing", "Accessories"];
+    // Components measured as a longitudinal area along the member, so design demand can be integrated for them.
+    public static readonly string[] LongitudinalComponents = ["Longitudinal", "LongitudinalTop", "LongitudinalBottom", "LongitudinalTorsion"];
 
     public static TakeoffResult Run(TakeoffSnapshot snapshot, CancellationToken cancellationToken = default, IReadOnlySet<string>? excluded = null,
         IReadOnlyDictionary<string, string>? sectionChanges = null)
@@ -26,6 +28,10 @@ public static class TakeoffEngine
         if (snapshot.Policy.ApprovedAt is null || string.IsNullOrWhiteSpace(snapshot.Policy.ApprovedBy))
             warnings.Add(new("POLICY_PENDING", "Measurement policy has not been approved; report acceptance is blocked."));
         if (Plausibility.Policy(snapshot.Policy) is { } policyWarning) warnings.Add(policyWarning);
+        var sourceWarnings = snapshot.SourceWarnings.IsDefault ? [] : snapshot.SourceWarnings;
+        warnings.AddRange(sourceWarnings.Where(x => x.ObjectId is null).Select(x => new CalculationWarning(x.Code, x.Message)));
+        var sourceByObject = sourceWarnings.Where(x => x.ObjectId is not null)
+            .ToLookup(x => x.ObjectId!, x => new CalculationWarning(x.Code, x.Message), StringComparer.Ordinal);
         foreach (var source in snapshot.Model.Frames)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -37,7 +43,7 @@ public static class TakeoffEngine
                 q.Status, source.SourceReference, q.GrossModeledVolume?.CubicMetres,
                 q.GrossModeledVolume is null ? null : 0, q.GrossModeledVolume?.CubicMetres, null,
                 q.Trace?.AxisLength.Metres, q.Trace?.Formula ?? "Unavailable",
-                q.Warnings.Where(x => x.Code != "STEEL_UNKNOWN").ToImmutableArray());
+                q.Warnings.Where(x => x.Code != "STEEL_UNKNOWN").Concat(sourceByObject[source.ObjectId]).ToImmutableArray());
             if (element.Status == QuantityStatus.Quantified)
                 element = element with { Warnings = element.Warnings.AddRange(Plausibility.Frame(source, q.Trace!.AxisLength.Metres)) };
             elements.Add(element);
@@ -78,7 +84,8 @@ public static class TakeoffEngine
                 error is null ? geometry!.RemainingArea * thickness : null,
                 error is null ? geometry!.RemainingArea : null, null,
                 "true planar area minus union of clipped openings, multiplied by uniform normal thickness",
-                error is null ? AreaWarnings(source, geometry!, thickness, snapshot.Model.CoordinateUnit) : [new(code ?? "AREA_" + status.ToString().ToUpperInvariant(), error)]);
+                (error is null ? AreaWarnings(source, geometry!, thickness, snapshot.Model.CoordinateUnit) : [new(code ?? "AREA_" + status.ToString().ToUpperInvariant(), error)])
+                    .AddRange(sourceByObject[source.ObjectId]));
             elements.Add(element);
             if (element.Status == QuantityStatus.Quantified)
                 AllocateArea(source, element, m, geometry!, thickness, snapshot, stories);
@@ -371,13 +378,27 @@ public static class TakeoffEngine
                 yield return $"{name}: an all-in estimate must use VolumeFraction or KgPerCubicMetre and cover exactly the element's required components.";
             if (steel.Component != "AllIn" && steel.CoversComponents.Length > 0)
                 yield return $"{name}: coversComponents is only for AllIn estimates; a component entry covers only its named component.";
-            if (steel.Method == SteelMethod.DemandEquivalent && steel.Component is not ("Longitudinal" or "LongitudinalTop" or "LongitudinalBottom"))
+            if (steel.Method == SteelMethod.DemandEquivalent && !LongitudinalComponents.Contains(steel.Component))
                 yield return $"{name}: demand integration supports longitudinal area only, not shear area-per-length.";
         }
         foreach (var mixed in s.Reinforcement.Where(x => !string.IsNullOrWhiteSpace(x?.ObjectId)).GroupBy(x => x.ObjectId, StringComparer.Ordinal)
             .Where(g => g.Count() > 1 && g.Any(x => x.Component == "AllIn")).OrderBy(g => g.Key, StringComparer.Ordinal))
             yield return $"Reinforcement {mixed.Key}: an AllIn estimate replaces component quantities and cannot be combined with them.";
+        if (!s.SourceWarnings.IsDefault)
+            foreach (var w in s.SourceWarnings)
+            {
+                if (w is null || string.IsNullOrWhiteSpace(w.Code) || !SourceCode().IsMatch(w.Code) || string.IsNullOrWhiteSpace(w.Message))
+                    yield return "Every sourceWarnings entry needs an upper-case code (e.g. ETABS_SECTION_UNSUPPORTED) and a message.";
+                else if (w.ObjectId is not null && !ids.Contains(w.ObjectId))
+                    yield return $"Source warning {w.Code}: no frame or area has objectId '{w.ObjectId}'.";
+            }
+        if (s.Source is { } src && (new[] { src.Program, src.ProgramVersion, src.ProgramBuild, src.ApiAssembly, src.ApiAssemblyVersion, src.ModelPath,
+                src.PresentUnits, src.Extractor, src.ExtractorVersion, src.RawCaptureSha256 }.Any(string.IsNullOrWhiteSpace) || src.ExtractedAt == default))
+            yield return "Source: program, versions, API assembly, model path, units, extractor, extraction time and raw capture hash are required when a source is given.";
     }
+
+    [System.Text.RegularExpressions.GeneratedRegex("^[A-Z][A-Z0-9]*(_[A-Z0-9]+)+$")]
+    private static partial System.Text.RegularExpressions.Regex SourceCode();
 
     private readonly record struct Box(double MinX, double MaxX, double MinY, double MaxY, double MinZ, double MaxZ)
     {

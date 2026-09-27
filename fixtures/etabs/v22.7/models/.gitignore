@@ -1,0 +1,7 @@
+# ETABS side files that are not needed to reopen a model. The analysis result files of 13-designed-frame
+# (.Y*, .K_*, .msh) are kept: without them it reopens unlocked and without design results.
+*.$et
+*.ebk
+*.ico
+*.LOG
+*.OUT

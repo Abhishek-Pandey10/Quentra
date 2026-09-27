@@ -3,8 +3,13 @@
     <Project Path="src/Quentra.Application/Quentra.Application.csproj" />
     <Project Path="src/Quentra.Cli/Quentra.Cli.csproj" />
     <Project Path="src/Quentra.Core/Quentra.Core.csproj" />
+    <Project Path="src/Quentra.Etabs/Quentra.Etabs.csproj" />
+    <Project Path="src/Quentra.Etabs.Api/Quentra.Etabs.Api.csproj" />
     <Project Path="src/Quentra.Gui/Quentra.Gui.csproj" />
     <Project Path="src/Quentra.Infrastructure/Quentra.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/Quentra.EtabsFixtures/Quentra.EtabsFixtures.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Quentra.Tests/Quentra.Tests.csproj" />
