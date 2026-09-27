@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quentra</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --text: #1c2330; --muted: #5d6778; --line: #dde1e8;
+    --accent: #1f5fbf; --accent-text: #ffffff; --warn-bg: #fff6e0; --warn: #8a5a00;
+    --err-bg: #fdecec; --err: #a12626; --ok-bg: #e7f5ec; --ok: #1d6b3a; --code: #eef1f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12161d; --panel: #1a2029; --text: #e3e8ef; --muted: #9aa5b5; --line: #2d3542;
+      --accent: #5b9bf0; --accent-text: #0d1117; --warn-bg: #3a2e12; --warn: #f0c060;
+      --err-bg: #3d1c1c; --err: #f29a9a; --ok-bg: #173323; --ok: #7fd49c; --code: #232a35;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+    padding: 12px 20px; background: var(--panel); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 2; }
+  header h1 { font-size: 18px; margin: 0; }
+  header .sub { color: var(--muted); font-size: 12px; }
+  main { max-width: 1200px; margin: 0 auto; padding: 16px 20px 60px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+  h2 { font-size: 15px; margin: 0 0 10px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .spread { justify-content: space-between; }
+  button { font: inherit; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  input, select, textarea { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; }
+  textarea { width: 100%; min-height: 320px; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; }
+  label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
+  label.inline { flex-direction: row; align-items: center; gap: 6px; color: var(--text); font-size: 14px; }
+  .banner { white-space: pre-wrap; padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; }
+  .banner.err { background: var(--err-bg); color: var(--err); }
+  .banner.ok { background: var(--ok-bg); color: var(--ok); }
+  .banner.warn { background: var(--warn-bg); color: var(--warn); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+  .card { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+  .card .label { color: var(--muted); font-size: 12px; }
+  .card .value { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .card .second { font-variant-numeric: tabular-nums; }
+  .flag { color: var(--warn); font-size: 12px; margin-top: 4px; }
+  .muted { color: var(--muted); }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; background: var(--code); }
+  .pill.Accepted { background: var(--ok-bg); color: var(--ok); }
+  .pill.AcceptedPartial { background: var(--warn-bg); color: var(--warn); }
+  code, .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+  code { background: var(--code); padding: 1px 4px; border-radius: 4px; }
+  .table-wrap { overflow-x: auto; max-height: 420px; overflow-y: auto; border: 1px solid var(--line); border-radius: 6px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { position: sticky; top: 0; background: var(--panel); font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+  .tabs button[aria-selected="true"] { background: var(--code); font-weight: 600; }
+  .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; }
+  .acks { display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto; border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+  .acks .meaning { color: var(--muted); font-size: 12px; margin-left: 24px; }
+  .empty { text-align: center; padding: 40px 10px; color: var(--muted); }
+  .hidden { display: none !important; }
+  @media (max-width: 600px) { header, main { padding-left: 16px; padding-right: 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Quentra</h1>
+    <div class="sub">Concrete and steel takeoff from a model snapshot · development build · runs on this computer only</div>
+  </div>
+  <div class="row">
+    <button id="btn-template">New from template</button>
+    <button id="btn-open-snapshot">Open snapshot…</button>
+    <button id="btn-open-run">Open run…</button>
+    <input type="file" id="file-snapshot" accept=".json,application/json" class="hidden">
+    <input type="file" id="file-run" accept=".json,application/json" class="hidden">
+  </div>
+</header>
+
+<main>
+  <div id="message" class="banner hidden" role="status" aria-live="polite"></div>
+
+  <section id="empty" class="empty">
+    <p><strong>Start with a snapshot</strong>: a JSON description of the model. The <a href="/format" target="_blank" rel="noopener">field reference</a> describes every field.</p>
+    <p>New from template loads a small synthetic example to edit. Open run continues a run you saved earlier.</p>
+  </section>
+
+  <section id="editor" class="hidden">
+    <div class="row spread">
+      <h2 id="editor-title">Snapshot</h2>
+      <div class="row">
+        <button id="btn-download-snapshot">Download snapshot</button>
+        <button id="btn-calculate" class="primary">Calculate</button>
+      </div>
+    </div>
+    <p class="muted" style="margin:0 0 6px">Every field is described in the <a href="/format" target="_blank" rel="noopener">field reference</a>.</p>
+    <p id="editor-large" class="muted hidden" style="margin:0"></p>
+    <details id="editor-details">
+      <summary>Edit snapshot JSON</summary>
+      <textarea id="snapshot-text" spellcheck="false" aria-label="Snapshot JSON"></textarea>
+    </details>
+  </section>
+
+  <div id="run" class="hidden">
+    <section>
+      <div class="row spread">
+        <div>
+          <h2 style="margin-bottom:4px"><span id="model-id"></span> <span id="review-status" class="pill"></span></h2>
+          <div class="muted">Origin <span id="origin"></span> · snapshot <span id="snapshot-hash" class="mono"></span></div>
+        </div>
+        <div class="row">
+          <button id="btn-download-run" class="primary">Download run.json</button>
+          <button id="btn-export">Export report (.zip)</button>
+        </div>
+      </div>
+      <div id="unsaved" class="muted hidden" style="margin-top:6px">This run has not been downloaded yet. It is kept only while the GUI is running (see Runs in this session).</div>
+      <div id="stale" class="banner warn hidden" style="margin:10px 0 0">The snapshot has been edited since these results were calculated. The results below are for the earlier text; Calculate again before overriding or accepting.</div>
+    </section>
+
+    <section>
+      <h2>Runs in this session</h2>
+      <p class="muted" style="margin-top:0">The GUI keeps the 4 most recent runs in memory, and accepted runs until they are downloaded. Download a run to keep it.</p>
+      <div class="table-wrap"><table id="tbl-held"></table></div>
+    </section>
+
+    <section>
+      <h2>Totals</h2>
+      <div class="cards">
+        <div class="card"><div class="label">Gross modeled concrete · known</div><div class="value" id="t-known-gross"></div>
+          <div class="second"><span class="complete-label"></span>: <span id="t-complete-gross"></span></div><div class="flag" id="t-flag-concrete"></div></div>
+        <div class="card"><div class="label">Opening-adjusted concrete · known</div><div class="value" id="t-known-open"></div>
+          <div class="second"><span class="complete-label"></span>: <span id="t-complete-open"></span></div><div class="flag" id="t-flag-concrete2"></div></div>
+        <div class="card"><div class="label">Steel · known</div><div class="value" id="t-known-steel"></div>
+          <div class="second"><span class="complete-label"></span>: <span id="t-complete-steel"></span> · missing components: <span id="t-missing"></span></div><div class="flag" id="t-flag-steel"></div></div>
+      </div>
+      <p class="muted" id="t-counts" style="margin:10px 0 0"></p>
+      <p class="muted" style="margin:4px 0 0">Unknown quantities are shown as “unknown”, never zero. Volumes are modeled: member intersections are retained; this is not a BOQ quantity.</p>
+    </section>
+
+    <section>
+      <div class="tabs" role="tablist">
+        <button role="tab" data-tab="warnings" aria-selected="true">Warnings <span id="n-warnings"></span></button>
+        <button role="tab" data-tab="elements" aria-selected="false">Elements <span id="n-elements"></span></button>
+        <button role="tab" data-tab="steel" aria-selected="false">Steel coverage</button>
+        <button role="tab" data-tab="history" aria-selected="false">Overrides &amp; reviews</button>
+      </div>
+      <div class="row" style="margin-bottom:8px"><input id="filter" type="search" placeholder="Filter rows (ID, code, text)" aria-label="Filter rows" style="flex:1;min-width:180px"><span id="filter-note" class="muted"></span></div>
+      <div class="table-wrap" data-panel="warnings"><table id="tbl-warnings"></table></div>
+      <div class="table-wrap hidden" data-panel="elements"><table id="tbl-elements"></table></div>
+      <div class="table-wrap hidden" data-panel="steel"><table id="tbl-steel"></table></div>
+      <div class="hidden" data-panel="history">
+        <h2>Overrides</h2><div class="table-wrap"><table id="tbl-overrides"></table></div>
+        <h2 style="margin-top:14px">Review history</h2><div class="table-wrap"><table id="tbl-reviews"></table></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Override</h2>
+      <p class="muted" style="margin-top:0">Records a hand change in a new run. The original snapshot is kept; any acceptance no longer applies.</p>
+      <div class="grid-form">
+        <label>Element ID<input id="ov-element" list="ov-elements" autocomplete="off" spellcheck="false"><datalist id="ov-elements"></datalist></label>
+        <label>Change<select id="ov-action">
+          <option value="set">Set a dimension</option><option value="exclude">Exclude from scope</option><option value="include">Include again</option>
+        </select></label>
+        <label id="ov-field-wrap">Dimension<select id="ov-field"></select></label>
+        <label id="ov-value-wrap">New value<span class="row" style="flex-wrap:nowrap">
+          <input id="ov-value" type="number" step="any" style="width:100%">
+          <select id="ov-unit"><option>mm</option><option>m</option><option>in</option><option>ft</option></select></span></label>
+        <label>Reason<input id="ov-reason" placeholder="e.g. Revised drawing S-201 rev C"></label>
+        <label>Author<input id="ov-author"></label>
+        <button id="btn-override" class="primary">Apply override</button>
+      </div>
+      <div id="ov-current" class="muted" style="margin-top:6px"></div>
+    </section>
+
+    <section>
+      <h2>Accept</h2>
+      <div id="acc-policy" class="banner warn hidden">The measurement policy has not been approved, so this run cannot be accepted. Approve the policy in the snapshot and calculate again.</div>
+      <p class="muted" style="margin-top:0">Tick each warning you have reviewed; there is deliberately no “tick all”. Implausible values are acknowledged per element.</p>
+      <div class="row" style="margin-bottom:6px"><button id="btn-ack-none">Clear</button></div>
+      <div id="acks" class="acks"></div>
+      <div class="grid-form" style="margin-top:10px">
+        <label>Reviewer<input id="acc-reviewer"></label>
+        <label>Note<input id="acc-note" placeholder="What was checked"></label>
+        <label class="inline" id="acc-partial-wrap"><input type="checkbox" id="acc-partial"> Accept as partial scope</label>
+        <button id="btn-accept" class="primary">Accept</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+// The server holds runs; the page keeps only the id of the run it shows. Large snapshots stay as the file picked.
+// basis maps a run id to the snapshot text (or file) it was calculated from, so edits after calculating mark it stale.
+const state = { runId: null, fileName: "run.json", view: null, saved: true, snapshotName: "snapshot.json", snapshotFile: null, held: [], basis: new Map() };
+const EDITABLE_BYTES = 2 * 1024 * 1024, ROWS_SHOWN = 500, LIST_OPTIONS = 2000;
+
+function h(tag, attrs = {}, ...children) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") el.className = v; else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (v === true) el.setAttribute(k, ""); else if (v !== false && v != null) el.setAttribute(k, v);
+  }
+  for (const c of children.flat()) el.append(c instanceof Node ? c : document.createTextNode(c ?? ""));
+  return el;
+}
+
+function show(text, kind = "err") {
+  const m = $("message");
+  m.textContent = text; m.className = "banner " + kind;
+  if (kind !== "err") setTimeout(() => { if (m.textContent === text) m.classList.add("hidden"); }, 5000);
+  m.scrollIntoView({ block: "nearest" });
+}
+function clearMessage() { $("message").className = "banner hidden"; }
+
+// body is sent as is when it is a string or a file (a snapshot or run), otherwise as JSON.
+async function call(path, body, busyButton) {
+  clearMessage();
+  if (busyButton) busyButton.disabled = true;
+  document.body.style.cursor = "progress";
+  try {
+    const raw = typeof body === "string" || body instanceof Blob;
+    const res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: raw ? body : JSON.stringify(body) });
+    if (!res.ok) {
+      let error = `Request failed (${res.status}).`;
+      try { error = (await res.json()).error ?? error; } catch { /* not JSON */ }
+      throw new Error(error);
+    }
+    return res;
+  } finally { if (busyButton) busyButton.disabled = false; document.body.style.cursor = ""; }
+}
+
+function download(name, blob) {
+  const a = h("a", { href: URL.createObjectURL(blob), download: name });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function downloadUrl(name, url) { const a = h("a", { href: url, download: name }); document.body.append(a); a.click(); a.remove(); }
+
+// basis: the snapshot the run was calculated from; undefined for a run opened from a file.
+function setRun(response, message, basis) {
+  if (basis !== undefined) state.basis.set(response.runId, basis);
+  state.runId = response.runId; state.fileName = response.fileName; state.view = response.view; state.held = response.held;
+  state.saved = !!response.held.find(x => x.runId === response.runId)?.saved;
+  render();
+  const dropped = response.dropped ?? [];
+  if (dropped.length) show((message ? message + "\n" : "") + `No longer held in memory, never downloaded: ${dropped.join("; ")}.`, "warn");
+  else if (message) show(message, "ok");
+}
+
+const currentSource = () => state.snapshotFile ?? $("snapshot-text").value;
+function isStale() { return state.basis.has(state.runId) && state.basis.get(state.runId) !== currentSource(); }
+// Override and Accept act on the shown run, so they are blocked while it no longer matches the snapshot being edited.
+function updateActions() {
+  if (!state.view) return;
+  const stale = isStale();
+  $("stale").classList.toggle("hidden", !stale);
+  $("btn-override").disabled = stale;
+  $("btn-accept").disabled = stale || !state.view.policyApproved;
+}
+
+function renderHeld() {
+  drawRows($("tbl-held"), ["Run", "Status", "Downloaded", ""], state.held.map(r => [
+    r.label + (r.runId === state.runId ? " (shown)" : ""), r.reviewStatus,
+    r.saved ? "Yes" : r.pinned ? "No — kept until downloaded" : "No",
+    h("span", { class: "row" },
+      h("button", { disabled: r.runId === state.runId, onclick: () => showHeld(r.runId) }, "Show"),
+      h("button", { onclick: () => downloadRun(r.runId, r.fileName) }, "Download"))
+  ]), []);
+}
+async function showHeld(runId) {
+  try {
+    const res = await fetch(`/api/runs/${runId}`);
+    if (!res.ok) throw new Error((await res.json()).error ?? `Request failed (${res.status}).`);
+    setRun(await res.json());
+  } catch (e) { show(e.message); }
+}
+function downloadRun(runId, name) {
+  downloadUrl(name, `/api/runs/${runId}/file`);
+  const held = state.held.find(x => x.runId === runId);
+  if (held) { held.saved = true; held.pinned = false; }
+  if (runId === state.runId) { state.saved = true; $("unsaved").classList.add("hidden"); }
+  renderHeld();
+}
+
+// A large snapshot is not put in the text box; it is sent straight from the file.
+function loadSnapshot(text, name, file = null) {
+  state.snapshotName = name; state.snapshotFile = file;
+  $("snapshot-text").value = file ? "" : text;
+  $("editor-details").classList.toggle("hidden", !!file);
+  $("editor-large").classList.toggle("hidden", !file);
+  if (file) $("editor-large").textContent = `${(file.size / 1048576).toFixed(1)} MB: too large to edit here. Edit it in a text editor, then open it again.`;
+  $("editor").classList.remove("hidden");
+  $("empty").classList.add("hidden");
+  $("editor-title").textContent = "Snapshot · " + name;
+  updateActions();
+}
+
+// ---------- rendering ----------
+// Rows are [cells, searchText]. Only the first ROWS_SHOWN matching rows are drawn, so large models stay responsive.
+const tables = {};
+function table(el, headers, rows, numeric = []) {
+  tables[el.id] = { headers, rows, numeric };
+  drawTable(el.id);
+}
+function drawTable(id) {
+  const { headers, rows, numeric } = tables[id];
+  const q = $("filter").value.trim().toLowerCase();
+  const matching = q ? rows.filter(r => r[1].includes(q)) : rows;
+  const shown = matching.slice(0, ROWS_SHOWN).map(r => r[0]);
+  const el = $(id);
+  if (!el.closest("[data-panel]").classList.contains("hidden") && matching.length > 0)
+    $("filter-note").textContent = matching.length > ROWS_SHOWN ? `Showing ${ROWS_SHOWN} of ${matching.length}. Filter to narrow.` : (q ? `${matching.length} matching` : "");
+  drawRows(el, headers, shown, numeric);
+}
+function drawRows(el, headers, rows, numeric) {
+  el.replaceChildren(
+    h("thead", {}, h("tr", {}, headers.map(x => h("th", { scope: "col" }, x)))),
+    h("tbody", {}, rows.length ? rows.map(r => h("tr", {}, r.map((c, i) => h("td", { class: numeric.includes(i) ? "num" : "" }, c))))
+      : h("tr", {}, h("td", { colspan: headers.length, class: "muted" }, "None"))));
+}
+
+function flagText(ids, extra) {
+  if (!ids.length && !extra) return "";
+  const list = ids.length > 10 ? ids.slice(0, 10).join(", ") + ` and ${ids.length - 10} more` : ids.join(", ");
+  return (ids.length ? `Includes ${ids.length} element${ids.length === 1 ? "" : "s"} with implausible values: ${list}` : "") +
+    (extra ? (ids.length ? "; " : "") + "steel density outside its review band" : "");
+}
+
+function render() {
+  const v = state.view;
+  $("empty").classList.add("hidden");
+  $("run").classList.remove("hidden");
+  $("model-id").textContent = v.modelId;
+  const status = $("review-status"); status.textContent = v.reviewStatus; status.className = "pill " + v.reviewStatus;
+  $("origin").textContent = v.origin;
+  $("snapshot-hash").textContent = v.snapshotSha256.slice(0, 12) + "…"; $("snapshot-hash").title = v.snapshotSha256;
+  $("unsaved").classList.toggle("hidden", state.saved);
+
+  renderHeld();
+  document.querySelectorAll(".complete-label").forEach(x => x.textContent = v.completeLabel);
+  const t = v.totals;
+  $("t-known-gross").textContent = t.knownGross; $("t-complete-gross").textContent = t.completeGross;
+  $("t-known-open").textContent = t.knownOpeningAdjusted; $("t-complete-open").textContent = t.completeOpeningAdjusted;
+  $("t-known-steel").textContent = t.knownSteel; $("t-complete-steel").textContent = t.completeSteel; $("t-missing").textContent = t.missingSteelComponents;
+  $("t-flag-concrete").textContent = $("t-flag-concrete2").textContent = flagText(v.concreteFlagged, false);
+  $("t-flag-steel").textContent = flagText(v.steelFlagged, v.densityFlagged);
+  $("t-counts").textContent = `Quantified ${t.quantified} of ${t.inScope} in scope · unsupported ${t.unsupported} · invalid ${t.invalid} · out of scope ${t.outOfScope}` +
+    (v.excluded.length ? ` · excluded by override: ${v.excluded.join(", ")}` : "") +
+    (v.partial ? " · partial: some concrete or steel is unknown, or an element is excluded" : "");
+
+  $("n-warnings").textContent = `(${v.warnings.length})`; $("n-elements").textContent = `(${v.elements.length})`;
+  const row = (cells, ...text) => [cells, text.join(" ").toLowerCase()];
+  table($("tbl-warnings"), ["Code", "Subject", "Message"], v.warnings.map(w => row([h("code", {}, w.code), w.subject, w.message], w.code, w.subject, w.message)));
+  table($("tbl-elements"), ["ID", "Category", "Status", "Gross", "Opening-adjusted", "Formula"],
+    v.elements.map(e => row([e.objectId, e.category, e.excluded ? "Excluded" : e.status, e.gross, e.openingAdjusted, h("span", { class: "muted" }, e.formula)],
+      e.objectId, e.category, e.excluded ? "excluded" : e.status)), [3, 4]);
+  table($("tbl-steel"), ["ID", "Required", "Missing", "Known", "Complete"],
+    v.steel.map(s => row([s.objectId, s.required, s.missing || "—", s.known, s.complete], s.objectId, s.required, s.missing)), [3, 4]);
+  table($("tbl-overrides"), ["ID", "Element", "Change", "Reason", "Author", "Recorded"],
+    v.overrides.map(o => row([o.id, o.objectId, o.change, o.reason, o.author, o.recordedAt], o.id, o.objectId, o.change, o.reason, o.author)));
+  table($("tbl-reviews"), ["Status", "Reviewer", "Reviewed", "Note", "Applies to this run"],
+    v.reviews.map(r => row([r.status, r.reviewer, r.reviewedAt, r.note, r.current ? "Yes" : "No (superseded by a later change)"], r.status, r.reviewer, r.note)));
+
+  // Override form
+  state.elementsById = new Map(v.elements.map(e => [e.objectId, e]));
+  $("ov-elements").replaceChildren(...(v.elements.length <= LIST_OPTIONS
+    ? v.elements.map(e => h("option", { value: e.objectId }, `${e.category}${e.excluded ? ", excluded" : ""}`)) : []));
+  if (!state.elementsById.has($("ov-element").value)) $("ov-element").value = v.elements[0]?.objectId ?? "";
+  updateOverrideForm();
+
+  // Accept form
+  $("acc-policy").classList.toggle("hidden", v.policyApproved);
+  $("acks").replaceChildren(...v.acknowledgements.map((a, i) => h("div", {},
+    h("label", { class: "inline" }, h("input", { type: "checkbox", id: "ack-" + i, "data-token": a.token }), h("code", {}, a.token)),
+    h("div", { class: "meaning" }, a.meaning))));
+  $("acc-partial").checked = false;
+  $("acc-partial-wrap").classList.toggle("hidden", !v.partial);
+  updateActions();
+}
+
+function updateOverrideForm() {
+  const v = state.view; if (!v) return;
+  const element = state.elementsById.get($("ov-element").value.trim());
+  const action = $("ov-action").value;
+  const setting = action === "set";
+  $("ov-field-wrap").classList.toggle("hidden", !setting);
+  $("ov-value-wrap").classList.toggle("hidden", !setting);
+  const fields = element?.fields ?? [];
+  const current = $("ov-field").value;
+  $("ov-field").replaceChildren(...fields.map(f => h("option", { value: f.field }, f.label)));
+  if (fields.some(f => f.field === current)) $("ov-field").value = current;
+  const field = fields.find(f => f.field === $("ov-field").value);
+  $("ov-current").textContent = !element ? ($("ov-element").value.trim() ? "No element has this ID." : "") :
+    setting ? (field ? `Current ${field.label}: ${field.currentMm}` : `${element.objectId} has no dimension that can be overridden.`)
+    : element.excluded ? `${element.objectId} is currently excluded.` : `${element.objectId} is currently in scope.`;
+}
+
+// ---------- actions ----------
+$("btn-template").onclick = async () => {
+  if (!confirmDiscard()) return;
+  try {
+    const res = await fetch("/api/template");
+    loadSnapshot((await res.json()).snapshot, "template.json");
+    $("editor-details").open = true;
+    show("Template loaded. Edit it here or download it, then Calculate.", "ok");
+  } catch (e) { show(e.message); }
+};
+$("btn-open-snapshot").onclick = () => { if (confirmDiscard()) $("file-snapshot").click(); };
+$("btn-open-run").onclick = () => { if (confirmDiscard()) $("file-run").click(); };
+
+$("file-snapshot").onchange = async e => {
+  const file = e.target.files[0]; e.target.value = "";
+  if (!file) return;
+  if (file.size > EDITABLE_BYTES) loadSnapshot("", file.name, file); else loadSnapshot(await file.text(), file.name);
+  $("btn-calculate").click();
+};
+$("file-run").onchange = async e => {
+  const file = e.target.files[0]; e.target.value = "";
+  if (!file) return;
+  try {
+    show(`Opening ${file.name}: recalculating every quantity to check it…`, "warn");
+    const res = await call("/api/open", file);
+    setRun(await res.json(), `Opened ${file.name}. Every quantity and hash was recalculated and matches.`);
+    state.fileName = file.name;
+  } catch (err) { show(err.message); }
+};
+
+$("btn-calculate").onclick = async e => {
+  try {
+    const source = currentSource();
+    const res = await call("/api/calculate", source, e.currentTarget);
+    setRun(await res.json(), "Calculated. Review the warnings, then download the run or export the report.", source);
+  } catch (err) { show(err.message); }
+};
+$("btn-download-snapshot").onclick = () => download(state.snapshotName, state.snapshotFile ?? new Blob([$("snapshot-text").value], { type: "application/json" }));
+
+$("btn-download-run").onclick = () => downloadRun(state.runId, state.fileName);
+let editTimer;
+$("snapshot-text").oninput = () => { clearTimeout(editTimer); editTimer = setTimeout(updateActions, 150); };
+$("btn-export").onclick = async e => {
+  try {
+    const res = await call("/api/export", { runId: state.runId }, e.currentTarget);
+    const name = (res.headers.get("Content-Disposition") || "").match(/filename="?([^";]+)"?/)?.[1] || "report.zip";
+    download(name, await res.blob());
+  } catch (err) { show(err.message); }
+};
+
+$("ov-element").oninput = updateOverrideForm;
+$("ov-action").onchange = updateOverrideForm;
+$("ov-field").onchange = updateOverrideForm;
+$("btn-override").onclick = async e => {
+  const action = $("ov-action").value;
+  const value = $("ov-value").value.trim();
+  if (action === "set" && value === "") { show("Enter the new value."); return; }
+  try {
+    const res = await call("/api/override", {
+      runId: state.runId, objectId: $("ov-element").value.trim(), action,
+      field: action === "set" ? $("ov-field").value : null,
+      value: action === "set" ? Number(value) : null, unit: $("ov-unit").value,
+      reason: $("ov-reason").value, author: $("ov-author").value
+    }, e.currentTarget);
+    setRun(await res.json(), "Override recorded in a new run.", state.basis.get(state.runId));
+    $("ov-value").value = ""; $("ov-reason").value = "";
+  } catch (err) { show(err.message); }
+};
+
+$("btn-ack-none").onclick = () => document.querySelectorAll("#acks input").forEach(x => x.checked = false);
+$("btn-accept").onclick = async e => {
+  const acknowledge = [...document.querySelectorAll("#acks input:checked")].map(x => x.dataset.token);
+  try {
+    const res = await call("/api/accept", {
+      runId: state.runId, reviewer: $("acc-reviewer").value, note: $("acc-note").value,
+      partial: $("acc-partial").checked, acknowledge
+    }, e.currentTarget);
+    setRun(await res.json(), "Accepted. Download the run to keep the acceptance; the GUI keeps it until you do.", state.basis.get(state.runId));
+  } catch (err) { show(err.message); }
+};
+
+document.querySelectorAll("[role=tab]").forEach(tab => tab.onclick = () => {
+  document.querySelectorAll("[role=tab]").forEach(t => t.setAttribute("aria-selected", t === tab));
+  document.querySelectorAll("[data-panel]").forEach(p => p.classList.toggle("hidden", p.dataset.panel !== tab.dataset.tab));
+  redrawTables();
+});
+function redrawTables() { $("filter-note").textContent = ""; Object.keys(tables).forEach(drawTable); }
+let filterTimer;
+$("filter").oninput = () => { clearTimeout(filterTimer); filterTimer = setTimeout(redrawTables, 150); };
+
+function confirmDiscard() {
+  return !state.runId || state.saved || confirm("The current run has not been downloaded. Discard it?");
+}
+window.addEventListener("beforeunload", e => {
+  if ((state.runId && !state.saved) || state.held.some(x => x.pinned)) { e.preventDefault(); e.returnValue = ""; }
+});
+</script>
+</body>
+</html>

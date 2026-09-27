@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quentra.local/schemas/snapshot.schema.json",
+  "title": "Quentra normalized model snapshot",
+  "description": "Normalized structural-model snapshot consumed by the Quentra quantity engine. The same shape carries synthetic benchmarks and captured ETABS data; `provenance` says which. Field names belong to the Quentra normalization layer and are NOT claimed to be ETABS API names. The schema checks structure only: semantic problems (zero widths, self-intersecting polygons, ...) are schema-valid on purpose so that the engine's own validation can be tested.",
+  "type": "object",
+  "required": ["schemaVersion", "model", "materials", "sections", "elements", "provenance"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "model": {
+      "type": "object",
+      "required": ["name", "units", "stories"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": ["string", "null"] },
+        "units": {
+          "type": "object",
+          "required": ["length"],
+          "properties": {
+            "length": { "enum": ["m", "mm", "cm", "ft", "in"], "description": "Unit of every coordinate, section dimension, bar diameter, spacing, cover and station. Areas are length^2; shear areas per length are length^2/length." },
+            "force": { "type": ["string", "null"] },
+            "temperature": { "type": ["string", "null"] }
+          }
+        },
+        "source": { "type": ["string", "null"], "description": "Free text: 'synthetic', 'etabs-capture', ..." },
+        "stories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "elevation", "height"],
+            "properties": {
+              "name": { "type": "string" },
+              "elevation": { "type": "number", "description": "Top-of-story (floor) elevation in model length units." },
+              "height": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "materials": { "type": "array", "items": { "$ref": "#/$defs/material" } },
+    "sections": { "type": "array", "items": { "$ref": "#/$defs/section" } },
+    "elements": { "type": "array", "items": { "$ref": "#/$defs/element" } },
+    "designResults": { "type": "array", "items": { "$ref": "#/$defs/designResult" } },
+    "warnings": {
+      "type": "array",
+      "description": "Warnings reported by the source/extractor itself. The engine passes each one through as SOURCE_WARNING with subject = the source code.",
+      "items": {
+        "type": "object",
+        "required": ["code"],
+        "properties": {
+          "code": { "type": "string" },
+          "severity": { "type": ["string", "null"] },
+          "subject": { "type": ["string", "null"] },
+          "message": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "provenance": { "$ref": "#/$defs/provenance" }
+  },
+  "$defs": {
+    "point": {
+      "type": "object",
+      "required": ["x", "y", "z"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "z": { "type": "number" } },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["type", "etabs_verified"],
+      "properties": {
+        "type": { "enum": ["synthetic_engineering_benchmark", "captured_etabs_snapshot"] },
+        "etabs_verified": { "type": "boolean" },
+        "etabs_version": { "type": ["string", "null"], "description": "Exact ETABS version string as reported by the application. Required for captures." },
+        "generator": { "type": ["string", "null"] },
+        "generatorVersion": { "type": ["string", "null"] },
+        "caseId": { "type": ["string", "null"] },
+        "capturedAt": { "type": ["string", "null"], "description": "ISO-8601 timestamp of capture (captures only)." },
+        "capturedBy": { "type": ["string", "null"] },
+        "extractorVersion": { "type": ["string", "null"] },
+        "etabsModelFile": { "type": ["string", "null"] },
+        "notes": { "type": ["string", "null"] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "synthetic_engineering_benchmark" } } },
+          "then": { "properties": { "etabs_verified": { "const": false } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "captured_etabs_snapshot" } } },
+          "then": {
+            "properties": { "etabs_verified": { "const": true }, "etabs_version": { "type": "string", "minLength": 1 } },
+            "required": ["etabs_version"]
+          }
+        }
+      ]
+    },
+    "material": {
+      "type": "object",
+      "required": ["name", "type"],
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "description": "Concrete | Rebar | Steel | anything else (anything else is 'ambiguous' for quantity purposes)." },
+        "grade": { "type": ["string", "null"] },
+        "density": { "type": "number" },
+        "densityUnit": { "enum": ["kg/m3", "lb/ft3"] },
+        "fckMPa": { "type": "number" },
+        "fyMPa": { "type": "number" }
+      }
+    },
+    "section": {
+      "type": "object",
+      "required": ["name", "kind"],
+      "properties": {
+        "name": { "type": "string" },
+        "kind": { "enum": ["Frame", "Slab", "Wall"] },
+        "shape": { "type": "string", "description": "Frame sections: Rectangle | Circle are quantifiable; any other shape is UNSUPPORTED_SECTION." },
+        "width": { "type": "number" },
+        "depth": { "type": "number" },
+        "diameter": { "type": "number" },
+        "thickness": { "type": "number" }
+      }
+    },
+    "element": {
+      "type": "object",
+      "required": ["id", "type", "geometry"],
+      "properties": {
+        "id": { "type": "string", "description": "Unique object identifier. For ETABS captures use the unique object name." },
+        "name": { "type": ["string", "null"], "description": "Human label (may repeat across stories, may be misleading - never used for classification)." },
+        "type": { "type": "string", "description": "Beam | Column | Slab | Wall are quantified; others are skipped with UNSUPPORTED_ELEMENT_TYPE." },
+        "role": { "enum": ["Physical", "AnalyticalSegment", "MeshElement"], "default": "Physical" },
+        "parentId": { "type": ["string", "null"] },
+        "story": { "type": ["string", "null"] },
+        "material": { "type": ["string", "null"] },
+        "section": { "type": ["string", "null"] },
+        "pier": { "type": ["string", "null"] },
+        "geometry": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["kind", "start", "end"],
+              "properties": { "kind": { "const": "Line" }, "start": { "$ref": "#/$defs/point" }, "end": { "$ref": "#/$defs/point" } }
+            },
+            {
+              "type": "object",
+              "required": ["kind", "points"],
+              "properties": {
+                "kind": { "const": "Area" },
+                "points": { "type": "array", "items": { "$ref": "#/$defs/point" }, "description": "Boundary in order; first edge defines the local u axis for walls." },
+                "openings": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["id", "points"],
+                    "properties": { "id": { "type": "string" }, "points": { "type": "array", "items": { "$ref": "#/$defs/point" } } }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "reinforcement": { "$ref": "#/$defs/reinforcement" },
+        "source": {
+          "type": "object",
+          "description": "Traceability back to the originating application. Synthetic fixtures leave ETABS-specific fields null; never invent GUIDs or API method names.",
+          "properties": {
+            "application": { "type": ["string", "null"] },
+            "version": { "type": ["string", "null"] },
+            "objectName": { "type": ["string", "null"] },
+            "objectGuid": { "type": ["string", "null"] },
+            "apiMethod": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "reinforcement": {
+      "type": "object",
+      "required": ["source"],
+      "properties": {
+        "source": { "enum": ["ProvidedBars", "RequiredDesignArea", "EstimatedRatio", "ManualOverride", "Unavailable"] },
+        "exact": { "type": "boolean", "description": "Informational only. The engine derives exactness from `source` and warns on conflict." },
+        "steelMaterial": { "type": ["string", "null"] },
+        "components": { "type": "array", "items": { "$ref": "#/$defs/component" } }
+      }
+    },
+    "component": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["StraightBars", "Hoops", "Crossties", "Mesh", "RequiredArea", "Ratio", "FixedMass"] },
+        "role": { "type": ["string", "null"] },
+        "count": { "type": "number" },
+        "diameter": { "type": "number" },
+        "length": { "type": "number" },
+        "spacing": { "type": "number" },
+        "cover": { "type": "number" },
+        "endOffset": { "type": "number" },
+        "zoneLength": { "type": "number" },
+        "hookAllowance": { "type": "number" },
+        "setsPerLocation": { "type": "number" },
+        "centerlineWidth": { "type": "number" },
+        "centerlineHeight": { "type": "number" },
+        "centerlineDiameter": { "type": "number" },
+        "pieceLength": { "type": "number" },
+        "perLocation": { "type": "number" },
+        "direction": { "enum": ["X", "Y", "Horizontal", "Vertical"] },
+        "edgeOffset": { "type": "number" },
+        "endCover": { "type": "number" },
+        "faces": { "type": "number" },
+        "region": {
+          "type": "object",
+          "properties": {
+            "xMin": { "type": "number" }, "xMax": { "type": "number" }, "yMin": { "type": "number" }, "yMax": { "type": "number" },
+            "uMin": { "type": "number" }, "uMax": { "type": "number" }, "vMin": { "type": "number" }, "vMax": { "type": "number" }
+          }
+        },
+        "designResultRef": { "type": "string" },
+        "envelope": { "enum": ["MaxOfStations", "TrapezoidalIntegration", "SegmentStepMax"] },
+        "includeShear": { "type": "boolean" },
+        "hoopLength": { "type": "number" },
+        "legs": { "type": "number" },
+        "rate": { "type": "number" },
+        "rateUnit": { "enum": ["kg/m3", "lb/ft3"] },
+        "mass": { "type": "number" },
+        "massUnit": { "enum": ["kg", "lb"] }
+      }
+    },
+    "designResult": {
+      "type": "object",
+      "required": ["elementId", "status", "stations"],
+      "properties": {
+        "elementId": { "type": "string" },
+        "resultType": { "type": ["string", "null"] },
+        "status": { "enum": ["Current", "Stale", "NotDesigned"] },
+        "origin": { "enum": ["simulated", "captured"], "description": "'simulated' for synthetic benchmarks. Never label simulated results as captured." },
+        "stations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["station", "topRequiredArea", "bottomRequiredArea", "shearRequiredAreaPerLength"],
+            "properties": {
+              "station": { "type": "number" },
+              "topRequiredArea": { "type": "number" },
+              "bottomRequiredArea": { "type": "number" },
+              "shearRequiredAreaPerLength": { "type": "number" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Column reinforcement varying by story",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 4.0,
+        "height": 4.0
+      },
+      {
+        "name": "L2",
+        "elevation": 7.2,
+        "height": 3.2
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C40",
+      "type": "Concrete",
+      "grade": "C40",
+      "fckMPa": 40
+    },
+    {
+      "name": "B500",
+      "type": "Rebar",
+      "grade": "B500",
+      "density": 7850.0,
+      "densityUnit": "kg/m3",
+      "fyMPa": 500
+    }
+  ],
+  "sections": [
+    {
+      "name": "C500",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.5,
+      "depth": 0.5
+    }
+  ],
+  "elements": [
+    {
+      "id": "C1@L1",
+      "name": "C1",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C40",
+      "section": "C500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "end": {
+          "x": 0,
+          "y": 0,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "longitudinal+lap",
+            "count": 8,
+            "diameter": 0.025,
+            "length": 5.0
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "C1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "C1@L2",
+      "name": "C1",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L2",
+      "material": "C40",
+      "section": "C500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 4.0
+        },
+        "end": {
+          "x": 0,
+          "y": 0,
+          "z": 7.2
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "longitudinal+lap",
+            "count": 8,
+            "diameter": 0.02,
+            "length": 4.0
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.008,
+            "spacing": 0.2,
+            "endOffset": 0.05,
+            "hookAllowance": 0.16,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "C1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "RCOL-005",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

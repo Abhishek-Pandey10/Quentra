@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Inclined column",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.5,
+        "height": 3.5
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C30",
+      "type": "Concrete",
+      "grade": "C30",
+      "fckMPa": 30
+    }
+  ],
+  "sections": [
+    {
+      "name": "C400x400",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.4,
+      "depth": 0.4
+    }
+  ],
+  "elements": [
+    {
+      "id": "IC1",
+      "name": "IC1",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30",
+      "section": "C400x400",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "end": {
+          "x": 1.2,
+          "y": 0,
+          "z": 3.5
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "IC1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "FRAME-008",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

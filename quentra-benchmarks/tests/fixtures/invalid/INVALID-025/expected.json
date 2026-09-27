@@ -1,0 +1,81 @@
+{
+  "caseId": "INVALID-025",
+  "schemaVersion": "1.0",
+  "provenanceType": "synthetic_engineering_benchmark",
+  "snapshotStatus": "Accepted",
+  "finalization": {
+    "allowed": false,
+    "blockingCodes": [
+      "EMPTY_MODEL"
+    ]
+  },
+  "modelTotals": {
+    "grossConcreteM3": 0.0,
+    "openingDeductionM3": 0.0,
+    "netConcreteM3": 0.0,
+    "unclassifiedVolumeM3": 0.0,
+    "steelKg": null,
+    "steelExactKg": null,
+    "steelApproximateKg": null,
+    "steelKgBySource": null
+  },
+  "completeness": {
+    "concrete": "Complete",
+    "steel": "NotEvaluated",
+    "concreteUnknownElementIds": [],
+    "steelUnknownElementIds": []
+  },
+  "byStory": {
+    "L1": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    }
+  },
+  "byElementType": {
+    "Beam": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    },
+    "Column": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    },
+    "Slab": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    },
+    "Wall": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    }
+  },
+  "byMaterial": {},
+  "steelByMaterial": {},
+  "elements": [],
+  "warnings": [
+    {
+      "code": "EMPTY_MODEL",
+      "severity": "Warning",
+      "subject": null
+    }
+  ],
+  "tolerance": {
+    "volumeM3": 1e-06,
+    "areaM2": 1e-06,
+    "lengthM": 1e-06,
+    "steelKg": 0.001,
+    "relative": 1e-09
+  },
+  "derivation": {
+    "method": "independent_first_principles",
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "handChecks": 1,
+    "closedFormCrossCheck": false
+  }
+}

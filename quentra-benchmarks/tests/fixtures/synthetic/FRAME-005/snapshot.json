@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Beam-column frame",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.0,
+        "height": 3.0
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C30",
+      "type": "Concrete",
+      "grade": "C30",
+      "fckMPa": 30
+    }
+  ],
+  "sections": [
+    {
+      "name": "C400x400",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.4,
+      "depth": 0.4
+    },
+    {
+      "name": "B300x600",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.3,
+      "depth": 0.6
+    }
+  ],
+  "elements": [
+    {
+      "id": "C1",
+      "name": "C1",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30",
+      "section": "C400x400",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "end": {
+          "x": 0,
+          "y": 0,
+          "z": 3
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "C1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "C2",
+      "name": "C2",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30",
+      "section": "C400x400",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 6,
+          "y": 0,
+          "z": 0
+        },
+        "end": {
+          "x": 6,
+          "y": 0,
+          "z": 3
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "C2",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "B1",
+      "name": "B1",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30",
+      "section": "B300x600",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 3
+        },
+        "end": {
+          "x": 6,
+          "y": 0,
+          "z": 3
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "FRAME-005",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

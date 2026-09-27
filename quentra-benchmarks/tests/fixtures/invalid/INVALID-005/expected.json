@@ -1,0 +1,125 @@
+{
+  "caseId": "INVALID-005",
+  "schemaVersion": "1.0",
+  "provenanceType": "synthetic_engineering_benchmark",
+  "snapshotStatus": "Accepted",
+  "finalization": {
+    "allowed": false,
+    "blockingCodes": [
+      "UNIT_PLAUSIBILITY"
+    ]
+  },
+  "modelTotals": {
+    "grossConcreteM3": 3001.08,
+    "openingDeductionM3": 0.0,
+    "netConcreteM3": 3001.08,
+    "unclassifiedVolumeM3": 0.0,
+    "steelKg": null,
+    "steelExactKg": null,
+    "steelApproximateKg": null,
+    "steelKgBySource": null
+  },
+  "completeness": {
+    "concrete": "Complete",
+    "steel": "NotEvaluated",
+    "concreteUnknownElementIds": [],
+    "steelUnknownElementIds": []
+  },
+  "byStory": {
+    "L1": {
+      "grossConcreteM3": 3001.08,
+      "netConcreteM3": 3001.08,
+      "steelKg": null
+    }
+  },
+  "byElementType": {
+    "Beam": {
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": null
+    },
+    "Column": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    },
+    "Slab": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    },
+    "Wall": {
+      "grossConcreteM3": 3000.0,
+      "netConcreteM3": 3000.0,
+      "steelKg": null
+    }
+  },
+  "byMaterial": {
+    "C30": {
+      "grossConcreteM3": 3001.08,
+      "netConcreteM3": 3001.08
+    }
+  },
+  "steelByMaterial": {},
+  "elements": [
+    {
+      "id": "W1",
+      "occurrence": 0,
+      "type": "Wall",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 3000.0,
+      "netConcreteM3": 3000.0,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "grossAreaM2": 12.0,
+      "openingAreaSumM2": 0.0,
+      "openingDeductedAreaM2": 0.0,
+      "netAreaM2": 12.0
+    },
+    {
+      "id": "B-OK",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "lengthM": 6.0
+    }
+  ],
+  "warnings": [
+    {
+      "code": "UNREALISTIC_DIMENSION",
+      "severity": "Warning",
+      "subject": "W1"
+    },
+    {
+      "code": "UNIT_PLAUSIBILITY",
+      "severity": "Error",
+      "subject": "W1"
+    }
+  ],
+  "tolerance": {
+    "volumeM3": 1e-06,
+    "areaM2": 1e-06,
+    "lengthM": 1e-06,
+    "steelKg": 0.001,
+    "relative": 1e-09
+  },
+  "derivation": {
+    "method": "independent_first_principles",
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "handChecks": 2,
+    "closedFormCrossCheck": false
+  }
+}

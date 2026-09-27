@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Opening partly outside slab boundary",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.0,
+        "height": 3.0
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C30",
+      "type": "Concrete",
+      "grade": "C30",
+      "fckMPa": 30
+    }
+  ],
+  "sections": [
+    {
+      "name": "S200",
+      "kind": "Slab",
+      "thickness": 0.2
+    }
+  ],
+  "elements": [
+    {
+      "id": "S1",
+      "name": "S1",
+      "type": "Slab",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30",
+      "section": "S200",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 3.0
+          },
+          {
+            "x": 6,
+            "y": 0,
+            "z": 3.0
+          },
+          {
+            "x": 6,
+            "y": 5,
+            "z": 3.0
+          },
+          {
+            "x": 0,
+            "y": 5,
+            "z": 3.0
+          }
+        ],
+        "openings": [
+          {
+            "id": "O1",
+            "points": [
+              {
+                "x": 5,
+                "y": 1,
+                "z": 3.0
+              },
+              {
+                "x": 7,
+                "y": 1,
+                "z": 3.0
+              },
+              {
+                "x": 7,
+                "y": 3,
+                "z": 3.0
+              },
+              {
+                "x": 5,
+                "y": 3,
+                "z": 3.0
+              }
+            ]
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "S1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "SLAB-007",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

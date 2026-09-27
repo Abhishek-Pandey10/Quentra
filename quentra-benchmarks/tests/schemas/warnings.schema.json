@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quentra.local/schemas/warnings.schema.json",
+  "title": "Quentra warning object and warning-code catalog",
+  "description": "A warning is identified by (code, subject). Subject is an element id, 'hostId/openingId' for opening warnings, 'idA+idB' for pairwise warnings (input order), a material name for material warnings, the source's own code for SOURCE_WARNING, or null for snapshot-level warnings. Warnings form a SET: the same (code, subject) is reported once. Messages are never compared.",
+  "oneOf": [
+    { "$ref": "#/$defs/catalog" },
+    { "$ref": "#/$defs/warning" }
+  ],
+  "$defs": {
+    "severity": { "enum": ["Info", "Warning", "Error", "Fatal"] },
+    "warning": {
+      "type": "object",
+      "required": ["code", "severity", "subject"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+        "severity": { "$ref": "#/$defs/severity" },
+        "subject": { "type": ["string", "null"] },
+        "message": { "type": ["string", "null"] }
+      }
+    },
+    "catalog": {
+      "type": "object",
+      "required": ["catalogVersion", "codes"],
+      "properties": {
+        "catalogVersion": { "type": "string" },
+        "severityMeaning": { "type": "object" },
+        "codes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["code", "severity", "blocksFinalization", "category", "description"],
+            "properties": {
+              "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+              "severity": { "$ref": "#/$defs/severity" },
+              "blocksFinalization": { "type": "boolean" },
+              "category": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

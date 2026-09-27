@@ -1,0 +1,3176 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Building D - irregular multi-story",
+    "description": "L-shaped plan (GF-1F), setback rectangle above, sloped roof beams, one inclined column, circular columns, irregular slab reinforced by regions.",
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "GF",
+        "elevation": 4.0,
+        "height": 4.0
+      },
+      {
+        "name": "1F",
+        "elevation": 7.5,
+        "height": 3.5
+      },
+      {
+        "name": "2F",
+        "elevation": 11.0,
+        "height": 3.5
+      },
+      {
+        "name": "RF",
+        "elevation": 14.0,
+        "height": 3.0
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C30/37",
+      "type": "Concrete",
+      "grade": "C30/37",
+      "fckMPa": 30
+    },
+    {
+      "name": "C40/50",
+      "type": "Concrete",
+      "grade": "C40/50",
+      "fckMPa": 40
+    },
+    {
+      "name": "B500B",
+      "type": "Rebar",
+      "grade": "B500B",
+      "density": 7850.0,
+      "densityUnit": "kg/m3",
+      "fyMPa": 500
+    }
+  ],
+  "sections": [
+    {
+      "name": "COL-500SQ",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.5,
+      "depth": 0.5
+    },
+    {
+      "name": "COL-D500",
+      "kind": "Frame",
+      "shape": "Circle",
+      "diameter": 0.5
+    },
+    {
+      "name": "BM 300X650",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.3,
+      "depth": 0.65
+    },
+    {
+      "name": "BM-SLOPE 300X500",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.3,
+      "depth": 0.5
+    },
+    {
+      "name": "SLAB 200",
+      "kind": "Slab",
+      "thickness": 0.2
+    },
+    {
+      "name": "ROOF 180",
+      "kind": "Slab",
+      "thickness": 0.18
+    },
+    {
+      "name": "RW 250",
+      "kind": "Wall",
+      "thickness": 0.25
+    }
+  ],
+  "elements": [
+    {
+      "id": "COL_001",
+      "name": "CIRC_00",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C40/50",
+      "section": "COL-D500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 0.0
+        },
+        "end": {
+          "x": 0,
+          "y": 0,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "CIRC_00",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_002",
+      "name": "COLUMN_80",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 0,
+          "z": 0.0
+        },
+        "end": {
+          "x": 8,
+          "y": 0,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_80",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_003",
+      "name": "COLUMN_160",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 16,
+          "y": 0,
+          "z": 0.0
+        },
+        "end": {
+          "x": 16,
+          "y": 0,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_160",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_004",
+      "name": "CIRC_08",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C40/50",
+      "section": "COL-D500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 8,
+          "z": 0.0
+        },
+        "end": {
+          "x": 0,
+          "y": 8,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "CIRC_08",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_005",
+      "name": "COLUMN_88",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 8,
+          "z": 0.0
+        },
+        "end": {
+          "x": 8,
+          "y": 8,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_88",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_006",
+      "name": "COLUMN_168",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 16,
+          "y": 8,
+          "z": 0.0
+        },
+        "end": {
+          "x": 16,
+          "y": 8,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_168",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_007",
+      "name": "CIRC_016",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C40/50",
+      "section": "COL-D500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 16,
+          "z": 0.0
+        },
+        "end": {
+          "x": 0,
+          "y": 16,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "CIRC_016",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_008",
+      "name": "COLUMN_816",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 16,
+          "z": 0.0
+        },
+        "end": {
+          "x": 8,
+          "y": 16,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_816",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_GF_01",
+      "name": "B-01",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 4.0
+        },
+        "end": {
+          "x": 8,
+          "y": 0,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-01",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_GF_02",
+      "name": "B-02",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 0,
+          "z": 4.0
+        },
+        "end": {
+          "x": 16,
+          "y": 0,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-02",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_GF_03",
+      "name": "B-03",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 8,
+          "z": 4.0
+        },
+        "end": {
+          "x": 8,
+          "y": 8,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-03",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_GF_04",
+      "name": "B-04",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 8,
+          "z": 4.0
+        },
+        "end": {
+          "x": 16,
+          "y": 8,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-04",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_GF_05",
+      "name": "B-05",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 16,
+          "z": 4.0
+        },
+        "end": {
+          "x": 8,
+          "y": 16,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-05",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_GF_06",
+      "name": "B-06",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 4.0
+        },
+        "end": {
+          "x": 0,
+          "y": 8,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-06",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_GF_07",
+      "name": "B-07",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 8,
+          "z": 4.0
+        },
+        "end": {
+          "x": 0,
+          "y": 16,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-07",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_GF_08",
+      "name": "B-08",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 0,
+          "z": 4.0
+        },
+        "end": {
+          "x": 8,
+          "y": 8,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-08",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_GF_09",
+      "name": "B-09",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 8,
+          "z": 4.0
+        },
+        "end": {
+          "x": 8,
+          "y": 16,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-09",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_GF_10",
+      "name": "B-10",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 16,
+          "y": 0,
+          "z": 4.0
+        },
+        "end": {
+          "x": 16,
+          "y": 8,
+          "z": 4.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-10",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "SLAB-GF-A",
+      "name": "SLAB-GF-A",
+      "type": "Slab",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C30/37",
+      "section": "SLAB 200",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 4.0
+          },
+          {
+            "x": 16,
+            "y": 0,
+            "z": 4.0
+          },
+          {
+            "x": 16,
+            "y": 8,
+            "z": 4.0
+          },
+          {
+            "x": 8,
+            "y": 8,
+            "z": 4.0
+          },
+          {
+            "x": 8,
+            "y": 16,
+            "z": 4.0
+          },
+          {
+            "x": 0,
+            "y": 16,
+            "z": 4.0
+          }
+        ],
+        "openings": []
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "X",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1,
+            "region": {
+              "xMin": 0,
+              "xMax": 16,
+              "yMin": 0,
+              "yMax": 8
+            }
+          },
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "Y",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1,
+            "region": {
+              "xMin": 0,
+              "xMax": 16,
+              "yMin": 0,
+              "yMax": 8
+            }
+          },
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "X",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1,
+            "region": {
+              "xMin": 0,
+              "xMax": 8,
+              "yMin": 8,
+              "yMax": 16
+            }
+          },
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "Y",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1,
+            "region": {
+              "xMin": 0,
+              "xMax": 8,
+              "yMin": 8,
+              "yMax": 16
+            }
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "SLAB-GF-A",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "RW-01",
+      "name": "Wall Pier 01",
+      "type": "Wall",
+      "role": "Physical",
+      "parentId": null,
+      "story": "GF",
+      "material": "C40/50",
+      "section": "RW 250",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": -1,
+            "z": 0.0
+          },
+          {
+            "x": 16,
+            "y": -1,
+            "z": 0.0
+          },
+          {
+            "x": 16,
+            "y": -1,
+            "z": 4.0
+          },
+          {
+            "x": 0,
+            "y": -1,
+            "z": 4.0
+          }
+        ],
+        "openings": [
+          {
+            "id": "VENT",
+            "points": [
+              {
+                "x": 6,
+                "y": -1,
+                "z": 2.5
+              },
+              {
+                "x": 7.2,
+                "y": -1,
+                "z": 2.5
+              },
+              {
+                "x": 7.2,
+                "y": -1,
+                "z": 3.1
+              },
+              {
+                "x": 6,
+                "y": -1,
+                "z": 3.1
+              }
+            ]
+          }
+        ]
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "Vertical",
+            "diameter": 0.016,
+            "spacing": 0.15,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 2
+          },
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "Horizontal",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 2
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "Wall Pier 01",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_009",
+      "name": "CIRC_00",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C40/50",
+      "section": "COL-D500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 4.0
+        },
+        "end": {
+          "x": 0,
+          "y": 0,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "CIRC_00",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_010",
+      "name": "COLUMN_80",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 0,
+          "z": 4.0
+        },
+        "end": {
+          "x": 8,
+          "y": 0,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_80",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_011",
+      "name": "COLUMN_160",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 16,
+          "y": 0,
+          "z": 4.0
+        },
+        "end": {
+          "x": 16,
+          "y": 0,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_160",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_012",
+      "name": "CIRC_08",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C40/50",
+      "section": "COL-D500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 8,
+          "z": 4.0
+        },
+        "end": {
+          "x": 0,
+          "y": 8,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "CIRC_08",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_013",
+      "name": "COLUMN_88",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 8,
+          "z": 4.0
+        },
+        "end": {
+          "x": 8,
+          "y": 8,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_88",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "ICOL_014",
+      "name": "COLUMN_INCLINED_1",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 16,
+          "y": 8,
+          "z": 4.0
+        },
+        "end": {
+          "x": 15,
+          "y": 8,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_INCLINED_1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_015",
+      "name": "CIRC_016",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C40/50",
+      "section": "COL-D500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 16,
+          "z": 4.0
+        },
+        "end": {
+          "x": 0,
+          "y": 16,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "CIRC_016",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_016",
+      "name": "COLUMN_816",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 16,
+          "z": 4.0
+        },
+        "end": {
+          "x": 8,
+          "y": 16,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_816",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_1F_01",
+      "name": "B-01",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 7.5
+        },
+        "end": {
+          "x": 8,
+          "y": 0,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-01",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_1F_02",
+      "name": "B-02",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 0,
+          "z": 7.5
+        },
+        "end": {
+          "x": 16,
+          "y": 0,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-02",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_1F_03",
+      "name": "B-03",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 8,
+          "z": 7.5
+        },
+        "end": {
+          "x": 8,
+          "y": 8,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-03",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_1F_04",
+      "name": "B-04",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 8,
+          "z": 7.5
+        },
+        "end": {
+          "x": 15,
+          "y": 8,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-04",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_1F_05",
+      "name": "B-05",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 16,
+          "z": 7.5
+        },
+        "end": {
+          "x": 8,
+          "y": 16,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-05",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_1F_06",
+      "name": "B-06",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 7.5
+        },
+        "end": {
+          "x": 0,
+          "y": 8,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-06",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_1F_07",
+      "name": "B-07",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 8,
+          "z": 7.5
+        },
+        "end": {
+          "x": 0,
+          "y": 16,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-07",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_1F_08",
+      "name": "B-08",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 0,
+          "z": 7.5
+        },
+        "end": {
+          "x": 8,
+          "y": 8,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-08",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_1F_09",
+      "name": "B-09",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 8,
+          "z": 7.5
+        },
+        "end": {
+          "x": 8,
+          "y": 16,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-09",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_1F_10",
+      "name": "B-10",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 16,
+          "y": 0,
+          "z": 7.5
+        },
+        "end": {
+          "x": 15,
+          "y": 8,
+          "z": 7.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-10",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "SLAB-1F-A",
+      "name": "SLAB-1F-A",
+      "type": "Slab",
+      "role": "Physical",
+      "parentId": null,
+      "story": "1F",
+      "material": "C30/37",
+      "section": "SLAB 200",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 7.5
+          },
+          {
+            "x": 16,
+            "y": 0,
+            "z": 7.5
+          },
+          {
+            "x": 16,
+            "y": 8,
+            "z": 7.5
+          },
+          {
+            "x": 8,
+            "y": 8,
+            "z": 7.5
+          },
+          {
+            "x": 8,
+            "y": 16,
+            "z": 7.5
+          },
+          {
+            "x": 0,
+            "y": 16,
+            "z": 7.5
+          }
+        ],
+        "openings": []
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "X",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1,
+            "region": {
+              "xMin": 0,
+              "xMax": 16,
+              "yMin": 0,
+              "yMax": 8
+            }
+          },
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "Y",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1,
+            "region": {
+              "xMin": 0,
+              "xMax": 16,
+              "yMin": 0,
+              "yMax": 8
+            }
+          },
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "X",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1,
+            "region": {
+              "xMin": 0,
+              "xMax": 8,
+              "yMin": 8,
+              "yMax": 16
+            }
+          },
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "Y",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1,
+            "region": {
+              "xMin": 0,
+              "xMax": 8,
+              "yMin": 8,
+              "yMax": 16
+            }
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "SLAB-1F-A",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_017",
+      "name": "CIRC_00",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "2F",
+      "material": "C40/50",
+      "section": "COL-D500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 7.5
+        },
+        "end": {
+          "x": 0,
+          "y": 0,
+          "z": 11.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "CIRC_00",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_018",
+      "name": "COLUMN_80",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "2F",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 0,
+          "z": 7.5
+        },
+        "end": {
+          "x": 8,
+          "y": 0,
+          "z": 11.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_80",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_019",
+      "name": "CIRC_08",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "2F",
+      "material": "C40/50",
+      "section": "COL-D500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 8,
+          "z": 7.5
+        },
+        "end": {
+          "x": 0,
+          "y": 8,
+          "z": 11.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "CIRC_08",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_020",
+      "name": "COLUMN_88",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "2F",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 8,
+          "z": 7.5
+        },
+        "end": {
+          "x": 8,
+          "y": 8,
+          "z": 11.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_88",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_2F_01",
+      "name": "B-01",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "2F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 11.0
+        },
+        "end": {
+          "x": 8,
+          "y": 0,
+          "z": 11.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-01",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_2F_02",
+      "name": "B-02",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "2F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 8,
+          "z": 11.0
+        },
+        "end": {
+          "x": 8,
+          "y": 8,
+          "z": 11.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-02",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_2F_03",
+      "name": "B-03",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "2F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 11.0
+        },
+        "end": {
+          "x": 0,
+          "y": 8,
+          "z": 11.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-03",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "Beam_2F_04",
+      "name": "B-04",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "2F",
+      "material": "C30/37",
+      "section": "BM 300X650",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 0,
+          "z": 11.0
+        },
+        "end": {
+          "x": 8,
+          "y": 8,
+          "z": 11.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 3,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-04",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "SLAB-2F-A",
+      "name": "SLAB-2F-A",
+      "type": "Slab",
+      "role": "Physical",
+      "parentId": null,
+      "story": "2F",
+      "material": "C30/37",
+      "section": "SLAB 200",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 11.0
+          },
+          {
+            "x": 8,
+            "y": 0,
+            "z": 11.0
+          },
+          {
+            "x": 8,
+            "y": 8,
+            "z": 11.0
+          },
+          {
+            "x": 0,
+            "y": 8,
+            "z": 11.0
+          }
+        ],
+        "openings": []
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "X",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1,
+            "region": {
+              "xMin": 0,
+              "xMax": 8,
+              "yMin": 0,
+              "yMax": 8
+            }
+          },
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "Y",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1,
+            "region": {
+              "xMin": 0,
+              "xMax": 8,
+              "yMin": 0,
+              "yMax": 8
+            }
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "SLAB-2F-A",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_R0",
+      "name": "COLUMN_ROOF_0",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "RF",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 8,
+          "z": 11.0
+        },
+        "end": {
+          "x": 0,
+          "y": 8,
+          "z": 14.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 4,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_ROOF_0",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "COL_R1",
+      "name": "COLUMN_ROOF_1",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "RF",
+      "material": "C40/50",
+      "section": "COL-500SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 8,
+          "z": 11.0
+        },
+        "end": {
+          "x": 8,
+          "y": 8,
+          "z": 14.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 4,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_ROOF_1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "RAFTER_0",
+      "name": "Sloped Beam 0",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "RF",
+      "material": "C30/37",
+      "section": "BM-SLOPE 300X500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 11.0
+        },
+        "end": {
+          "x": 0,
+          "y": 8,
+          "z": 14.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 4,
+            "diameter": 0.016
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.2,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "Sloped Beam 0",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "RAFTER_1",
+      "name": "Sloped Beam 1",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "RF",
+      "material": "C30/37",
+      "section": "BM-SLOPE 300X500",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 8,
+          "y": 0,
+          "z": 11.0
+        },
+        "end": {
+          "x": 8,
+          "y": 8,
+          "z": 14.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500B",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 4,
+            "diameter": 0.016
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.2,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.025
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "Sloped Beam 1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "BLDG-D",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

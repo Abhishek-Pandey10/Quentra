@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Transfer slab with overridden threshold",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.0,
+        "height": 3.0
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C40",
+      "type": "Concrete",
+      "grade": "C40",
+      "fckMPa": 40
+    }
+  ],
+  "sections": [
+    {
+      "name": "TS2500",
+      "kind": "Slab",
+      "thickness": 2.5
+    }
+  ],
+  "elements": [
+    {
+      "id": "TS1",
+      "name": "TS1",
+      "type": "Slab",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C40",
+      "section": "TS2500",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 3
+          },
+          {
+            "x": 8,
+            "y": 0,
+            "z": 3
+          },
+          {
+            "x": 8,
+            "y": 8,
+            "z": 3
+          },
+          {
+            "x": 0,
+            "y": 8,
+            "z": 3
+          }
+        ],
+        "openings": []
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "TS1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "PLAUS-002",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

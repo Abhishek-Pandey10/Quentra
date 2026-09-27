@@ -1,0 +1,137 @@
+{
+  "rulesVersion": "1.1.0",
+  "rules": [
+    {
+      "id": "BEAM_SECTION_DIM_MAX",
+      "appliesTo": "Beam",
+      "quantity": "section width or depth",
+      "comparator": ">",
+      "threshold": 5.0,
+      "unit": "m",
+      "code": "UNREALISTIC_DIMENSION",
+      "rationale": "Beams wider or deeper than 5 m are very unusual (transfer girders excepted); often a unit error.",
+      "configurable": true,
+      "enabled": true
+    },
+    {
+      "id": "COLUMN_SECTION_DIM_MAX",
+      "appliesTo": "Column",
+      "quantity": "section width, depth or diameter",
+      "comparator": ">",
+      "threshold": 5.0,
+      "unit": "m",
+      "code": "UNREALISTIC_DIMENSION",
+      "rationale": "Columns larger than 5 m are unusual (mega-columns excepted).",
+      "configurable": true,
+      "enabled": true
+    },
+    {
+      "id": "SLAB_THICKNESS_MAX",
+      "appliesTo": "Slab",
+      "quantity": "thickness",
+      "comparator": ">",
+      "threshold": 2.0,
+      "unit": "m",
+      "code": "UNREALISTIC_DIMENSION",
+      "rationale": "Slabs thicker than 2 m are rare (raft/transfer slabs excepted).",
+      "configurable": true,
+      "enabled": true
+    },
+    {
+      "id": "WALL_THICKNESS_MAX",
+      "appliesTo": "Wall",
+      "quantity": "thickness",
+      "comparator": ">",
+      "threshold": 3.0,
+      "unit": "m",
+      "code": "UNREALISTIC_DIMENSION",
+      "rationale": "Walls thicker than 3 m are rare (dams, shielding excepted).",
+      "configurable": true,
+      "enabled": true
+    },
+    {
+      "id": "FRAME_LENGTH_MAX",
+      "appliesTo": "Beam,Column",
+      "quantity": "member length",
+      "comparator": ">",
+      "threshold": 100.0,
+      "unit": "m",
+      "code": "UNREALISTIC_DIMENSION",
+      "rationale": "Single frame objects longer than 100 m usually indicate a unit or coordinate error.",
+      "configurable": true,
+      "enabled": true
+    },
+    {
+      "id": "UNIT_SCALE_SUSPECT",
+      "appliesTo": "Beam,Column,Slab,Wall",
+      "quantity": "section dimension / 1000",
+      "comparator": "in band",
+      "threshold": 0.05,
+      "unit": "m",
+      "code": "UNIT_PLAUSIBILITY",
+      "rationale": "If a dimension breaks its MAX rule but value/1000 lies between this lower bound and the MAX threshold, the value was probably entered in mm while the model is in m.",
+      "configurable": true,
+      "enabled": true
+    },
+    {
+      "id": "STEEL_DENSITY_MIN",
+      "appliesTo": "Rebar material",
+      "quantity": "density",
+      "comparator": "<",
+      "threshold": 7000.0,
+      "unit": "kg/m3",
+      "code": "UNREALISTIC_MATERIAL_DENSITY",
+      "rationale": "Reinforcing steel is about 7850 kg/m3.",
+      "configurable": true,
+      "enabled": true
+    },
+    {
+      "id": "STEEL_DENSITY_MAX",
+      "appliesTo": "Rebar material",
+      "quantity": "density",
+      "comparator": ">",
+      "threshold": 9000.0,
+      "unit": "kg/m3",
+      "code": "UNREALISTIC_MATERIAL_DENSITY",
+      "rationale": "Reinforcing steel is about 7850 kg/m3; > 9000 is not steel.",
+      "configurable": true,
+      "enabled": true
+    },
+    {
+      "id": "STEEL_RATE_HIGH",
+      "appliesTo": "Beam,Column,Slab,Wall",
+      "quantity": "steel kg / net concrete m3",
+      "comparator": ">",
+      "threshold": 600.0,
+      "unit": "kg/m3",
+      "code": "HIGH_STEEL_RATE",
+      "rationale": "Above ~600 kg/m3 congestion is severe; worth a check.",
+      "configurable": true,
+      "enabled": true
+    },
+    {
+      "id": "STEEL_RATE_IMPOSSIBLE",
+      "appliesTo": "Beam,Column,Slab,Wall",
+      "quantity": "steel kg / net concrete m3",
+      "comparator": "> steel density",
+      "threshold": null,
+      "unit": "kg/m3",
+      "code": "UNREALISTIC_STEEL_RATE",
+      "rationale": "Steel cannot occupy more than 100 % of the concrete volume.",
+      "configurable": false,
+      "enabled": true
+    },
+    {
+      "id": "COORDINATE_MAX",
+      "appliesTo": "all",
+      "quantity": "|coordinate|",
+      "comparator": ">",
+      "threshold": 10000000.0,
+      "unit": "m",
+      "code": "COORDINATE_OUT_OF_RANGE",
+      "rationale": "Coordinates beyond 10,000 km are not a building; also protects against overflow.",
+      "configurable": true,
+      "enabled": true
+    }
+  ]
+}

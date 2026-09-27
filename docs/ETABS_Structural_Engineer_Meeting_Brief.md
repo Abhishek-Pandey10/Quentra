@@ -128,6 +128,7 @@ The five highest-priority questions are marked ★. The full questionnaire is in
 | 13 | Is a steel density of 7850 kg/m³ acceptable? | Yes | |
 | 14 | Should code minimum steel apply when demand is lower? Does ETABS demand already include it? | Not applied; needs checking per code | |
 | 15 | Which checks would convince you the numbers are right? Which errors would make you distrust the tool? | Fixtures A–E, then pilot comparison | |
+| 16 | Which ranges should trigger a "check the units" warning? Values outside are still quantified, but the reviewer must acknowledge them. | Section 0.1–3 m; area thickness 0.05–2 m; frame length ≤ 50 m; area extent ≤ 300 m; steel ≤ 600 kg per m³ of concrete; steel density 7000–8500 kg/m³ | |
 
 ## 7. What we need from you
 

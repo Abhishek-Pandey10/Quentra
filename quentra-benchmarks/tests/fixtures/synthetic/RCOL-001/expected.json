@@ -1,0 +1,104 @@
+{
+  "caseId": "RCOL-001",
+  "schemaVersion": "1.0",
+  "provenanceType": "synthetic_engineering_benchmark",
+  "snapshotStatus": "Accepted",
+  "finalization": {
+    "allowed": true,
+    "blockingCodes": []
+  },
+  "modelTotals": {
+    "grossConcreteM3": 0.4800000000000001,
+    "openingDeductionM3": 0.0,
+    "netConcreteM3": 0.4800000000000001,
+    "unclassifiedVolumeM3": 0.0,
+    "steelKg": 27.273648657545486,
+    "steelExactKg": 27.273648657545486,
+    "steelApproximateKg": 0.0,
+    "steelKgBySource": {
+      "ProvidedBars": 27.273648657545486,
+      "RequiredDesignArea": 0.0,
+      "EstimatedRatio": 0.0,
+      "ManualOverride": 0.0
+    }
+  },
+  "completeness": {
+    "concrete": "Complete",
+    "steel": "Complete",
+    "concreteUnknownElementIds": [],
+    "steelUnknownElementIds": []
+  },
+  "byStory": {
+    "L1": {
+      "grossConcreteM3": 0.4800000000000001,
+      "netConcreteM3": 0.4800000000000001,
+      "steelKg": 27.273648657545486
+    }
+  },
+  "byElementType": {
+    "Beam": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": 0.0
+    },
+    "Column": {
+      "grossConcreteM3": 0.4800000000000001,
+      "netConcreteM3": 0.4800000000000001,
+      "steelKg": 27.273648657545486
+    },
+    "Slab": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": 0.0
+    },
+    "Wall": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": 0.0
+    }
+  },
+  "byMaterial": {
+    "C40": {
+      "grossConcreteM3": 0.4800000000000001,
+      "netConcreteM3": 0.4800000000000001
+    }
+  },
+  "steelByMaterial": {
+    "B500": 27.273648657545486
+  },
+  "elements": [
+    {
+      "id": "C1",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L1",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.4800000000000001,
+      "netConcreteM3": 0.4800000000000001,
+      "steelKg": 27.273648657545486,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        18.940033789962143,
+        8.333614867583343
+      ],
+      "lengthM": 3.0
+    }
+  ],
+  "warnings": [],
+  "tolerance": {
+    "volumeM3": 1e-06,
+    "areaM2": 1e-06,
+    "lengthM": 1e-06,
+    "steelKg": 0.001,
+    "relative": 1e-09
+  },
+  "derivation": {
+    "method": "independent_first_principles",
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "handChecks": 2,
+    "closedFormCrossCheck": false
+  }
+}

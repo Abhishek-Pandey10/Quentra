@@ -16,6 +16,9 @@ public static class SteelCalculator
         SteelQuantity Unknown(string message) => new(input.ObjectId, input.Component, evidence, null, covers,
             input.SourceReference, "Not calculated", input.Assumption, input.ApprovedBy, input.ApprovedAt,
             [new("STEEL_UNAVAILABLE", message)]);
+        // Out-of-scope elements (excluded or non-concrete) need no steel, so they raise no warning to acknowledge.
+        if (element.Status == QuantityStatus.OutOfScope)
+            return Unknown("") with { Formula = "Not calculated: element is out of scope", Warnings = [] };
         if (element.Status != QuantityStatus.Quantified) return Unknown("Supported geometry is required for this steel component.");
         if (string.IsNullOrWhiteSpace(input.ApprovedBy) || input.ApprovedAt == default || string.IsNullOrWhiteSpace(input.Assumption))
             return Unknown("A named approval, date and measurement assumption are required.");
@@ -29,14 +32,25 @@ public static class SteelCalculator
                     var ratio = Nonnegative(input.Ratio);
                     if (input.Method == SteelMethod.VolumeFraction && ratio > 1)
                         throw new ArgumentException("A volumetric fraction must be between 0 and 1.");
+                    if (input.Method == SteelMethod.KgPerCubicMetre && ratio > policy.SteelDensityKgM3)
+                        throw new ArgumentException(string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                            $"A rate of {ratio:G6} kg/m³ exceeds the steel density of {policy.SteelDensityKgM3:G6} kg/m³. Check the rate and its units."));
                     var concrete = input.ConcreteBasis == ConcreteBasis.GrossModeled ? element.GrossM3 : element.OpeningAdjustedM3;
                     if (concrete is null) throw new ArgumentException("The estimate's concrete basis is unavailable.");
                     var mass = ratio * concrete.Value * (input.Method == SteelMethod.VolumeFraction ? policy.SteelDensityKgM3 : 1);
                     formula = input.Method == SteelMethod.VolumeFraction ? "volume fraction × declared concrete volume × steel density" : "kg/m³ × declared concrete volume";
                     return Make(mass, formula);
                 case SteelMethod.DemandEquivalent:
-                    if (input.DesignEvidence != DesignEvidence.VerifiedCurrent || string.IsNullOrWhiteSpace(input.DesignCode))
-                        throw new ArgumentException("Demand requires verified-current design evidence, a matching design section and a declared code/edition; check ratios are not areas.");
+                    if (input.DesignEvidence != DesignEvidence.VerifiedCurrent)
+                        throw new ArgumentException($"Design demand is only counted when designEvidence is VerifiedCurrent; this entry is {input.DesignEvidence}: " + input.DesignEvidence switch
+                        {
+                            DesignEvidence.Missing => "there is no design evidence for it.",
+                            DesignEvidence.Stale => "the model changed after the design run.",
+                            DesignEvidence.Failed => "the design failed, so its demand is not a valid reinforcement area.",
+                            _ => "its values are check ratios, not reinforcement areas."
+                        });
+                    if (string.IsNullOrWhiteSpace(input.DesignCode))
+                        throw new ArgumentException("Design demand needs the design code and edition in designCode.");
                     if (element.AxisLengthM is null) throw new ArgumentException("Longitudinal demand requires a supported frame.");
                     var start = Nonnegative(input.DomainStartM); var end = Positive(input.DomainEndM);
                     var maxGap = Positive(input.MaximumStationGapM);
@@ -58,10 +72,14 @@ public static class SteelCalculator
                     formula = "sum(max(endpoint As) × interval length) × density; declared domain only";
                     var demandResult = Make(volume * policy.SteelDensityKgM3, formula);
                     var fullDomain = start <= 1e-9 && Math.Abs(end - element.AxisLengthM.Value) <= 1e-9;
+                    var partial = string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                        $"Demand stations cover {start:0.###}–{end:0.###} m of the {element.AxisLengthM.Value:0.###} m axis. The mass counts that length only, and the component stays missing from coverage until the full length is covered.");
                     return demandResult with
                     {
                         CoversComponents = fullDomain ? covers : [],
-                        Warnings = [new(fullDomain ? "DEMAND_EQUIVALENT" : "PARTIAL_DEMAND_DOMAIN", "Sample-based demand equivalent; unsampled peaks, end zones outside the declared domain, laps, anchorage and transverse bars are not inferred.")]
+                        Warnings = [fullDomain
+                            ? new("DEMAND_EQUIVALENT", "Sample-based demand equivalent; unsampled peaks, end zones outside the declared domain, laps, anchorage and transverse bars are not inferred.")
+                            : new("PARTIAL_DEMAND_DOMAIN", partial)]
                     };
                 case SteelMethod.AssignedBars:
                     if (input.Bars.IsDefaultOrEmpty) throw new ArgumentException("Bar count, area and straight length are required.");

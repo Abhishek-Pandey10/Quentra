@@ -79,7 +79,7 @@ public class SnapshotTests
             await Assert.ThrowsAsync<IOException>(() => SnapshotJson.WriteAsync(path, package));
             Assert.Equal(first, await File.ReadAllTextAsync(path));
             Assert.Single(Directory.GetFiles(directory));
-            Assert.Equal(package.CalculationSha256, SnapshotJson.Replay(await SnapshotJson.ReadAsync(path)).CalculationSha256);
+            Assert.Equal(package.CalculationSha256, SnapshotJson.Replay(await SnapshotJson.ReadAsync(path, SnapshotJson.MaximumRunBytes)).CalculationSha256);
         }
         finally { if (Directory.Exists(directory)) Directory.Delete(directory, recursive: true); }
     }
