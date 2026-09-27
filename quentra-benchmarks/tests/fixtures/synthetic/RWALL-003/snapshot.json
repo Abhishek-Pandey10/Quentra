@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Wall with boundary-zone reinforcement",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.5,
+        "height": 3.5
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C35",
+      "type": "Concrete",
+      "grade": "C35",
+      "fckMPa": 35
+    },
+    {
+      "name": "B500",
+      "type": "Rebar",
+      "grade": "B500",
+      "density": 7850.0,
+      "densityUnit": "kg/m3",
+      "fyMPa": 500
+    }
+  ],
+  "sections": [
+    {
+      "name": "W",
+      "kind": "Wall",
+      "thickness": 0.3
+    }
+  ],
+  "elements": [
+    {
+      "id": "W1",
+      "name": "W1",
+      "type": "Wall",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C35",
+      "section": "W",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": 6,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": 6,
+            "y": 0,
+            "z": 3.5
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "z": 3.5
+          }
+        ],
+        "openings": []
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500",
+        "components": [
+          {
+            "type": "Mesh",
+            "role": "web-vertical",
+            "direction": "Vertical",
+            "diameter": 0.012,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 2,
+            "region": {
+              "uMin": 0.6,
+              "uMax": 5.4,
+              "vMin": 0,
+              "vMax": 3.5
+            }
+          },
+          {
+            "type": "Mesh",
+            "role": "web-horizontal",
+            "direction": "Horizontal",
+            "diameter": 0.01,
+            "spacing": 0.2,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 2
+          },
+          {
+            "type": "StraightBars",
+            "role": "boundary-left",
+            "count": 6,
+            "diameter": 0.02,
+            "length": 3.5
+          },
+          {
+            "type": "StraightBars",
+            "role": "boundary-right",
+            "count": 6,
+            "diameter": 0.02,
+            "length": 3.5
+          },
+          {
+            "type": "Hoops",
+            "role": "boundary-left-hoops",
+            "diameter": 0.01,
+            "spacing": 0.1,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "zoneLength": 3.5,
+            "centerlineWidth": 0.22,
+            "centerlineHeight": 0.5
+          },
+          {
+            "type": "Hoops",
+            "role": "boundary-right-hoops",
+            "diameter": 0.01,
+            "spacing": 0.1,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "zoneLength": 3.5,
+            "centerlineWidth": 0.22,
+            "centerlineHeight": 0.5
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "W1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "RWALL-003",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

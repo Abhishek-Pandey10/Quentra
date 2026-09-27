@@ -4,5 +4,7 @@
 output/
 TestResults/
 .DS_Store
+__pycache__/
+*.pyc
 .vs/
 *.user

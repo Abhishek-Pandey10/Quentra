@@ -37,33 +37,60 @@ public static class CalculateSnapshot
     public static void Validate(ModelSnapshot snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
+        ThrowIfAny(Problems(snapshot));
+    }
+
+    // Every independent problem is reported, so a hand-edited snapshot is fixed in one pass rather than
+    // one error per run. Checking stops early only where later checks cannot run.
+    public static IEnumerable<string> Problems(ModelSnapshot snapshot)
+    {
         if (snapshot.SchemaVersion != 1)
-            throw new ArgumentException($"Unsupported snapshot schema version {snapshot.SchemaVersion}; expected 1.");
+        {
+            yield return $"Unsupported snapshot schema version {snapshot.SchemaVersion}; expected 1.";
+            yield break;
+        }
         if (string.IsNullOrWhiteSpace(snapshot.ModelId) || string.IsNullOrWhiteSpace(snapshot.SourceDescription))
-            throw new ArgumentException("Model identity and source description must be supplied.");
+            yield return "Model identity and source description must be supplied.";
         if (snapshot.CapturedAt == default)
-            throw new ArgumentException("Snapshot capture time must be supplied.");
+            yield return "Snapshot capture time must be supplied.";
         if (!Enum.IsDefined(snapshot.CoordinateUnit) || !Enum.IsDefined(snapshot.Origin))
-            throw new ArgumentException("Unknown coordinate unit or snapshot origin.");
+            yield return "Unknown coordinate unit or snapshot origin.";
         if (snapshot.Frames.IsDefault)
-            throw new ArgumentException("Frames must be an array, including for an empty snapshot.");
+        {
+            yield return "Frames must be an array, including for an empty snapshot.";
+            yield break;
+        }
         var ids = new HashSet<string>(StringComparer.Ordinal);
         for (var i = 0; i < snapshot.Frames.Length; i++)
         {
             var frame = snapshot.Frames[i];
             if (frame is null || string.IsNullOrWhiteSpace(frame.ObjectId))
-                throw new ArgumentException($"Frame {i + 1}: objectId is required.");
+            {
+                yield return $"Frame {i + 1}: objectId is required.";
+                continue;
+            }
             if (string.IsNullOrWhiteSpace(frame.SourceReference))
-                throw new ArgumentException($"Frame {frame.ObjectId}: sourceReference is required.");
+                yield return $"Frame {frame.ObjectId}: sourceReference is required.";
             if (!ids.Add(frame.ObjectId))
-                throw new ArgumentException($"Duplicate object identity: {frame.ObjectId}.");
+                yield return $"Duplicate object identity: {frame.ObjectId}.";
             if (!Enum.IsDefined(frame.Kind) || !Enum.IsDefined(frame.Material) ||
                 (frame.Section is not null && !Enum.IsDefined(frame.Section.Shape)))
-                throw new ArgumentException($"Unknown frame classification: {frame.ObjectId}.");
-            if (frame.Section is { } section)
-                foreach (var dimension in new[] { section.Width, section.Depth, section.Diameter })
-                    if (dimension is not null && !Enum.IsDefined(dimension.Unit))
-                        throw new ArgumentException($"Unknown section unit: {frame.ObjectId}.");
+                yield return $"Unknown frame classification: {frame.ObjectId}.";
+            if (frame.Section is { } section &&
+                new[] { section.Width, section.Depth, section.Diameter }.Any(d => d is not null && !Enum.IsDefined(d.Unit)))
+                yield return $"Unknown section unit: {frame.ObjectId}.";
         }
+    }
+
+    public const int ProblemsShown = 50;
+
+    // A single problem keeps its own message; several are listed together.
+    public static void ThrowIfAny(IEnumerable<string> problems)
+    {
+        var list = problems.ToList();
+        if (list.Count == 1) throw new ArgumentException(list[0]);
+        if (list.Count > 1)
+            throw new ArgumentException($"The snapshot has {list.Count} problems:" + string.Concat(list.Take(ProblemsShown).Select(x => "\n  - " + x)) +
+                (list.Count > ProblemsShown ? $"\n  ... and {list.Count - ProblemsShown} more." : ""));
     }
 }

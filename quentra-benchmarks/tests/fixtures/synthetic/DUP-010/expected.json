@@ -1,0 +1,119 @@
+{
+  "caseId": "DUP-010",
+  "schemaVersion": "1.0",
+  "provenanceType": "synthetic_engineering_benchmark",
+  "snapshotStatus": "Accepted",
+  "finalization": {
+    "allowed": false,
+    "blockingCodes": [
+      "ORPHAN_ANALYTICAL_ELEMENT"
+    ]
+  },
+  "modelTotals": {
+    "grossConcreteM3": 1.08,
+    "openingDeductionM3": 0.0,
+    "netConcreteM3": 1.08,
+    "unclassifiedVolumeM3": 0.0,
+    "steelKg": null,
+    "steelExactKg": null,
+    "steelApproximateKg": null,
+    "steelKgBySource": null
+  },
+  "completeness": {
+    "concrete": "Incomplete",
+    "steel": "NotEvaluated",
+    "concreteUnknownElementIds": [
+      "B9~A1"
+    ],
+    "steelUnknownElementIds": []
+  },
+  "byStory": {
+    "L1": {
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": null
+    }
+  },
+  "byElementType": {
+    "Beam": {
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": null
+    },
+    "Column": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    },
+    "Slab": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    },
+    "Wall": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    }
+  },
+  "byMaterial": {
+    "C30": {
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08
+    }
+  },
+  "steelByMaterial": {},
+  "elements": [
+    {
+      "id": "B9~A1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": null,
+      "status": "Rejected",
+      "grossConcreteM3": null,
+      "netConcreteM3": null,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "lengthM": null
+    },
+    {
+      "id": "B2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "lengthM": 6.0
+    }
+  ],
+  "warnings": [
+    {
+      "code": "ORPHAN_ANALYTICAL_ELEMENT",
+      "severity": "Error",
+      "subject": "B9~A1"
+    }
+  ],
+  "tolerance": {
+    "volumeM3": 1e-06,
+    "areaM2": 1e-06,
+    "lengthM": 1e-06,
+    "steelKg": 0.001,
+    "relative": 1e-09
+  },
+  "derivation": {
+    "method": "independent_first_principles",
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "handChecks": 2,
+    "closedFormCrossCheck": false
+  }
+}

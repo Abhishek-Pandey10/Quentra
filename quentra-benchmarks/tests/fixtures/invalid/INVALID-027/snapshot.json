@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Missing provenance",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.0,
+        "height": 3.0
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C30",
+      "type": "Concrete",
+      "grade": "C30",
+      "fckMPa": 30
+    },
+    {
+      "name": "B500",
+      "type": "Rebar",
+      "grade": "B500",
+      "density": 7850.0,
+      "densityUnit": "kg/m3",
+      "fyMPa": 500
+    }
+  ],
+  "sections": [
+    {
+      "name": "B300x600",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.3,
+      "depth": 0.6
+    },
+    {
+      "name": "S200",
+      "kind": "Slab",
+      "thickness": 0.2
+    },
+    {
+      "name": "W200",
+      "kind": "Wall",
+      "thickness": 0.2
+    }
+  ],
+  "elements": [
+    {
+      "id": "B-OK",
+      "name": "B-OK",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30",
+      "section": "B300x600",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 20,
+          "z": 3
+        },
+        "end": {
+          "x": 6,
+          "y": 20,
+          "z": 3
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-OK",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": []
+}

@@ -13,10 +13,13 @@ public sealed record RunPackage(int SchemaVersion, string SnapshotSha256,
 
 public static class SnapshotJson
 {
-    public const long MaximumSnapshotBytes = 16 * 1024 * 1024;
-    // A run embeds its snapshot plus per-element results and is several times larger, so a
-    // snapshot at the input limit must still produce a run that every later command can open.
-    public const long MaximumRunBytes = 256 * 1024 * 1024;
+    // Sized for tall buildings: a pretty-printed 70-storey, 84k-element snapshot is about 144 MB. The limit guards
+    // against opening the wrong file, not against real models.
+    public const long MaximumSnapshotBytes = 192 * 1024 * 1024;
+    // A run embeds its snapshot plus per-element results and is written indented: up to about four times a compact
+    // snapshot. A snapshot at its limit must still produce a run every later command can open, and a run is read
+    // as one string, which .NET caps just under 1 GiB of characters.
+    public const long MaximumRunBytes = 1000L * 1024 * 1024;
     private static readonly JsonSerializerOptions Compact = CreateOptions(false);
     private static readonly JsonSerializerOptions Indented = CreateOptions(true);
 
@@ -32,6 +35,7 @@ public static class SnapshotJson
             MaxDepth = 32
         };
         options.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false));
+        options.Converters.Add(new UtcDateTimeConverter());
         return options;
     }
 
@@ -79,7 +83,7 @@ public static class SnapshotJson
         await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
         if (stream.Length > maximumBytes)
             throw new InvalidDataException(tooLarge);
-        using var buffer = new MemoryStream();
+        using var buffer = new MemoryStream((int)stream.Length); // One allocation, not repeated doubling.
         var chunk = new byte[8192];
         int count;
         while ((count = await stream.ReadAsync(chunk, cancellationToken)) != 0)
@@ -88,7 +92,8 @@ public static class SnapshotJson
                 throw new InvalidDataException(tooLarge);
             buffer.Write(chunk, 0, count);
         }
-        return new UTF8Encoding(false, true).GetString(buffer.ToArray()).TrimStart('\uFEFF');
+        try { return new UTF8Encoding(false, true).GetString(buffer.GetBuffer(), 0, (int)buffer.Length).TrimStart('\uFEFF'); }
+        catch (DecoderFallbackException) { throw new InvalidDataException($"{Path.GetFileName(path)} is not UTF-8 text. Save it as a UTF-8 JSON file."); }
     }
 
     // The completed file appears only after a successful write. Existing reports are
@@ -97,7 +102,8 @@ public static class SnapshotJson
     {
         var fullPath = Path.GetFullPath(path);
         var directory = Path.GetDirectoryName(fullPath)!;
-        Directory.CreateDirectory(directory);
+        try { Directory.CreateDirectory(directory); }
+        catch (IOException e) { throw FolderFailed(directory, e); }
         var temporary = Path.Combine(directory, $".quentra-{Guid.NewGuid():N}.tmp");
         try
         {
@@ -105,11 +111,21 @@ public static class SnapshotJson
             cancellationToken.ThrowIfCancellationRequested();
             File.Move(temporary, fullPath, overwrite: false);
         }
+        catch (IOException e) { throw WriteFailed(fullPath, e); }
         finally
         {
             if (File.Exists(temporary)) File.Delete(temporary);
         }
     }
+
+    // The temporary file's name means nothing to the user; name the file they asked for.
+    public static IOException WriteFailed(string path, Exception inner) => new(File.Exists(path)
+        ? $"{path} already exists. Choose a new path; existing runs and reports are never overwritten."
+        : $"Could not write {path}. Check that the folder is writable and has free space.", inner);
+
+    // The OS message ("Read-only file system : '/x'") does not say what Quentra was trying to do.
+    public static IOException FolderFailed(string folder, Exception inner) =>
+        new($"Could not create the folder {folder}. Choose a location you can write to.", inner);
 
     private static ModelSnapshot CanonicalSnapshot(ModelSnapshot snapshot) => snapshot with
     {

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Source ManualOverride",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.0,
+        "height": 3.0
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C30",
+      "type": "Concrete",
+      "grade": "C30",
+      "fckMPa": 30
+    },
+    {
+      "name": "B500",
+      "type": "Rebar",
+      "grade": "B500",
+      "density": 7850.0,
+      "densityUnit": "kg/m3",
+      "fyMPa": 500
+    }
+  ],
+  "sections": [
+    {
+      "name": "B",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.3,
+      "depth": 0.6
+    }
+  ],
+  "elements": [
+    {
+      "id": "B1",
+      "name": "B1",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30",
+      "section": "B",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 3
+        },
+        "end": {
+          "x": 6.0,
+          "y": 0,
+          "z": 3
+        }
+      },
+      "reinforcement": {
+        "source": "ManualOverride",
+        "steelMaterial": "B500",
+        "components": [
+          {
+            "type": "FixedMass",
+            "mass": 150.0,
+            "massUnit": "kg"
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "RSRC-003",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

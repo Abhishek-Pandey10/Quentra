@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Circular column with circular hoops",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.5,
+        "height": 3.5
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C40",
+      "type": "Concrete",
+      "grade": "C40",
+      "fckMPa": 40
+    },
+    {
+      "name": "B500",
+      "type": "Rebar",
+      "grade": "B500",
+      "density": 7850.0,
+      "densityUnit": "kg/m3",
+      "fyMPa": 500
+    }
+  ],
+  "sections": [
+    {
+      "name": "C600D",
+      "kind": "Frame",
+      "shape": "Circle",
+      "diameter": 0.6
+    }
+  ],
+  "elements": [
+    {
+      "id": "C1",
+      "name": "C1",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C40",
+      "section": "C600D",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "end": {
+          "x": 0,
+          "y": 0,
+          "z": 3.5
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 8,
+            "diameter": 0.02
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.01,
+            "spacing": 0.15,
+            "endOffset": 0.05,
+            "hookAllowance": 0.2,
+            "setsPerLocation": 1,
+            "cover": 0.04
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "C1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "RCOL-004",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

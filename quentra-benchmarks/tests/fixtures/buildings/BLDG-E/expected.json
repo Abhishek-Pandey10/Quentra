@@ -1,0 +1,1239 @@
+{
+  "caseId": "BLDG-E",
+  "schemaVersion": "1.0",
+  "provenanceType": "synthetic_engineering_benchmark",
+  "snapshotStatus": "Accepted",
+  "finalization": {
+    "allowed": false,
+    "blockingCodes": [
+      "DUPLICATE_ELEMENT_ID",
+      "DUPLICATE_GEOMETRY",
+      "MATERIAL_TYPE_AMBIGUOUS",
+      "MISSING_REINFORCEMENT",
+      "ORPHAN_ANALYTICAL_ELEMENT",
+      "STALE_DESIGN_RESULT",
+      "STORY_REFERENCE_MISSING",
+      "UNIT_PLAUSIBILITY",
+      "UNKNOWN_MATERIAL"
+    ]
+  },
+  "modelTotals": {
+    "grossConcreteM3": 43273.64000000001,
+    "openingDeductionM3": 0.3999999999999986,
+    "netConcreteM3": 43273.240000000005,
+    "unclassifiedVolumeM3": 2.16,
+    "steelKg": 3677406.189296209,
+    "steelExactKg": 2878.9608962094044,
+    "steelApproximateKg": 3674527.2284,
+    "steelKgBySource": {
+      "ProvidedBars": 2878.9608962094044,
+      "RequiredDesignArea": 113.22840000000001,
+      "EstimatedRatio": 3674414.0,
+      "ManualOverride": 0.0
+    }
+  },
+  "completeness": {
+    "concrete": "Incomplete",
+    "steel": "Incomplete",
+    "concreteUnknownElementIds": [
+      "BX99-L2~seg1",
+      "DUPE-1",
+      "B-UNK",
+      "B-AMB"
+    ],
+    "steelUnknownElementIds": [
+      "W-L1",
+      "BX99-L2~seg1",
+      "DUPE-1",
+      "B-UNK",
+      "B-AMB"
+    ]
+  },
+  "byStory": {
+    "L1": {
+      "grossConcreteM3": 52.4,
+      "netConcreteM3": 52.00000000000001,
+      "steelKg": 3773.5771805533
+    },
+    "L2": {
+      "grossConcreteM3": 43220.16,
+      "netConcreteM3": 43220.16,
+      "steelKg": 3673552.7088481043
+    },
+    "<unassigned>": {
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279
+    }
+  },
+  "byElementType": {
+    "Beam": {
+      "grossConcreteM3": 29.159999999999982,
+      "netConcreteM3": 29.159999999999982,
+      "steelKg": 2190.713356336471
+    },
+    "Column": {
+      "grossConcreteM3": 10.080000000000005,
+      "netConcreteM3": 10.080000000000005,
+      "steelKg": 801.4759398729333
+    },
+    "Slab": {
+      "grossConcreteM3": 43228.8,
+      "netConcreteM3": 43228.4,
+      "steelKg": 3674414.0
+    },
+    "Wall": {
+      "grossConcreteM3": 5.6000000000000005,
+      "netConcreteM3": 5.6000000000000005,
+      "steelKg": 0.0
+    }
+  },
+  "byMaterial": {
+    "C40": {
+      "grossConcreteM3": 10.080000000000005,
+      "netConcreteM3": 10.080000000000005
+    },
+    "C30": {
+      "grossConcreteM3": 43263.560000000005,
+      "netConcreteM3": 43263.16
+    }
+  },
+  "steelByMaterial": {
+    "B500": 3677406.189296209
+  },
+  "elements": [
+    {
+      "id": "C00-L1",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L1",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C06-L1",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L1",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C012-L1",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L1",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C60-L1",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L1",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C66-L1",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L1",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C612-L1",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L1",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C120-L1",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L1",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C126-L1",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L1",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C1212-L1",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L1",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "BX00-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BX10-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BX06-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BX16-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BX012-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BX112-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY00-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY10-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY06-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY16-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY012-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY112-L1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "C00-L2",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L2",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C06-L2",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L2",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C012-L2",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L2",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C60-L2",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L2",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C66-L2",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L2",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C612-L2",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L2",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C120-L2",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L2",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C126-L2",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L2",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "C1212-L2",
+      "occurrence": 0,
+      "type": "Column",
+      "story": "L2",
+      "materialGroup": "C40",
+      "status": "Included",
+      "grossConcreteM3": 0.56,
+      "netConcreteM3": 0.56,
+      "steelKg": 44.52644110405185,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        34.526103262951835,
+        10.000337841100013
+      ],
+      "lengthM": 3.5
+    },
+    {
+      "id": "BX00-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BX10-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BX06-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BX16-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BX012-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BX112-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY00-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY10-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY06-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY16-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY012-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "BY112-L2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "S-L1",
+      "occurrence": 0,
+      "type": "Slab",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 28.8,
+      "netConcreteM3": 28.400000000000002,
+      "steelKg": 2414.0,
+      "reinforcementSource": "EstimatedRatio",
+      "steelExact": false,
+      "steelComponentsKg": [
+        2414.0
+      ],
+      "grossAreaM2": 144.0,
+      "openingAreaSumM2": 4.0,
+      "openingDeductedAreaM2": 2.0,
+      "netAreaM2": 142.0
+    },
+    {
+      "id": "S-L2",
+      "occurrence": 0,
+      "type": "Slab",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 43200.0,
+      "netConcreteM3": 43200.0,
+      "steelKg": 3672000.0,
+      "reinforcementSource": "EstimatedRatio",
+      "steelExact": false,
+      "steelComponentsKg": [
+        3672000.0
+      ],
+      "grossAreaM2": 144.0,
+      "openingAreaSumM2": 0.0,
+      "openingDeductedAreaM2": 0.0,
+      "netAreaM2": 144.0
+    },
+    {
+      "id": "W-L1",
+      "occurrence": 0,
+      "type": "Wall",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 5.6000000000000005,
+      "netConcreteM3": 5.6000000000000005,
+      "steelKg": null,
+      "reinforcementSource": "Unavailable",
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "grossAreaM2": 28.0,
+      "openingAreaSumM2": 0.0,
+      "openingDeductedAreaM2": 0.0,
+      "netAreaM2": 28.0
+    },
+    {
+      "id": "BX00-L1~seg1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": null,
+      "status": "Excluded",
+      "grossConcreteM3": null,
+      "netConcreteM3": null,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "lengthM": null
+    },
+    {
+      "id": "BX00-L1~seg2",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": null,
+      "status": "Excluded",
+      "grossConcreteM3": null,
+      "netConcreteM3": null,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "lengthM": null
+    },
+    {
+      "id": "BX99-L2~seg1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": null,
+      "status": "Rejected",
+      "grossConcreteM3": null,
+      "netConcreteM3": null,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "lengthM": null
+    },
+    {
+      "id": "C00-L1",
+      "occurrence": 1,
+      "type": "Column",
+      "story": "L1",
+      "materialGroup": null,
+      "status": "Excluded",
+      "grossConcreteM3": null,
+      "netConcreteM3": null,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "lengthM": null
+    },
+    {
+      "id": "DUPE-1",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": null,
+      "status": "Rejected",
+      "grossConcreteM3": null,
+      "netConcreteM3": null,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "lengthM": null
+    },
+    {
+      "id": "DUPE-1",
+      "occurrence": 1,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": null,
+      "status": "Rejected",
+      "grossConcreteM3": null,
+      "netConcreteM3": null,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "lengthM": null
+    },
+    {
+      "id": "B-GHOST",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "B-UNK",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": null,
+      "status": "Unclassified",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "lengthM": 6.0
+    },
+    {
+      "id": "B-AMB",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L1",
+      "materialGroup": null,
+      "status": "Unclassified",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "lengthM": 6.0
+    },
+    {
+      "id": "B-NOSTORY",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "<unassigned>",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 79.90326755140279,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        28.410050684943215,
+        18.940033789962143,
+        32.55318307649744
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "B-STALE",
+      "occurrence": 0,
+      "type": "Beam",
+      "story": "L2",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 1.08,
+      "netConcreteM3": 1.08,
+      "steelKg": 113.22840000000001,
+      "reinforcementSource": "RequiredDesignArea",
+      "steelExact": false,
+      "steelComponentsKg": [
+        113.22840000000001
+      ],
+      "lengthM": 6.0
+    },
+    {
+      "id": "LINK-1",
+      "occurrence": 0,
+      "type": "Link",
+      "story": "L1",
+      "materialGroup": null,
+      "status": "Skipped",
+      "grossConcreteM3": null,
+      "netConcreteM3": null,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": []
+    }
+  ],
+  "warnings": [
+    {
+      "code": "DUPLICATE_ELEMENT",
+      "severity": "Warning",
+      "subject": "C00-L1"
+    },
+    {
+      "code": "DUPLICATE_ELEMENT_ID",
+      "severity": "Error",
+      "subject": "DUPE-1"
+    },
+    {
+      "code": "OPENING_CLIPPED",
+      "severity": "Warning",
+      "subject": "S-L1/OP-EDGE"
+    },
+    {
+      "code": "ESTIMATED_REINFORCEMENT",
+      "severity": "Warning",
+      "subject": "S-L1"
+    },
+    {
+      "code": "UNREALISTIC_DIMENSION",
+      "severity": "Warning",
+      "subject": "S-L2"
+    },
+    {
+      "code": "UNIT_PLAUSIBILITY",
+      "severity": "Error",
+      "subject": "S-L2"
+    },
+    {
+      "code": "ESTIMATED_REINFORCEMENT",
+      "severity": "Warning",
+      "subject": "S-L2"
+    },
+    {
+      "code": "MISSING_REINFORCEMENT",
+      "severity": "Warning",
+      "subject": "W-L1"
+    },
+    {
+      "code": "ANALYTICAL_CHILD_EXCLUDED",
+      "severity": "Info",
+      "subject": "BX00-L1~seg1"
+    },
+    {
+      "code": "ANALYTICAL_CHILD_EXCLUDED",
+      "severity": "Info",
+      "subject": "BX00-L1~seg2"
+    },
+    {
+      "code": "ORPHAN_ANALYTICAL_ELEMENT",
+      "severity": "Error",
+      "subject": "BX99-L2~seg1"
+    },
+    {
+      "code": "UNKNOWN_MATERIAL",
+      "severity": "Error",
+      "subject": "B-UNK"
+    },
+    {
+      "code": "MATERIAL_TYPE_AMBIGUOUS",
+      "severity": "Error",
+      "subject": "B-AMB"
+    },
+    {
+      "code": "STORY_REFERENCE_MISSING",
+      "severity": "Error",
+      "subject": "B-NOSTORY"
+    },
+    {
+      "code": "STALE_DESIGN_RESULT",
+      "severity": "Warning",
+      "subject": "B-STALE"
+    },
+    {
+      "code": "REQUIRED_AREA_USED",
+      "severity": "Info",
+      "subject": "B-STALE"
+    },
+    {
+      "code": "UNSUPPORTED_ELEMENT_TYPE",
+      "severity": "Warning",
+      "subject": "LINK-1"
+    },
+    {
+      "code": "DUPLICATE_GEOMETRY",
+      "severity": "Warning",
+      "subject": "BY012-L2+B-GHOST"
+    }
+  ],
+  "tolerance": {
+    "volumeM3": 1e-06,
+    "areaM2": 1e-06,
+    "lengthM": 1e-06,
+    "steelKg": 0.001,
+    "relative": 1e-09
+  },
+  "derivation": {
+    "method": "independent_first_principles",
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "handChecks": 5,
+    "closedFormCrossCheck": true
+  }
+}

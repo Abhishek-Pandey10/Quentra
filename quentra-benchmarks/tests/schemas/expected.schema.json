@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quentra.local/schemas/expected.schema.json",
+  "title": "Quentra golden expected result",
+  "description": "Independently calculated expected output for one benchmark snapshot. Produced from first principles by tests/generators - never from Quentra output. A value of null means 'unknown' and Quentra must report null (not 0). Keys that are absent are not checked.",
+  "type": "object",
+  "required": ["caseId", "schemaVersion", "snapshotStatus", "finalization", "modelTotals", "byStory", "byElementType", "byMaterial", "steelByMaterial", "elements", "warnings", "tolerance", "derivation"],
+  "properties": {
+    "caseId": { "type": "string" },
+    "schemaVersion": { "const": "1.0" },
+    "provenanceType": { "type": ["string", "null"] },
+    "derivation": {
+      "type": "object",
+      "required": ["method", "generator", "generatorVersion", "handChecks"],
+      "properties": {
+        "method": { "const": "independent_first_principles" },
+        "generator": { "type": "string" },
+        "generatorVersion": { "type": "string" },
+        "handChecks": { "type": "integer", "minimum": 0, "description": "Number of hand-worked values this expected file was verified against." },
+        "closedFormCrossCheck": { "type": "boolean" }
+      }
+    },
+    "snapshotStatus": { "enum": ["Accepted", "Rejected"] },
+    "finalization": {
+      "type": "object",
+      "required": ["allowed", "blockingCodes"],
+      "properties": { "allowed": { "type": "boolean" }, "blockingCodes": { "type": "array", "items": { "type": "string" } } }
+    },
+    "modelTotals": {
+      "type": ["object", "null"],
+      "required": ["grossConcreteM3", "openingDeductionM3", "netConcreteM3", "unclassifiedVolumeM3", "steelKg", "steelExactKg", "steelApproximateKg", "steelKgBySource"],
+      "properties": {
+        "grossConcreteM3": { "$ref": "#/$defs/qty" },
+        "openingDeductionM3": { "$ref": "#/$defs/qty" },
+        "netConcreteM3": { "$ref": "#/$defs/qty" },
+        "unclassifiedVolumeM3": { "$ref": "#/$defs/qty" },
+        "steelKg": { "$ref": "#/$defs/qty" },
+        "steelExactKg": { "$ref": "#/$defs/qty" },
+        "steelApproximateKg": { "$ref": "#/$defs/qty" },
+        "steelKgBySource": {
+          "type": ["object", "null"],
+          "properties": {
+            "ProvidedBars": { "$ref": "#/$defs/qty" }, "RequiredDesignArea": { "$ref": "#/$defs/qty" },
+            "EstimatedRatio": { "$ref": "#/$defs/qty" }, "ManualOverride": { "$ref": "#/$defs/qty" }
+          }
+        }
+      }
+    },
+    "completeness": {
+      "type": ["object", "null"],
+      "properties": {
+        "concrete": { "enum": ["Complete", "Incomplete"] },
+        "steel": { "enum": ["Complete", "Incomplete", "NotEvaluated"] },
+        "concreteUnknownElementIds": { "type": "array", "items": { "type": "string" } },
+        "steelUnknownElementIds": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "byStory": { "type": "object", "additionalProperties": { "$ref": "#/$defs/bucket" } },
+    "byElementType": { "type": "object", "additionalProperties": { "$ref": "#/$defs/bucket" } },
+    "byMaterial": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["grossConcreteM3", "netConcreteM3"],
+        "properties": { "grossConcreteM3": { "type": "number" }, "netConcreteM3": { "type": "number" } }
+      }
+    },
+    "steelByMaterial": { "type": "object", "additionalProperties": { "type": "number" } },
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "occurrence", "type", "status"],
+        "properties": {
+          "id": { "type": ["string", "null"] },
+          "occurrence": { "type": "integer", "minimum": 0, "description": "0 for the first element with this id, 1 for the second, ... (input order)." },
+          "type": { "type": ["string", "null"] },
+          "story": { "type": ["string", "null"] },
+          "materialGroup": { "type": ["string", "null"] },
+          "status": { "enum": ["Included", "Excluded", "Skipped", "Rejected", "Unquantified", "Unclassified"] },
+          "lengthM": { "$ref": "#/$defs/qty" },
+          "grossAreaM2": { "$ref": "#/$defs/qty" },
+          "openingAreaSumM2": { "$ref": "#/$defs/qty" },
+          "openingDeductedAreaM2": { "$ref": "#/$defs/qty" },
+          "netAreaM2": { "$ref": "#/$defs/qty" },
+          "grossConcreteM3": { "$ref": "#/$defs/qty" },
+          "netConcreteM3": { "$ref": "#/$defs/qty" },
+          "steelKg": { "$ref": "#/$defs/qty" },
+          "reinforcementSource": { "type": ["string", "null"], "description": "Declared source category (ProvidedBars, RequiredDesignArea, EstimatedRatio, ManualOverride, Unavailable), echoed even when steel is unknown; null when steel was not evaluated." },
+          "steelExact": { "type": ["boolean", "null"] },
+          "steelComponentsKg": { "type": "array", "items": { "type": "number" } }
+        }
+      }
+    },
+    "warnings": { "type": "array", "items": { "$ref": "warnings.schema.json#/$defs/warning" } },
+    "tolerance": {
+      "type": "object",
+      "required": ["volumeM3", "areaM2", "lengthM", "steelKg", "relative"],
+      "properties": {
+        "volumeM3": { "type": "number" }, "areaM2": { "type": "number" }, "lengthM": { "type": "number" },
+        "steelKg": { "type": "number" }, "relative": { "type": "number" }
+      }
+    }
+  },
+  "$defs": {
+    "qty": { "type": ["number", "null"] },
+    "bucket": {
+      "type": "object",
+      "required": ["grossConcreteM3", "netConcreteM3", "steelKg"],
+      "properties": { "grossConcreteM3": { "type": "number" }, "netConcreteM3": { "type": "number" }, "steelKg": { "type": ["number", "null"] } }
+    }
+  }
+}

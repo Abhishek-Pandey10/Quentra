@@ -11,12 +11,15 @@ public sealed record QuantityOverride(string Id, string ObjectId, OverrideField 
 
 public static class Overrides
 {
-    public static (TakeoffSnapshot Effective, HashSet<string> Excluded) Apply(TakeoffSnapshot source,
+    // SectionChanges names, per frame, the overrides that changed its section, so steel that no longer
+    // matches the section can say which override caused it.
+    public static (TakeoffSnapshot Effective, HashSet<string> Excluded, Dictionary<string, string> SectionChanges) Apply(TakeoffSnapshot source,
         ImmutableArray<QuantityOverride> changes, string sourceHash)
     {
         if (changes.IsDefault) throw new ArgumentException("Override ledger must be an array.");
         var effective = source;
         var excluded = new HashSet<string>(StringComparer.Ordinal);
+        var sectionChanges = new Dictionary<string, string>(StringComparer.Ordinal);
         var ids = new HashSet<string>(StringComparer.Ordinal);
         foreach (var change in changes)
         {
@@ -36,10 +39,15 @@ public static class Overrides
             {
                 if (change.OriginalValue != (excluded.Contains(change.ObjectId) ? 1 : 0) || change.ReplacementValue is not (0 or 1))
                     throw new ArgumentException($"{name}: an exclusion uses 0 (included) or 1 (excluded), and originalValue must be the current state ({(excluded.Contains(change.ObjectId) ? 1 : 0)}).");
+                if (change.ReplacementValue == change.OriginalValue)
+                    throw new ArgumentException($"{name}: {change.ObjectId} is already {(change.OriginalValue == 1 ? "excluded" : "included")}; the override would change nothing.");
                 if (change.ReplacementValue == 1) excluded.Add(change.ObjectId); else excluded.Remove(change.ObjectId);
                 continue;
             }
-            if (change.ReplacementValue <= 0) throw new ArgumentException($"{name}: replacementValue must be a positive dimension in metres.");
+            var (min, max) = Plausibility.OverrideRange(change.Field);
+            if (change.ReplacementValue < min || change.ReplacementValue > max)
+                throw new ArgumentException(string.Create(CultureInfo.InvariantCulture,
+                    $"{name}: {Label(change.Field)} {Mm(change.ReplacementValue)} for {change.ObjectId} is outside the accepted override range {Mm(min)}–{Mm(max)}. Check the value and its unit."));
             SourceLength? current = change.Field switch
             {
                 OverrideField.FrameWidthM => frame?.Section?.Width,
@@ -53,6 +61,8 @@ public static class Overrides
             if (Math.Abs(current.Metres - change.OriginalValue) > 1e-12)
                 throw new ArgumentException(string.Create(CultureInfo.InvariantCulture,
                     $"{name}: originalValue {change.OriginalValue} does not match the current {change.Field} of {change.ObjectId}, {current.Metres} m."));
+            if (Math.Abs(change.ReplacementValue - current.Metres) <= effective.Policy.LinearToleranceM)
+                throw new ArgumentException($"{name}: {change.ObjectId} {Label(change.Field)} is already {Mm(current.Metres)}; the override would change nothing.");
             var replacement = new SourceLength { Value = change.ReplacementValue, Unit = LengthUnit.Metre };
             if (change.Field == OverrideField.AreaThicknessM)
                 effective = effective with { Areas = effective.Areas.Select(x => x.ObjectId == change.ObjectId ? x with { Thickness = replacement } : x).ToImmutableArray() };
@@ -68,21 +78,33 @@ public static class Overrides
                 };
                 effective = effective with { Model = effective.Model with
                 { Frames = effective.Model.Frames.Select(x => x.ObjectId == change.ObjectId ? x with { Section = section } : x).ToImmutableArray() } };
+                var described = $"override {change.Id} ({Label(change.Field)} {Mm(current.Metres)} → {Mm(change.ReplacementValue)})";
+                sectionChanges[change.ObjectId] = sectionChanges.TryGetValue(change.ObjectId, out var earlier) ? earlier + ", " + described : described;
             }
         }
         // Dimension overrides invalidate previously asserted design/geometry matching.
-        var changedFrames = changes.Where(x => x.Field is OverrideField.FrameWidthM or OverrideField.FrameDepthM or OverrideField.FrameDiameterM)
-            .Select(x => x.ObjectId).ToHashSet(StringComparer.Ordinal);
-        effective = effective with { Reinforcement = effective.Reinforcement.Select(x => changedFrames.Contains(x.ObjectId) && x.Method == SteelMethod.DemandEquivalent
+        effective = effective with { Reinforcement = effective.Reinforcement.Select(x => sectionChanges.ContainsKey(x.ObjectId) && x.Method == SteelMethod.DemandEquivalent
             ? x with { DesignEvidence = DesignEvidence.Stale } : x).ToImmutableArray() };
-        return (effective, excluded);
+        return (effective, excluded, sectionChanges);
     }
+
+    public static string Label(OverrideField field) => field switch
+    {
+        OverrideField.FrameWidthM => "width", OverrideField.FrameDepthM => "depth", OverrideField.FrameDiameterM => "diameter",
+        OverrideField.AreaThicknessM => "thickness", _ => "exclusion"
+    };
+
+    // Override dimensions are shown in millimetres, to 0.1 mm, everywhere a person reads them.
+    // Values large enough to be typing errors use scientific notation rather than hundreds of digits.
+    public static string Mm(double metres) => (Math.Abs(metres * 1000) < 1e7
+        ? (Math.Round(metres * 1000, 1, MidpointRounding.AwayFromZero) + 0.0).ToString("0.#", CultureInfo.InvariantCulture)
+        : (metres * 1000).ToString("0.###E+0", CultureInfo.InvariantCulture)) + " mm";
 
     // Builds an override from the run's current effective state, so users never type hashes or original values.
     public static QuantityOverride Prepare(TakeoffSnapshot source, string sourceHash, ImmutableArray<QuantityOverride> existing,
         string objectId, OverrideField field, double replacement, string reason, string author, DateTimeOffset at)
     {
-        var (effective, excluded) = Apply(source, existing, sourceHash);
+        var (effective, excluded, _) = Apply(source, existing, sourceHash);
         var frame = effective.Model.Frames.FirstOrDefault(x => x.ObjectId == objectId);
         var area = effective.Areas.FirstOrDefault(x => x.ObjectId == objectId);
         if (frame is null && area is null) throw new ArgumentException($"No frame or area has objectId '{objectId}'.");

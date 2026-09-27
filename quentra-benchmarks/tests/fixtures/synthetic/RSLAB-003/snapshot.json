@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Slab with different X/Y spacing",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.0,
+        "height": 3.0
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C30",
+      "type": "Concrete",
+      "grade": "C30",
+      "fckMPa": 30
+    },
+    {
+      "name": "B500",
+      "type": "Rebar",
+      "grade": "B500",
+      "density": 7850.0,
+      "densityUnit": "kg/m3",
+      "fyMPa": 500
+    }
+  ],
+  "sections": [
+    {
+      "name": "S",
+      "kind": "Slab",
+      "thickness": 0.2
+    }
+  ],
+  "elements": [
+    {
+      "id": "S1",
+      "name": "S1",
+      "type": "Slab",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30",
+      "section": "S",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 3
+          },
+          {
+            "x": 6,
+            "y": 0,
+            "z": 3
+          },
+          {
+            "x": 6,
+            "y": 5,
+            "z": 3
+          },
+          {
+            "x": 0,
+            "y": 5,
+            "z": 3
+          }
+        ],
+        "openings": []
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "B500",
+        "components": [
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "X",
+            "diameter": 0.012,
+            "spacing": 0.15,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1
+          },
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "Y",
+            "diameter": 0.01,
+            "spacing": 0.25,
+            "edgeOffset": 0.05,
+            "endCover": 0.025,
+            "faces": 1
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "S1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "RSLAB-003",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

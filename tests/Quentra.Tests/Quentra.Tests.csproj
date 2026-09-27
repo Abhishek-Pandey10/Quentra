@@ -17,6 +17,7 @@
   <ItemGroup>
     <Using Include="Xunit" />
     <ProjectReference Include="../../src/Quentra.Infrastructure/Quentra.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/Quentra.Gui/Quentra.Gui.csproj" />
     <None Include="../../fixtures/synthetic/frames.json" Link="fixtures/frames.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../fixtures/synthetic/takeoff.json" Link="fixtures/takeoff.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../fixtures/validation/*.json" LinkBase="fixtures/validation" CopyToOutputDirectory="PreserveNewest" />

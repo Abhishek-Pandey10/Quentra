@@ -1,6 +1,6 @@
 # Snapshot format (schema 2)
 
-A snapshot is the JSON input to `quentra calculate`. It describes the model: frames, slabs and walls, stories, reinforcement sources, and the measurement policy. `quentra template snapshot <file>` writes a working example ([fixtures/synthetic/takeoff.json](../fixtures/synthetic/takeoff.json)) to start from.
+A snapshot is the JSON input to `quentra calculate`. It describes the model: frames, slabs and walls, stories, reinforcement sources, and the measurement policy. `quentra template snapshot <file>` writes a working example ([fixtures/synthetic/takeoff.json](../fixtures/synthetic/takeoff.json)) to start from. This reference is built into the tool: `quentra help format` prints it.
 
 Schema 2 is a development format. The ETABS adapter will eventually produce it; until then it is written by hand or by script.
 
@@ -9,7 +9,7 @@ Schema 2 is a development format. The ETABS adapter will eventually produce it; 
 - Property names are camelCase. An unknown or misspelled property is an error, and so is a property given twice.
 - Enum values are strings and case-sensitive, e.g. `"Beam"`, not `"beam"` or `0`.
 - Properties marked **required** must be present. `null` is allowed only where the tables say so.
-- Dates are ISO 8601 with an offset, e.g. `"2026-09-26T00:00:00+00:00"`.
+- Dates are ISO 8601 with an offset, e.g. `"2026-09-26T00:00:00+00:00"` or `"2026-09-26T05:30:00+05:30"`. A date without an offset is rejected, because it would be read in the local time zone of whichever machine runs Quentra. Dates are stored in UTC, so the same instant gives the same snapshot hash whichever offset it was written with.
 - Values ending in `M`, `M2`, `M3` or `KgM3` are metres, m², m³ or kg/m³. Coordinates use `model.coordinateUnit`. Every section dimension and thickness carries its own unit.
 
 A **length** is `{ "value": 300, "unit": "Millimetre" }`, with unit `Metre`, `Millimetre`, `Foot` or `Inch`. A **point** is `{ "x": 0, "y": 0, "z": 3.6 }` in the coordinate unit.
@@ -67,7 +67,7 @@ Volume is the section area × 3D axis length.
 
 ## `stories[]`
 
-`{ "id": "L1", "lowerElevationM": 0, "upperElevationM": 3.6 }`. Names must be unique, bands must not overlap, and `Unallocated` is reserved. Elevations are always metres. Walls and inclined frames are split by elevation. A horizontal beam belongs to the story whose top it sits on. Slabs use `metadata.assignedStoryId`. Anything unassigned is reported as `Unallocated`.
+`{ "id": "L1", "lowerElevationM": 0, "upperElevationM": 3.6 }`. Names must be unique, bands must not overlap, and `Unallocated` is reserved. Elevations are always metres. Columns, sloped beams and walls are split between stories in proportion to how much of their length (or area) lies within each band; a sloped beam that lies wholly within one band goes entirely to that story. A level beam (both ends within `linearToleranceM` of the same elevation) belongs to the story whose top it sits on (lower < z ≤ upper). Slabs use `metadata.assignedStoryId`. Anything unassigned is reported as `Unallocated`.
 
 ## `metadata[]`
 
@@ -78,7 +78,7 @@ Exactly one entry for every frame and area.
 | `objectId` | required | The frame or area |
 | `materialName`, `sectionName` | required | Names used for grouping in reports |
 | `assignedStoryId` | nullable | Story for slabs and horizontal members; overrides elevation-based allocation |
-| `requiredSteelComponents` | required | The steel components that must be supplied for complete steel. Any of: `Longitudinal`, `LongitudinalTop`, `LongitudinalBottom`, `Transverse`, `Web`, `Boundary`, `XTop`, `XBottom`, `YTop`, `YBottom`, `Detailing`, `Accessories`. `Longitudinal` cannot be combined with `LongitudinalTop` or `LongitudinalBottom`. |
+| `requiredSteelComponents` | required | The steel components that must be supplied for complete steel. `[]` declares that the element needs no steel: its steel is complete at 0 kg, it takes no `reinforcement` entries, and the run raises `NO_STEEL_REQUIRED` naming it, which the reviewer acknowledges. Otherwise any of: `Longitudinal`, `LongitudinalTop`, `LongitudinalBottom`, `Transverse`, `Web`, `Boundary`, `XTop`, `XBottom`, `YTop`, `YBottom`, `Detailing`, `Accessories`. `Longitudinal` cannot be combined with `LongitudinalTop` or `LongitudinalBottom`. |
 
 ## `reinforcement[]`
 
@@ -106,4 +106,4 @@ Each entry supplies one component of one element (or `AllIn`, which covers all o
 
 ## Plausibility warnings
 
-Values outside these provisional bands are still calculated, but raise an `IMPLAUSIBLE_*` warning that must be acknowledged at acceptance. The bands are meant to catch unit slips: section 0.1–3 m, area thickness 0.05–2 m, frame length up to 50 m, area extent up to 300 m, steel up to 600 kg per m³ of concrete, and steel density 7000–8500 kg/m³.
+Values outside these provisional bands are still calculated, but raise an `IMPLAUSIBLE_*` warning that must be acknowledged at acceptance; `IMPLAUSIBLE_DIMENSION` and `IMPLAUSIBLE_STEEL_INTENSITY` are acknowledged per element (`IMPLAUSIBLE_DIMENSION:B1`). The bands are meant to catch unit slips: section 0.1–3 m, area thickness 0.05–2 m, frame length up to 50 m, area extent up to 300 m, steel up to 600 kg per m³ of concrete, and steel density 7000–8500 kg/m³.

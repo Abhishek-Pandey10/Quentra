@@ -1,0 +1,282 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Slab plus mesh elements",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.0,
+        "height": 3.0
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C30",
+      "type": "Concrete",
+      "grade": "C30",
+      "fckMPa": 30
+    }
+  ],
+  "sections": [
+    {
+      "name": "B300x600",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.3,
+      "depth": 0.6
+    },
+    {
+      "name": "C400",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.4,
+      "depth": 0.4
+    },
+    {
+      "name": "S200",
+      "kind": "Slab",
+      "thickness": 0.2
+    },
+    {
+      "name": "W200",
+      "kind": "Wall",
+      "thickness": 0.2
+    }
+  ],
+  "elements": [
+    {
+      "id": "S1",
+      "name": "S1",
+      "type": "Slab",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30",
+      "section": "S200",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 3
+          },
+          {
+            "x": 6,
+            "y": 0,
+            "z": 3
+          },
+          {
+            "x": 6,
+            "y": 4,
+            "z": 3
+          },
+          {
+            "x": 0,
+            "y": 4,
+            "z": 3
+          }
+        ],
+        "openings": []
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "S1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "S1~M1",
+      "name": "S1~M1",
+      "type": "Slab",
+      "role": "MeshElement",
+      "parentId": "S1",
+      "story": "L1",
+      "material": "C30",
+      "section": "S200",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 3
+          },
+          {
+            "x": 3,
+            "y": 0,
+            "z": 3
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "z": 3
+          },
+          {
+            "x": 0,
+            "y": 2,
+            "z": 3
+          }
+        ],
+        "openings": []
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "S1~M1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "S1~M2",
+      "name": "S1~M2",
+      "type": "Slab",
+      "role": "MeshElement",
+      "parentId": "S1",
+      "story": "L1",
+      "material": "C30",
+      "section": "S200",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 3,
+            "y": 0,
+            "z": 3
+          },
+          {
+            "x": 6,
+            "y": 0,
+            "z": 3
+          },
+          {
+            "x": 6,
+            "y": 2,
+            "z": 3
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "z": 3
+          }
+        ],
+        "openings": []
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "S1~M2",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "S1~M3",
+      "name": "S1~M3",
+      "type": "Slab",
+      "role": "MeshElement",
+      "parentId": "S1",
+      "story": "L1",
+      "material": "C30",
+      "section": "S200",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 2,
+            "z": 3
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "z": 3
+          },
+          {
+            "x": 3,
+            "y": 4,
+            "z": 3
+          },
+          {
+            "x": 0,
+            "y": 4,
+            "z": 3
+          }
+        ],
+        "openings": []
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "S1~M3",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "S1~M4",
+      "name": "S1~M4",
+      "type": "Slab",
+      "role": "MeshElement",
+      "parentId": "S1",
+      "story": "L1",
+      "material": "C30",
+      "section": "S200",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 3,
+            "y": 2,
+            "z": 3
+          },
+          {
+            "x": 6,
+            "y": 2,
+            "z": 3
+          },
+          {
+            "x": 6,
+            "y": 4,
+            "z": 3
+          },
+          {
+            "x": 3,
+            "y": 4,
+            "z": 3
+          }
+        ],
+        "openings": []
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "S1~M4",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "DUP-002",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

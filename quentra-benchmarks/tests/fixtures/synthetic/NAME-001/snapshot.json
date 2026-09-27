@@ -1,0 +1,286 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Messy real-world naming",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "Base-L01",
+        "elevation": 3.5,
+        "height": 3.5
+      },
+      {
+        "name": "L02 (Typ)",
+        "elevation": 7.0,
+        "height": 3.5
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C30/37",
+      "type": "Concrete",
+      "grade": "C30/37",
+      "fckMPa": 30
+    }
+  ],
+  "sections": [
+    {
+      "name": "BM 300X600",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.3,
+      "depth": 0.6
+    },
+    {
+      "name": "COL-450SQ",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.45,
+      "depth": 0.45
+    },
+    {
+      "name": "SLAB 200",
+      "kind": "Slab",
+      "thickness": 0.2
+    },
+    {
+      "name": "Core Wall 300",
+      "kind": "Wall",
+      "thickness": 0.3
+    }
+  ],
+  "elements": [
+    {
+      "id": "frm-000417",
+      "name": "Beam_A12",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L02 (Typ)",
+      "material": "C30/37",
+      "section": "BM 300X600",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 7
+        },
+        "end": {
+          "x": 6,
+          "y": 0,
+          "z": 7
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "Beam_A12",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "frm-000418",
+      "name": "B-01",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L02 (Typ)",
+      "material": "C30/37",
+      "section": "BM 300X600",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 6,
+          "y": 0,
+          "z": 7
+        },
+        "end": {
+          "x": 12,
+          "y": 0,
+          "z": 7
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B-01",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "frm-000102",
+      "name": "COLUMN_CORE_3",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "Base-L01",
+      "material": "C30/37",
+      "section": "COL-450SQ",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "end": {
+          "x": 0,
+          "y": 0,
+          "z": 3.5
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "COLUMN_CORE_3",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "frm-000419",
+      "name": "C5",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L02 (Typ)",
+      "material": "C30/37",
+      "section": "BM 300X600",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 6,
+          "z": 7
+        },
+        "end": {
+          "x": 6,
+          "y": 6,
+          "z": 7
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "C5",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "area-000031",
+      "name": "Wall Pier 02",
+      "type": "Wall",
+      "role": "Physical",
+      "parentId": null,
+      "story": "Base-L01",
+      "material": "C30/37",
+      "section": "Core Wall 300",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 20,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": 24,
+            "y": 0,
+            "z": 0
+          },
+          {
+            "x": 24,
+            "y": 0,
+            "z": 3.5
+          },
+          {
+            "x": 20,
+            "y": 0,
+            "z": 3.5
+          }
+        ],
+        "openings": []
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "Wall Pier 02",
+        "objectGuid": null,
+        "apiMethod": null
+      },
+      "pier": "P2"
+    },
+    {
+      "id": "area-000077",
+      "name": "SLAB-L02-A",
+      "type": "Slab",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L02 (Typ)",
+      "material": "C30/37",
+      "section": "SLAB 200",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 0,
+            "z": 7
+          },
+          {
+            "x": 12,
+            "y": 0,
+            "z": 7
+          },
+          {
+            "x": 12,
+            "y": 6,
+            "z": 7
+          },
+          {
+            "x": 0,
+            "y": 6,
+            "z": 7
+          }
+        ],
+        "openings": []
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "SLAB-L02-A",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [
+    {
+      "code": "EXTRACT_ROUNDING",
+      "severity": "Warning",
+      "subject": null,
+      "message": "Coordinates rounded to 1 mm during extraction (synthetic example of a source-reported note)."
+    }
+  ],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "NAME-001",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

@@ -7,4 +7,14 @@
     <Deterministic>true</Deterministic>
     <Version>0.1.0</Version>
   </PropertyGroup>
+  <!-- A build from uncommitted source must not carry a clean commit id: its version reads 0.1.0+<commit>.dirty. -->
+  <Target Name="QuentraMarkDirtySource" AfterTargets="InitializeSourceControlInformation" Condition="'$(SourceRevisionId)' != ''">
+    <Exec Command="git status --porcelain -- src Directory.Build.props" WorkingDirectory="$(MSBuildThisFileDirectory)"
+          ConsoleToMSBuild="true" StandardOutputImportance="low" IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="QuentraUncommittedChanges" />
+    </Exec>
+    <PropertyGroup Condition="'$(QuentraUncommittedChanges)' != ''">
+      <SourceRevisionId>$(SourceRevisionId).dirty</SourceRevisionId>
+    </PropertyGroup>
+  </Target>
 </Project>

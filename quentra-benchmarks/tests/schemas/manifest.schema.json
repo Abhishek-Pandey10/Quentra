@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quentra.local/schemas/manifest.schema.json",
+  "title": "Quentra benchmark regression manifest",
+  "type": "object",
+  "required": ["suiteVersion", "schemaVersion", "cases"],
+  "properties": {
+    "suiteVersion": { "type": "string" },
+    "schemaVersion": { "type": "string" },
+    "generatedBy": { "type": "string" },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "category", "fixtureSet", "path", "expectedStatus", "options", "schemaValid"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "category": { "type": "string" },
+          "fixtureSet": { "enum": ["synthetic", "invalid", "buildings"] },
+          "path": { "type": "string", "description": "Folder relative to tests/fixtures." },
+          "expectedStatus": { "enum": ["pass", "knownFailure", "skip"], "description": "knownFailure: the engine is known not to meet this benchmark yet; reported but does not fail the build. Must carry a reason." },
+          "reason": { "type": ["string", "null"] },
+          "equivalenceGroup": { "type": ["string", "null"], "description": "Cases in the same group describe one physical model and must produce identical physical quantities." },
+          "options": {
+            "type": "object",
+            "properties": {
+              "quantifySteel": { "type": "boolean" },
+              "materialAliases": { "type": "object", "additionalProperties": { "type": "string" } },
+              "plausibility": { "type": "object" },
+              "defaultSteelDensityKgPerM3": { "type": "number" }
+            }
+          },
+          "schemaValid": { "type": "boolean", "description": "false for fixtures that deliberately violate snapshot.schema.json." },
+          "snapshotStatus": { "enum": ["Accepted", "Rejected"] },
+          "expectedBehaviour": { "type": ["string", "null"] },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "captures": {
+            "type": "array",
+            "description": "Captured ETABS snapshots of the same physical model, added later. Stored beside, never instead of, the synthetic snapshot.",
+            "items": {
+              "type": "object",
+              "required": ["etabsVersion", "path"],
+              "properties": { "etabsVersion": { "type": "string" }, "path": { "type": "string" }, "status": { "enum": ["pending", "pass", "knownDifference"] }, "notes": { "type": ["string", "null"] } }
+            }
+          }
+        }
+      }
+    }
+  }
+}

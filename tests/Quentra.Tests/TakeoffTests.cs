@@ -127,7 +127,7 @@ public class TakeoffTests
         Assert.Equal(.576, r.StoryAllocations.Single(x => x.ObjectId == "C2" && x.StoryId == "Unallocated").GrossM3, 9);
         Assert.Equal(5.4, r.StoryAllocations.Single(x => x.ObjectId == "W1" && x.StoryId == "Unallocated").GrossM3, 6);
         Assert.Equal(r.Summary.KnownGrossM3, r.StoryAllocations.Sum(x => x.GrossM3), 6);
-        Assert.Contains(r.Warnings, x => x.Code == "UNALLOCATED_STORY");
+        Assert.StartsWith("Not allocated to a story: C2, W1.", r.Warnings.Single(x => x.Code == "UNALLOCATED_STORY").Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -191,7 +191,8 @@ public class TakeoffTests
         var r = TakeoffEngine.Run(WithSteel(Fixture(), "B1", "LongitudinalTop", x => x with { DesignEvidence = evidence }));
         var top = Steel(r, "B1", "LongitudinalTop");
         Assert.Null(top.MassKg);
-        Assert.Contains(top.Warnings, x => x.Code == "STEEL_UNAVAILABLE");
+        // The message names the evidence state that stopped it.
+        Assert.Contains($"this entry is {evidence}:", top.Warnings.Single(x => x.Code == "STEEL_UNAVAILABLE").Message);
         Assert.Contains("LongitudinalTop", r.SteelCoverage.Single(x => x.ObjectId == "B1").Missing);
     }
 
@@ -214,7 +215,7 @@ public class TakeoffTests
         var top = Steel(r, "B1", "LongitudinalTop");
         Assert.Equal(.0036 * 7850, top.MassKg!.Value, 6);
         Assert.Empty(top.CoversComponents);
-        Assert.Contains(top.Warnings, x => x.Code == "PARTIAL_DEMAND_DOMAIN");
+        Assert.StartsWith("Demand stations cover", top.Warnings.Single(x => x.Code == "PARTIAL_DEMAND_DOMAIN").Message, StringComparison.Ordinal);
         Assert.Contains("LongitudinalTop", r.SteelCoverage.Single(x => x.ObjectId == "B1").Missing);
     }
 
@@ -232,6 +233,8 @@ public class TakeoffTests
         var r = TakeoffEngine.Run(WithArea(Fixture(), "S1", a => a with { OpeningsVerified = false }));
         var slab = Element(r, "S1");
         Assert.Equal(QuantityStatus.Unsupported, slab.Status);
+        // The warning names the flag that stopped the calculation.
+        Assert.Equal("Not quantified: openingsVerified is false (confirm every opening belongs to this host).", slab.Warnings.Single(x => x.Code == "AREA_UNSUPPORTED").Message);
         Assert.Null(slab.GrossM3);
         Assert.Null(r.Summary.CompleteOpeningAdjustedM3);
         Assert.Equal(13.608, r.Summary.KnownGrossM3, 9);
@@ -388,6 +391,22 @@ public class TakeoffTests
     }
 
     [Fact]
+    public void FullyVoidedAreaIsWarnedNotSilentlyComplete()
+    {
+        var voided = Element(TakeoffEngine.Run(WithArea(Fixture(), "S1", a => a with { Openings = [Rect(-1, -1, 7, 5, 3.6)] })), "S1");
+        Assert.Equal(0, voided.OpeningAdjustedM3!.Value, ClipTolerance);
+        Assert.Contains(voided.Warnings, x => x.Code == "AREA_FULLY_VOIDED");
+    }
+
+    [Fact]
+    public void InvalidThicknessMessageHasNoInternalParameterName()
+    {
+        var slab = Element(TakeoffEngine.Run(WithArea(Fixture(), "S1", a => a with { Thickness = new() { Value = -0.2, Unit = LengthUnit.Metre } })), "S1");
+        Assert.Equal(QuantityStatus.Invalid, slab.Status);
+        Assert.DoesNotContain("Parameter", slab.Warnings.Single().Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void EmptyScopeSteelWarningDoesNotClaimMissingComponents()
     {
         var s = Fixture();
@@ -401,5 +420,92 @@ public class TakeoffTests
     {
         var e = Assert.Throws<ArgumentException>(() => TakeoffEngine.Validate(WithMetadata(Fixture(), "W1", m => m with { RequiredSteelComponents = ["Hoops"] })));
         Assert.StartsWith("Metadata for W1: unknown steel component 'Hoops'", e.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ValidationReportsEveryIndependentProblem()
+    {
+        var s = WithMetadata(Fixture(), "W1", m => m with { AssignedStoryId = "L9" });
+        s = s with
+        {
+            Stories = s.Stories.Add(new StoryBand("Unallocated", 100, 103)),
+            Metadata = s.Metadata.Add(s.Metadata[0] with { ObjectId = "GHOST" }),
+            Reinforcement = s.Reinforcement.Add(s.Reinforcement[0] with { ObjectId = "PHANTOM" })
+        };
+        var e = Assert.Throws<ArgumentException>(() => TakeoffEngine.Validate(s));
+        Assert.StartsWith("The snapshot has 4 problems:", e.Message, StringComparison.Ordinal);
+        Assert.Contains("Every story needs a name other than 'Unallocated'.", e.Message, StringComparison.Ordinal);
+        Assert.Contains("Metadata for W1: assignedStoryId 'L9' is not a declared story.", e.Message, StringComparison.Ordinal);
+        Assert.Contains("Metadata for GHOST: no frame or area has this objectId.", e.Message, StringComparison.Ordinal);
+        Assert.Contains($"Reinforcement PHANTOM/{s.Reinforcement[0].Component}: no frame or area has this objectId.", e.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void LongProblemListsAreShortened()
+    {
+        var s = Fixture();
+        s = s with { Reinforcement = s.Reinforcement.AddRange(Enumerable.Range(1, 60).Select(i => s.Reinforcement[0] with { ObjectId = $"PHANTOM{i}" })) };
+        var e = Assert.Throws<ArgumentException>(() => TakeoffEngine.Validate(s));
+        Assert.StartsWith("The snapshot has 60 problems:", e.Message, StringComparison.Ordinal);
+        Assert.EndsWith("... and 10 more.", e.Message, StringComparison.Ordinal);
+        Assert.Equal(CalculateSnapshot.ProblemsShown, e.Message.Split("\n  - ").Length - 1);
+    }
+
+    [Fact]
+    public void StackedFloorsDoNotExhaustTheOverlapScan()
+    {
+        // 500 slabs identical in plan, one per floor: about 125,000 pairs overlap in x alone, above the scan limit.
+        var s = Fixture();
+        var slab = s.Areas.Single(x => x.ObjectId == "S1");
+        var meta = s.Metadata.Single(x => x.ObjectId == "S1");
+        static ImmutableArray<Point3> Up(ImmutableArray<Point3> ring, double dz) => ring.Select(p => p with { Z = p.Z + dz }).ToImmutableArray();
+        var floors = Enumerable.Range(1, 500).Select(k => slab with
+        {
+            ObjectId = $"F{k}", Boundary = Up(slab.Boundary, 3.6 * k), Openings = slab.Openings.Select(o => Up(o, 3.6 * k)).ToImmutableArray()
+        }).ToArray();
+        var duplicate = floors[249] with { ObjectId = "F250-copy" };
+        s = s with
+        {
+            Areas = s.Areas.AddRange(floors).Add(duplicate),
+            Metadata = s.Metadata.AddRange(floors.Append(duplicate).Select(f => meta with { ObjectId = f.ObjectId }))
+        };
+        var r = TakeoffEngine.Run(s);
+        Assert.DoesNotContain(r.Warnings, x => x.Code == "OVERLAP_SCAN_LIMIT");
+        Assert.Single(r.Warnings, x => x.Code == "AREA_OVERLAP" && x.Message.Contains("F250") && x.Message.Contains("F250-copy"));
+    }
+
+    [Fact]
+    public void PartialWarningsNameElementsAndComponents()
+    {
+        var r = TakeoffEngine.Run(Fixture());
+        Assert.Contains("B1 (Transverse)", r.Warnings.Single(x => x.Code == "PARTIAL_STEEL").Message, StringComparison.Ordinal);
+        var unsupported = TakeoffEngine.Run(WithArea(Fixture(), "W1", a => a with { OpeningsVerified = false }));
+        Assert.Contains("Not quantified: W1", unsupported.Warnings.Single(x => x.Code == "PARTIAL_CONCRETE").Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AnElementCanDeclareThatItNeedsNoSteel()
+    {
+        var s = WithMetadata(Fixture(), "B1", m => m with { RequiredSteelComponents = [] });
+        // Entries for an element that needs no steel are a contradiction, not silently ignored.
+        Assert.Contains("takes no reinforcement entries", Assert.Throws<ArgumentException>(() => TakeoffEngine.Run(s)).Message, StringComparison.Ordinal);
+
+        var r = TakeoffEngine.Run(s with { Reinforcement = s.Reinforcement.Where(x => x.ObjectId != "B1").ToImmutableArray() });
+        var b1 = r.SteelCoverage.Single(x => x.ObjectId == "B1");
+        Assert.Equal(0, b1.CompleteMassKg);
+        Assert.NotNull(r.Summary.CompleteSteelKg);
+        Assert.Contains("B1", r.Warnings.Single(x => x.Code == "NO_STEEL_REQUIRED").Message, StringComparison.Ordinal);
+
+        var missing = WithMetadata(Fixture(), "B1", m => m with { RequiredSteelComponents = default });
+        Assert.Contains("give [] for an element that needs no steel", Assert.Throws<ArgumentException>(() => TakeoffEngine.Run(missing)).Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void BadThicknessIsReportedAsThickness()
+    {
+        var r = TakeoffEngine.Run(WithArea(Fixture(), "S1", a => a with { Thickness = new() { Value = -200, Unit = LengthUnit.Millimetre } }));
+        var slab = Element(r, "S1");
+        Assert.Equal(QuantityStatus.Invalid, slab.Status);
+        Assert.Equal("Thickness must be finite and positive; the snapshot gives -200 Millimetre.", Assert.Single(slab.Warnings).Message);
     }
 }

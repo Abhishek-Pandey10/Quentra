@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup>
+    <!-- Same starter snapshot as 'quentra template snapshot'; the page is embedded so the app is one executable. -->
+    <EmbeddedResource Include="../../fixtures/synthetic/takeoff.json" LogicalName="Quentra.Templates.snapshot.json" />
+    <EmbeddedResource Include="index.html" LogicalName="Quentra.Gui.index.html" />
+    <EmbeddedResource Include="../../docs/SNAPSHOT_FORMAT.md" LogicalName="Quentra.Docs.SNAPSHOT_FORMAT.md" />
+    <ProjectReference Include="../Quentra.Infrastructure/Quentra.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

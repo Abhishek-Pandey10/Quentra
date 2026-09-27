@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "snapshotSha256": "f8a882cbbc6341e19352b8c72106b772b4a6a8bc3e5a98b3ec7d49a8794e0897",
-  "calculationSha256": "211b7be349eecf990eaa0ee997b007208fa64d4ea0edb28eb15e7b58e131c8ba",
+  "calculationSha256": "c85541e2989f8006d3e8ff8a711a2147ba7f8e60678baef79c73a6dc70ef8e6e",
   "snapshot": {
     "schemaVersion": 2,
     "model": {
@@ -468,7 +468,7 @@
   },
   "overrides": [],
   "result": {
-    "calculationVersion": "takeoff/0.3.0",
+    "calculationVersion": "takeoff/0.5.0",
     "elements": [
       {
         "objectId": "B1",
@@ -824,10 +824,10 @@
       },
       {
         "code": "PARTIAL_STEEL",
-        "message": "Required steel components are missing. Known steel is only a subtotal."
+        "message": "Required steel components missing: B1 (Transverse). Known steel is only a subtotal."
       }
     ]
   },
   "reviewHistory": [],
-  "packageSha256": "049888882e71459348e5be0ee26df1911975c9c08709357e99f8f59e2ec7c36f"
+  "packageSha256": "567a78e244f88c8ab5c852c07feaa118b1f01eae21e8e6ec1e7337c4a5d0b7db"
 }

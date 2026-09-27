@@ -25,7 +25,7 @@ This covers the offline part of roadmap Phases 1 and 3–5. G0 is pending. None 
 
 ## Evidence and limits
 
-Local verification on macOS arm64 with SDK 10.0.401: Release solution build succeeded with zero warnings/errors; all 134 xUnit tests passed.
+Local verification on macOS arm64 with SDK 10.0.401: Release solution build succeeded with zero warnings/errors; all 143 xUnit tests passed.
 
 - **Schema 1:** fixture calculates 1.656 m³.
 - **Schema 2:** fixture calculates 18.408 m³ gross and 17.808 m³ opening-adjusted concrete, and 1,297.505 kg of known steel, all matching hand calculations. Replay is byte-identical.
@@ -49,6 +49,7 @@ Reports remain Draft until accepted. Complete quantities mean every in-scope obj
 
 - **Beam story convention:** a horizontal beam at a level is assigned to the story interval (lower, upper] that the level tops; one at the base level is `Unallocated` unless metadata assigns a story. This matches the design specification's proposed default (§31.4, CQ-004), but the engineer has not yet confirmed it.
 - **Plausibility bands:** the "check the units" ranges in `Plausibility.cs` are provisional (brief question 16).
+- **Elements with no steel:** `requiredSteelComponents: []` declares an element steel-free (complete at 0 kg), and `NO_STEEL_REQUIRED` must be acknowledged. Which element types may be declared steel-free (plain concrete, blinding, some slabs on grade) is for the engineer to confirm.
 - **Measurement policy:** density, tolerances, required steel components per element type and intended report use are fixture values, not approved policy.
 
 These and the other policy questions are collected in the [engineer meeting brief](ETABS_Structural_Engineer_Meeting_Brief.md).

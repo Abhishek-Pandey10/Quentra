@@ -1,0 +1,103 @@
+{
+  "caseId": "WALL-004",
+  "schemaVersion": "1.0",
+  "provenanceType": "synthetic_engineering_benchmark",
+  "snapshotStatus": "Accepted",
+  "finalization": {
+    "allowed": true,
+    "blockingCodes": []
+  },
+  "modelTotals": {
+    "grossConcreteM3": 3.6,
+    "openingDeductionM3": 1.0,
+    "netConcreteM3": 2.6,
+    "unclassifiedVolumeM3": 0.0,
+    "steelKg": null,
+    "steelExactKg": null,
+    "steelApproximateKg": null,
+    "steelKgBySource": null
+  },
+  "completeness": {
+    "concrete": "Complete",
+    "steel": "NotEvaluated",
+    "concreteUnknownElementIds": [],
+    "steelUnknownElementIds": []
+  },
+  "byStory": {
+    "L1": {
+      "grossConcreteM3": 3.6,
+      "netConcreteM3": 2.6,
+      "steelKg": null
+    }
+  },
+  "byElementType": {
+    "Beam": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    },
+    "Column": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    },
+    "Slab": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": null
+    },
+    "Wall": {
+      "grossConcreteM3": 3.6,
+      "netConcreteM3": 2.6,
+      "steelKg": null
+    }
+  },
+  "byMaterial": {
+    "C30": {
+      "grossConcreteM3": 3.6,
+      "netConcreteM3": 2.6
+    }
+  },
+  "steelByMaterial": {},
+  "elements": [
+    {
+      "id": "W1",
+      "occurrence": 0,
+      "type": "Wall",
+      "story": "L1",
+      "materialGroup": "C30",
+      "status": "Included",
+      "grossConcreteM3": 3.6,
+      "netConcreteM3": 2.6,
+      "steelKg": null,
+      "reinforcementSource": null,
+      "steelExact": null,
+      "steelComponentsKg": [],
+      "grossAreaM2": 18.0,
+      "openingAreaSumM2": 6.0,
+      "openingDeductedAreaM2": 5.0,
+      "netAreaM2": 13.0
+    }
+  ],
+  "warnings": [
+    {
+      "code": "OPENING_OVERLAP",
+      "severity": "Info",
+      "subject": "W1"
+    }
+  ],
+  "tolerance": {
+    "volumeM3": 1e-06,
+    "areaM2": 1e-06,
+    "lengthM": 1e-06,
+    "steelKg": 0.001,
+    "relative": 1e-09
+  },
+  "derivation": {
+    "method": "independent_first_principles",
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "handChecks": 2,
+    "closedFormCrossCheck": false
+  }
+}

@@ -1,0 +1,333 @@
+{
+  "catalogVersion": "1.1.0",
+  "severityMeaning": {
+    "Fatal": "snapshot rejected, no quantities",
+    "Error": "element or its steel not trusted; blocks finalization",
+    "Warning": "quantities produced, human review; some block finalization",
+    "Info": "traceability only"
+  },
+  "codes": [
+    {
+      "code": "UNSUPPORTED_SCHEMA_VERSION",
+      "severity": "Fatal",
+      "blocksFinalization": true,
+      "category": "snapshot",
+      "description": "schemaVersion is not one this engine understands."
+    },
+    {
+      "code": "PROVENANCE_MISSING",
+      "severity": "Fatal",
+      "blocksFinalization": true,
+      "category": "provenance",
+      "description": "No provenance block, or provenance.type is not a known category."
+    },
+    {
+      "code": "PROVENANCE_INCONSISTENT",
+      "severity": "Fatal",
+      "blocksFinalization": true,
+      "category": "provenance",
+      "description": "Provenance mixes synthetic and ETABS-verified categories (e.g. synthetic with etabs_verified=true, or a capture without an ETABS version)."
+    },
+    {
+      "code": "UNSUPPORTED_UNITS",
+      "severity": "Fatal",
+      "blocksFinalization": true,
+      "category": "units",
+      "description": "model.units.length is not one of m, mm, cm, ft, in."
+    },
+    {
+      "code": "DUPLICATE_ELEMENT_ID",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "identity",
+      "description": "Two or more elements share an ID but differ in content. All copies are rejected because the true object cannot be determined."
+    },
+    {
+      "code": "INVALID_GEOMETRY",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "geometry",
+      "description": "Zero-length frame, polygon with < 3 points, non-planar, zero-area or self-intersecting polygon."
+    },
+    {
+      "code": "COORDINATE_OUT_OF_RANGE",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "geometry",
+      "description": "A coordinate is non-finite or larger than the configured maximum magnitude."
+    },
+    {
+      "code": "INVALID_SECTION",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "geometry",
+      "description": "A section dimension (width, depth, diameter, thickness) is zero or negative."
+    },
+    {
+      "code": "SECTION_NOT_FOUND",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "geometry",
+      "description": "The element references a section that is not defined in the snapshot."
+    },
+    {
+      "code": "UNSUPPORTED_SECTION",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "geometry",
+      "description": "The section shape is not supported for quantity take-off, or does not suit the element type."
+    },
+    {
+      "code": "UNKNOWN_MATERIAL",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "material",
+      "description": "The element or its reinforcement references a material not defined in the snapshot."
+    },
+    {
+      "code": "MATERIAL_TYPE_AMBIGUOUS",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "material",
+      "description": "The material exists but its type is not Concrete, Steel or Rebar, so the element cannot be classified."
+    },
+    {
+      "code": "STORY_REFERENCE_MISSING",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "story",
+      "description": "The element has no story. It is reported under '<unassigned>'."
+    },
+    {
+      "code": "STORY_NOT_FOUND",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "story",
+      "description": "The element's story is not in model.stories. It is reported under '<unassigned>'."
+    },
+    {
+      "code": "INVALID_MATERIAL_PROPERTY",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "material",
+      "description": "A rebar material density is zero or negative. Steel using it is unknown."
+    },
+    {
+      "code": "UNREALISTIC_MATERIAL_DENSITY",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "plausibility",
+      "description": "A rebar material density is outside the configured plausible band. Steel using it is unknown."
+    },
+    {
+      "code": "INVALID_REINFORCEMENT",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "reinforcement",
+      "description": "Reinforcement data is invalid (spacing <= 0, diameter <= 0, count <= 0, missing length for area elements, ...). Steel is unknown."
+    },
+    {
+      "code": "REINFORCEMENT_SOURCE_MISMATCH",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "reinforcement",
+      "description": "The reinforcement source category does not match the component types supplied, or is not a known category."
+    },
+    {
+      "code": "DESIGN_RESULT_MISSING",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "reinforcement",
+      "description": "A RequiredArea component references a design result that is absent or does not cover the member."
+    },
+    {
+      "code": "DESIGN_RESULT_NOT_DESIGNED",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "reinforcement",
+      "description": "The referenced result is not designed or has an unsupported status. Demand steel remains unknown."
+    },
+    {
+      "code": "DESIGN_RESULT_OWNER_MISMATCH",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "reinforcement",
+      "description": "The design result belongs to a different member. Demand steel remains unknown."
+    },
+    {
+      "code": "INVALID_DESIGN_RESULT",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "reinforcement",
+      "description": "Design results have invalid/nonfinite/negative demands, duplicate stations, ambiguous result records or conversion overflow."
+    },
+    {
+      "code": "UNSUPPORTED_REINFORCEMENT_LAYOUT",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "reinforcement",
+      "description": "A mesh layout was given for a host that is not a rectangle and no explicit region was supplied."
+    },
+    {
+      "code": "UNIT_PLAUSIBILITY",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "plausibility",
+      "description": "A dimension is implausibly large and would be typical if divided by 1000 - probably a unit error. The value is NOT auto-corrected."
+    },
+    {
+      "code": "UNREALISTIC_STEEL_RATE",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "plausibility",
+      "description": "Element steel mass per m3 of concrete exceeds the density of steel - physically impossible. The steel value is discarded (unknown)."
+    },
+    {
+      "code": "ORPHAN_ANALYTICAL_ELEMENT",
+      "severity": "Error",
+      "blocksFinalization": true,
+      "category": "identity",
+      "description": "An analytical/mesh child references a parent that does not exist."
+    },
+    {
+      "code": "STALE_DESIGN_RESULT",
+      "severity": "Warning",
+      "blocksFinalization": true,
+      "category": "reinforcement",
+      "description": "The design result used for required reinforcement is flagged stale (model changed after design)."
+    },
+    {
+      "code": "MISSING_REINFORCEMENT",
+      "severity": "Warning",
+      "blocksFinalization": true,
+      "category": "reinforcement",
+      "description": "Steel quantification was requested but the element has no reinforcement data. Steel is unknown, not zero."
+    },
+    {
+      "code": "SLAB_OVERLAP",
+      "severity": "Warning",
+      "blocksFinalization": true,
+      "category": "double-counting",
+      "description": "Two slabs on the same story and plane overlap in plan. Both are counted; the overlap is double-counted until resolved."
+    },
+    {
+      "code": "DUPLICATE_GEOMETRY",
+      "severity": "Warning",
+      "blocksFinalization": true,
+      "category": "double-counting",
+      "description": "Two elements with different IDs have identical type, section and geometry. Both are counted until resolved."
+    },
+    {
+      "code": "EMPTY_MODEL",
+      "severity": "Warning",
+      "blocksFinalization": true,
+      "category": "snapshot",
+      "description": "The snapshot contains no elements."
+    },
+    {
+      "code": "UNREALISTIC_DIMENSION",
+      "severity": "Warning",
+      "blocksFinalization": false,
+      "category": "plausibility",
+      "description": "A dimension exceeds a configurable plausibility band. Quantities are still computed as given."
+    },
+    {
+      "code": "OPENING_OUTSIDE_HOST",
+      "severity": "Warning",
+      "blocksFinalization": false,
+      "category": "openings",
+      "description": "An opening does not intersect its host. It deducts nothing."
+    },
+    {
+      "code": "OPENING_CLIPPED",
+      "severity": "Warning",
+      "blocksFinalization": false,
+      "category": "openings",
+      "description": "An opening lies partly outside its host. Only the part inside the host is deducted."
+    },
+    {
+      "code": "UNSUPPORTED_ELEMENT_TYPE",
+      "severity": "Warning",
+      "blocksFinalization": false,
+      "category": "scope",
+      "description": "The element type is outside the quantity scope (e.g. Tendon, Link). It is skipped."
+    },
+    {
+      "code": "WALL_COLUMN_OVERLAP",
+      "severity": "Warning",
+      "blocksFinalization": false,
+      "category": "double-counting",
+      "description": "A column axis lies inside a wall. Both are counted in full (no deduction)."
+    },
+    {
+      "code": "ESTIMATED_REINFORCEMENT",
+      "severity": "Warning",
+      "blocksFinalization": false,
+      "category": "reinforcement",
+      "description": "Steel comes from an estimated ratio, not from bars or design output."
+    },
+    {
+      "code": "HIGH_STEEL_RATE",
+      "severity": "Warning",
+      "blocksFinalization": false,
+      "category": "plausibility",
+      "description": "Element steel rate exceeds the configurable high-rate band."
+    },
+    {
+      "code": "EXACTNESS_FLAG_CONFLICT",
+      "severity": "Warning",
+      "blocksFinalization": false,
+      "category": "reinforcement",
+      "description": "The input 'exact' flag contradicts the reinforcement source. The engine reports exactness derived from the source."
+    },
+    {
+      "code": "DUPLICATE_ELEMENT",
+      "severity": "Warning",
+      "blocksFinalization": false,
+      "category": "identity",
+      "description": "An element appears more than once with identical content. The first copy is kept, later copies are excluded."
+    },
+    {
+      "code": "SOURCE_WARNING",
+      "severity": "Warning",
+      "blocksFinalization": false,
+      "category": "source",
+      "description": "A warning reported by the extractor/source was passed through. Subject = the source's own code."
+    },
+    {
+      "code": "ANALYTICAL_CHILD_EXCLUDED",
+      "severity": "Info",
+      "blocksFinalization": false,
+      "category": "double-counting",
+      "description": "An analytical segment or mesh element whose physical parent exists was excluded to avoid double counting."
+    },
+    {
+      "code": "OPENING_OVERLAP",
+      "severity": "Info",
+      "blocksFinalization": false,
+      "category": "openings",
+      "description": "Openings in one host overlap each other. Their union is deducted, not their sum."
+    },
+    {
+      "code": "NON_CONCRETE_ELEMENT",
+      "severity": "Info",
+      "blocksFinalization": false,
+      "category": "scope",
+      "description": "The element's material is structural steel; it is not part of concrete quantities."
+    },
+    {
+      "code": "REQUIRED_AREA_USED",
+      "severity": "Info",
+      "blocksFinalization": false,
+      "category": "reinforcement",
+      "description": "Steel was derived from required design areas, not from provided bars."
+    },
+    {
+      "code": "DEFAULT_STEEL_DENSITY_USED",
+      "severity": "Info",
+      "blocksFinalization": false,
+      "category": "reinforcement",
+      "description": "No steel material was named; the configured default density was used."
+    }
+  ]
+}

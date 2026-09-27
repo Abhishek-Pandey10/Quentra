@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Material aliases with explicit mapping",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.0,
+        "height": 3.0
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C30",
+      "type": "Concrete",
+      "grade": "C30",
+      "fckMPa": 30
+    },
+    {
+      "name": "C30/37",
+      "type": "Concrete",
+      "grade": "C30/37",
+      "fckMPa": 30
+    },
+    {
+      "name": "CONC30",
+      "type": "Concrete",
+      "grade": "CONC30",
+      "fckMPa": 30
+    },
+    {
+      "name": "Concrete_30MPa",
+      "type": "Concrete",
+      "grade": "Concrete_30MPa",
+      "fckMPa": 30
+    }
+  ],
+  "sections": [
+    {
+      "name": "B300x600",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 0.3,
+      "depth": 0.6
+    }
+  ],
+  "elements": [
+    {
+      "id": "B1",
+      "name": "B1",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30",
+      "section": "B300x600",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 0,
+          "z": 3
+        },
+        "end": {
+          "x": 6,
+          "y": 0,
+          "z": 3
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "B2",
+      "name": "B2",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30/37",
+      "section": "B300x600",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 5,
+          "z": 3
+        },
+        "end": {
+          "x": 6,
+          "y": 5,
+          "z": 3
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B2",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "B3",
+      "name": "B3",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "CONC30",
+      "section": "B300x600",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 10,
+          "z": 3
+        },
+        "end": {
+          "x": 6,
+          "y": 10,
+          "z": 3
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B3",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "B4",
+      "name": "B4",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "Concrete_30MPa",
+      "section": "B300x600",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0,
+          "y": 15,
+          "z": 3
+        },
+        "end": {
+          "x": 6,
+          "y": 15,
+          "z": 3
+        }
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B4",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "MAT-005",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

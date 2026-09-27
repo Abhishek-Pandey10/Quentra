@@ -1,0 +1,375 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Unit equivalence model (in)",
+    "description": null,
+    "units": {
+      "length": "in",
+      "force": "kip",
+      "temperature": "F"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 144.0,
+        "height": 144.0
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C4000",
+      "type": "Concrete",
+      "grade": "C4000",
+      "fckMPa": 27.6
+    },
+    {
+      "name": "A615-60",
+      "type": "Rebar",
+      "grade": "A615-60",
+      "density": 490.05949052273525,
+      "densityUnit": "lb/ft3",
+      "fyMPa": 414
+    }
+  ],
+  "sections": [
+    {
+      "name": "COL18x18",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 18.0,
+      "depth": 18.0
+    },
+    {
+      "name": "BM12x24",
+      "kind": "Frame",
+      "shape": "Rectangle",
+      "width": 12.0,
+      "depth": 24.0
+    },
+    {
+      "name": "SLAB6",
+      "kind": "Slab",
+      "thickness": 6.0
+    },
+    {
+      "name": "WALL9",
+      "kind": "Wall",
+      "thickness": 9.0
+    }
+  ],
+  "elements": [
+    {
+      "id": "C1",
+      "name": "C1",
+      "type": "Column",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C4000",
+      "section": "COL18x18",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "end": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 144.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "A615-60",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "main",
+            "count": 4,
+            "diameter": 0.75
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.375,
+            "spacing": 9.0,
+            "endOffset": 3.0,
+            "hookAllowance": 6.0,
+            "setsPerLocation": 1,
+            "cover": 1.5
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "C1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "B1",
+      "name": "B1",
+      "type": "Beam",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C4000",
+      "section": "BM12x24",
+      "geometry": {
+        "kind": "Line",
+        "start": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 144.0
+        },
+        "end": {
+          "x": 240.0,
+          "y": 0.0,
+          "z": 144.0
+        }
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "A615-60",
+        "components": [
+          {
+            "type": "StraightBars",
+            "role": "bottom",
+            "count": 3,
+            "diameter": 0.75
+          },
+          {
+            "type": "StraightBars",
+            "role": "top",
+            "count": 2,
+            "diameter": 0.75
+          },
+          {
+            "type": "Hoops",
+            "role": "ties",
+            "diameter": 0.375,
+            "spacing": 6.0,
+            "endOffset": 3.0,
+            "hookAllowance": 6.0,
+            "setsPerLocation": 1,
+            "cover": 1.5
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "B1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "S1",
+      "name": "S1",
+      "type": "Slab",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C4000",
+      "section": "SLAB6",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0.0,
+            "y": 12.0,
+            "z": 144.0
+          },
+          {
+            "x": 240.0,
+            "y": 12.0,
+            "z": 144.0
+          },
+          {
+            "x": 240.0,
+            "y": 192.0,
+            "z": 144.0
+          },
+          {
+            "x": 0.0,
+            "y": 192.0,
+            "z": 144.0
+          }
+        ],
+        "openings": [
+          {
+            "id": "O1",
+            "points": [
+              {
+                "x": 60.0,
+                "y": 72.0,
+                "z": 144.0
+              },
+              {
+                "x": 96.0,
+                "y": 72.0,
+                "z": 144.0
+              },
+              {
+                "x": 96.0,
+                "y": 120.0,
+                "z": 144.0
+              },
+              {
+                "x": 60.0,
+                "y": 120.0,
+                "z": 144.0
+              }
+            ]
+          }
+        ]
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "A615-60",
+        "components": [
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "X",
+            "diameter": 0.375,
+            "spacing": 9.0,
+            "edgeOffset": 3.0,
+            "endCover": 1.5,
+            "faces": 1
+          },
+          {
+            "type": "Mesh",
+            "role": "bottom",
+            "direction": "Y",
+            "diameter": 0.375,
+            "spacing": 9.0,
+            "edgeOffset": 3.0,
+            "endCover": 1.5,
+            "faces": 1
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "S1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    },
+    {
+      "id": "W1",
+      "name": "W1",
+      "type": "Wall",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C4000",
+      "section": "WALL9",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 300.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          {
+            "x": 300.0,
+            "y": 120.0,
+            "z": 0.0
+          },
+          {
+            "x": 300.0,
+            "y": 120.0,
+            "z": 144.0
+          },
+          {
+            "x": 300.0,
+            "y": 0.0,
+            "z": 144.0
+          }
+        ],
+        "openings": [
+          {
+            "id": "D1",
+            "points": [
+              {
+                "x": 300.0,
+                "y": 24.0,
+                "z": 0.0
+              },
+              {
+                "x": 300.0,
+                "y": 60.0,
+                "z": 0.0
+              },
+              {
+                "x": 300.0,
+                "y": 60.0,
+                "z": 84.0
+              },
+              {
+                "x": 300.0,
+                "y": 24.0,
+                "z": 84.0
+              }
+            ]
+          }
+        ]
+      },
+      "reinforcement": {
+        "source": "ProvidedBars",
+        "steelMaterial": "A615-60",
+        "components": [
+          {
+            "type": "Mesh",
+            "role": "vertical",
+            "direction": "Vertical",
+            "diameter": 0.375,
+            "spacing": 12.0,
+            "edgeOffset": 3.0,
+            "endCover": 1.5,
+            "faces": 2
+          },
+          {
+            "type": "Mesh",
+            "role": "horizontal",
+            "direction": "Horizontal",
+            "diameter": 0.375,
+            "spacing": 12.0,
+            "edgeOffset": 3.0,
+            "endCover": 1.5,
+            "faces": 2
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "W1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "UNITS-IN",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

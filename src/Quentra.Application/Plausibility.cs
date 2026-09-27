@@ -15,6 +15,11 @@ public static class Plausibility
     public const double MaxSteelKgPerM3 = 600;
     public const double MinSteelDensityKgM3 = 7000, MaxSteelDensityKgM3 = 8500;
 
+    // Overrides are typed by hand, so values far outside the review bands (ten times beyond them) are
+    // rejected rather than warned: they are almost certainly unit slips.
+    public static (double Min, double Max) OverrideRange(OverrideField field) => field == OverrideField.AreaThicknessM
+        ? (MinThicknessM / 10, MaxThicknessM * 10) : (MinSectionM / 10, MaxSectionM * 10);
+
     public static IEnumerable<CalculationWarning> Frame(FrameSnapshot frame, double lengthM)
     {
         var dimensions = frame.Section?.Shape == SectionShape.Circle

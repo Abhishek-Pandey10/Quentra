@@ -1,0 +1,40 @@
+{
+  "caseId": "DGUARD-003",
+  "schemaVersion": "1.0",
+  "provenanceType": "synthetic_engineering_benchmark",
+  "snapshotStatus": "Rejected",
+  "finalization": {
+    "allowed": false,
+    "blockingCodes": [
+      "PROVENANCE_INCONSISTENT"
+    ]
+  },
+  "modelTotals": null,
+  "completeness": null,
+  "byStory": {},
+  "byElementType": {},
+  "byMaterial": {},
+  "steelByMaterial": {},
+  "elements": [],
+  "warnings": [
+    {
+      "code": "PROVENANCE_INCONSISTENT",
+      "severity": "Fatal",
+      "subject": null
+    }
+  ],
+  "tolerance": {
+    "volumeM3": 1e-06,
+    "areaM2": 1e-06,
+    "lengthM": 1e-06,
+    "steelKg": 0.001,
+    "relative": 1e-09
+  },
+  "derivation": {
+    "method": "independent_first_principles",
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "handChecks": 2,
+    "closedFormCrossCheck": false
+  }
+}

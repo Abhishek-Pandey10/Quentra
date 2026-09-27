@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "snapshotSha256": "3f1270931a79226a7ba1c8c6d357a6e497ef1ddfa01d2c7be63b2ec16380fdea",
-  "calculationSha256": "5e8770ad0c4da07164a76e943d5dda04a55868158563bea1f72c9054930d8771",
+  "calculationSha256": "23d14e2530946fe4170f708e3532ae20b53ba42c7f1288df21f8bc81000927d0",
   "snapshot": {
     "schemaVersion": 2,
     "model": {
@@ -476,7 +476,7 @@
   },
   "overrides": [],
   "result": {
-    "calculationVersion": "takeoff/0.3.0",
+    "calculationVersion": "takeoff/0.5.0",
     "elements": [
       {
         "objectId": "E-B1",
@@ -920,10 +920,10 @@
       },
       {
         "code": "PARTIAL_STEEL",
-        "message": "Required steel components are missing. Known steel is only a subtotal."
+        "message": "Required steel components missing: E-B1 (LongitudinalBottom, LongitudinalTop, Transverse), E-B2 (LongitudinalBottom, LongitudinalTop, Transverse), E-B3 (LongitudinalBottom, LongitudinalTop, Transverse), E-B4 (LongitudinalBottom, LongitudinalTop, Transverse), E-C1 (Longitudinal, Transverse), E-C2 (Longitudinal, Transverse), E-C3 (Longitudinal, Transverse), E-C4 (Longitudinal, Transverse), E-S1 (XBottom, XTop, YBottom, YTop), E-W1 (Web). Known steel is only a subtotal."
       }
     ]
   },
   "reviewHistory": [],
-  "packageSha256": "12d34838a933640dc8a4defe9aca43bb9ae9a88a13b1b477db0ad617158c11ae"
+  "packageSha256": "6350fbdc3fe0ece09bf3ff28d00ee167e15600086357d03c1cfcdc22b51f9a1f"
 }

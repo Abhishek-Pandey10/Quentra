@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "1.0",
+  "model": {
+    "name": "Wall with two openings",
+    "description": null,
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "temperature": "C"
+    },
+    "source": "synthetic",
+    "stories": [
+      {
+        "name": "L1",
+        "elevation": 3.0,
+        "height": 3.0
+      }
+    ]
+  },
+  "materials": [
+    {
+      "name": "C30",
+      "type": "Concrete",
+      "grade": "C30",
+      "fckMPa": 30
+    }
+  ],
+  "sections": [
+    {
+      "name": "W200",
+      "kind": "Wall",
+      "thickness": 0.2
+    },
+    {
+      "name": "W250",
+      "kind": "Wall",
+      "thickness": 0.25
+    },
+    {
+      "name": "W300",
+      "kind": "Wall",
+      "thickness": 0.3
+    }
+  ],
+  "elements": [
+    {
+      "id": "W1",
+      "name": "W1",
+      "type": "Wall",
+      "role": "Physical",
+      "parentId": null,
+      "story": "L1",
+      "material": "C30",
+      "section": "W200",
+      "geometry": {
+        "kind": "Area",
+        "points": [
+          {
+            "x": 0,
+            "y": 0.0,
+            "z": 0
+          },
+          {
+            "x": 6,
+            "y": 0.0,
+            "z": 0
+          },
+          {
+            "x": 6,
+            "y": 0.0,
+            "z": 3
+          },
+          {
+            "x": 0,
+            "y": 0.0,
+            "z": 3
+          }
+        ],
+        "openings": [
+          {
+            "id": "D1",
+            "points": [
+              {
+                "x": 0.5,
+                "y": 0.0,
+                "z": 0
+              },
+              {
+                "x": 1.5,
+                "y": 0.0,
+                "z": 0
+              },
+              {
+                "x": 1.5,
+                "y": 0.0,
+                "z": 2.1
+              },
+              {
+                "x": 0.5,
+                "y": 0.0,
+                "z": 2.1
+              }
+            ]
+          },
+          {
+            "id": "WN1",
+            "points": [
+              {
+                "x": 3,
+                "y": 0.0,
+                "z": 1
+              },
+              {
+                "x": 4.5,
+                "y": 0.0,
+                "z": 1
+              },
+              {
+                "x": 4.5,
+                "y": 0.0,
+                "z": 2.2
+              },
+              {
+                "x": 3,
+                "y": 0.0,
+                "z": 2.2
+              }
+            ]
+          }
+        ]
+      },
+      "source": {
+        "application": "quentra_bench",
+        "version": "1.1.0",
+        "objectName": "W1",
+        "objectGuid": null,
+        "apiMethod": null
+      }
+    }
+  ],
+  "designResults": [],
+  "warnings": [],
+  "provenance": {
+    "type": "synthetic_engineering_benchmark",
+    "etabs_verified": false,
+    "etabs_version": null,
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "caseId": "WALL-003",
+    "notes": "Hand-designed synthetic benchmark. Not captured from ETABS."
+  }
+}

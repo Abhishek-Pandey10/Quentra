@@ -1,0 +1,107 @@
+{
+  "caseId": "RWALL-004",
+  "schemaVersion": "1.0",
+  "provenanceType": "synthetic_engineering_benchmark",
+  "snapshotStatus": "Accepted",
+  "finalization": {
+    "allowed": true,
+    "blockingCodes": []
+  },
+  "modelTotals": {
+    "grossConcreteM3": 3.0,
+    "openingDeductionM3": 0.41999999999999993,
+    "netConcreteM3": 2.58,
+    "unclassifiedVolumeM3": 0.0,
+    "steelKg": 262.79296883572476,
+    "steelExactKg": 262.79296883572476,
+    "steelApproximateKg": 0.0,
+    "steelKgBySource": {
+      "ProvidedBars": 262.79296883572476,
+      "RequiredDesignArea": 0.0,
+      "EstimatedRatio": 0.0,
+      "ManualOverride": 0.0
+    }
+  },
+  "completeness": {
+    "concrete": "Complete",
+    "steel": "Complete",
+    "concreteUnknownElementIds": [],
+    "steelUnknownElementIds": []
+  },
+  "byStory": {
+    "L1": {
+      "grossConcreteM3": 3.0,
+      "netConcreteM3": 2.58,
+      "steelKg": 262.79296883572476
+    }
+  },
+  "byElementType": {
+    "Beam": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": 0.0
+    },
+    "Column": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": 0.0
+    },
+    "Slab": {
+      "grossConcreteM3": 0.0,
+      "netConcreteM3": 0.0,
+      "steelKg": 0.0
+    },
+    "Wall": {
+      "grossConcreteM3": 3.0,
+      "netConcreteM3": 2.58,
+      "steelKg": 262.79296883572476
+    }
+  },
+  "byMaterial": {
+    "C35": {
+      "grossConcreteM3": 3.0,
+      "netConcreteM3": 2.58
+    }
+  },
+  "steelByMaterial": {
+    "B500": 262.79296883572476
+  },
+  "elements": [
+    {
+      "id": "W1",
+      "occurrence": 0,
+      "type": "Wall",
+      "story": "L1",
+      "materialGroup": "C35",
+      "status": "Included",
+      "grossConcreteM3": 3.0,
+      "netConcreteM3": 2.58,
+      "steelKg": 262.79296883572476,
+      "reinforcementSource": "ProvidedBars",
+      "steelExact": true,
+      "steelComponentsKg": [
+        130.95257737591015,
+        131.8403914598146
+      ],
+      "grossAreaM2": 15.0,
+      "openingAreaSumM2": 2.1,
+      "openingDeductedAreaM2": 2.1,
+      "netAreaM2": 12.9
+    }
+  ],
+  "warnings": [],
+  "tolerance": {
+    "volumeM3": 1e-06,
+    "areaM2": 1e-06,
+    "lengthM": 1e-06,
+    "steelKg": 0.001,
+    "relative": 1e-09
+  },
+  "derivation": {
+    "method": "independent_first_principles",
+    "generator": "quentra_bench",
+    "generatorVersion": "1.1.0",
+    "handChecks": 2,
+    "closedFormCrossCheck": false
+  }
+}

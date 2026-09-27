@@ -7,9 +7,26 @@ using Quentra.Application;
 using Quentra.Core;
 using Quentra.Infrastructure;
 
-if (args.Length == 1 && args[0] is "--help" or "-h" or "help")
+if (args.Length is 1 or 2 && args[0] is "--help" or "-h" or "help")
 {
-    Help();
+    if (args.Length == 1) { Help(); return 0; }
+    if (args[1] == "format")
+    {
+        await using var reference = typeof(Program).Assembly.GetManifestResourceStream("Quentra.Docs.SNAPSHOT_FORMAT.md")!;
+        Console.WriteLine((await new StreamReader(reference).ReadToEndAsync()).ReplaceLineEndings("\n").TrimEnd());
+        return 0;
+    }
+    if (!Commands.ContainsKey(args[1])) { Console.Error.WriteLine($"Quentra: unknown help topic '{args[1]}'. Topics: {string.Join(", ", Commands.Keys)}, format."); return 2; }
+    Console.WriteLine(Commands[args[1]].Usage);
+    Console.WriteLine();
+    Console.WriteLine(Commands[args[1]].Details);
+    return 0;
+}
+if (args.Length == 1 && args[0] == "codes")
+{
+    foreach (var (code, meaning) in WarningCatalogue.Entries) Console.WriteLine($"{code}\n    {meaning}");
+    Console.WriteLine();
+    Console.WriteLine(WarningCatalogue.Terms);
     return 0;
 }
 if (args.Length == 1 && args[0] is "--version")
@@ -21,7 +38,10 @@ if (args.Length == 1 && args[0] is "--version")
 if (UsageError(args, out var positional, out var options, out var edits) is { } usageError)
 {
     Console.Error.WriteLine($"Quentra: {usageError}");
-    Help();
+    if (args.Length > 0 && Commands.TryGetValue(args[0], out var command))
+        Console.Error.WriteLine($"Usage:\n{command.Usage}\nRun 'quentra help {args[0]}' for details.");
+    else
+        Console.Error.WriteLine($"Commands: {string.Join(", ", Commands.Keys)}. Run 'quentra --help' for usage.");
     return 2;
 }
 
@@ -31,12 +51,16 @@ var reading = positional[0];
 try
 {
     var inputPath = Path.GetFullPath(positional[0]);
-    var outputPath = Path.GetFullPath(positional[^1]);
-    foreach (var path in positional[..^1])
-        if (string.Equals(Path.GetFullPath(path), outputPath, StringComparison.OrdinalIgnoreCase))
-            throw new ArgumentException("Inputs and output must use different paths.");
-    if (File.Exists(outputPath) || Directory.Exists(outputPath))
-        throw new IOException("Output already exists. Choose a new path to preserve the previous run.");
+    var validating = args[0] == "validate";
+    var outputPath = validating ? "" : Path.GetFullPath(positional[^1]);
+    if (!validating)
+    {
+        foreach (var path in positional[..^1])
+            if (string.Equals(Path.GetFullPath(path), outputPath, StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Inputs and output must use different paths.");
+        if (File.Exists(outputPath) || Directory.Exists(outputPath))
+            throw new IOException($"{positional[^1]} already exists. Choose a new path; existing runs and reports are never overwritten.");
+    }
     if (args[0] == "template")
     {
         await using var resource = typeof(Program).Assembly.GetManifestResourceStream("Quentra.Templates.snapshot.json")!;
@@ -44,37 +68,41 @@ try
         await File.WriteAllTextAsync(outputPath, template.ReplaceLineEndings("\n"), new System.Text.UTF8Encoding(false), cancellation.Token);
         Console.WriteLine($"Snapshot template: {outputPath}");
         Console.WriteLine("It is a small synthetic model (beam, columns, slab, wall, steel). Replace its contents with your model;");
-        Console.WriteLine("docs/SNAPSHOT_FORMAT.md describes every field. Run 'quentra calculate' on it to check it.");
+        Console.WriteLine("'quentra help format' describes every field. Run 'quentra validate' on it to check it.");
         return 0;
     }
-    var json = await SnapshotJson.ReadAsync(inputPath,
-        args[0] == "calculate" ? SnapshotJson.MaximumSnapshotBytes : SnapshotJson.MaximumRunBytes, cancellation.Token);
+    var takesSnapshot = args[0] is "calculate" or "validate";
+    var json = await ReadInput(inputPath, reading, takesSnapshot ? SnapshotJson.MaximumSnapshotBytes : SnapshotJson.MaximumRunBytes, cancellation.Token);
     var isRun = IsRun(json);
-    if (args[0] == "calculate" && isRun)
+    if (takesSnapshot && isRun)
         throw new ArgumentException($"{reading} is a saved run, not a snapshot. Use 'quentra replay' to recompute a saved run.");
-    if (args[0] != "calculate" && !isRun)
+    if (!takesSnapshot && !isRun)
         throw new ArgumentException($"{reading} is a snapshot, not a run. Run 'quentra calculate' on it first and pass the run file it writes.");
 
-    if (args[0] is "calculate" or "replay" && Schema(json) == 1)
+    if (args[0] is "calculate" or "replay" or "validate" && Schema(json) == 1)
     {
-        var package = args[0] == "calculate"
-            ? SnapshotJson.Calculate(SnapshotJson.ParseSnapshot(json))
-            : SnapshotJson.Replay(json);
-        await SnapshotJson.WriteAsync(outputPath, package, cancellation.Token);
-        PrintFrameRun(package, outputPath);
+        var package = args[0] == "replay"
+            ? SnapshotJson.Replay(json)
+            : SnapshotJson.Calculate(SnapshotJson.ParseSnapshot(json));
+        if (!validating) await SnapshotJson.WriteAsync(outputPath, package, cancellation.Token);
+        PrintFrameRun(package, validating ? null : outputPath);
         return 0;
     }
 
     TakeoffRun run;
     switch (args[0])
     {
-        case "calculate":
+        case "calculate" or "validate":
             if (Schema(json) != 2) throw new NotSupportedException("Snapshot schemaVersion must be 1 (frames) or 2 (takeoff).");
             run = TakeoffJson.Calculate(TakeoffJson.Parse<TakeoffSnapshot>(json), cancellationToken: cancellation.Token);
-            break;
+            if (!validating) break;
+            PrintTakeoffRun(run, "Checked", null);
+            Console.WriteLine("The snapshot is readable and was calculated. Nothing was written; review the warnings above.");
+            return 0;
         case "replay":
             RequireTakeoffRun(json, args[0], reading);
             run = TakeoffJson.Replay(json, cancellation.Token);
+            Console.WriteLine("Reproduced: every saved quantity and hash matches a fresh calculation.");
             break;
         case "override":
             RequireTakeoffRun(json, args[0], reading);
@@ -96,21 +124,23 @@ try
             {
                 reading = positional[1];
                 changes = TakeoffJson.Parse<ImmutableArray<QuantityOverride>>(
-                    await SnapshotJson.ReadAsync(Path.GetFullPath(positional[1]), SnapshotJson.MaximumSnapshotBytes, cancellation.Token));
+                    await ReadInput(Path.GetFullPath(positional[1]), reading, SnapshotJson.MaximumSnapshotBytes, cancellation.Token));
                 if (changes.IsDefaultOrEmpty) throw new ArgumentException("The override file must contain at least one override.");
             }
             run = TakeoffJson.AddOverrides(current, changes);
             foreach (var change in changes)
-                Console.WriteLine(string.Create(CultureInfo.InvariantCulture,
-                    $"Override {change.Id}: {change.ObjectId} {change.Field} {change.OriginalValue:G6} -> {change.ReplacementValue:G6}"));
+                Console.WriteLine(change.Field == OverrideField.Excluded
+                    ? $"Override {change.Id}: {change.ObjectId} {(change.ReplacementValue == 1 ? "excluded" : "included again")}"
+                    : $"Override {change.Id}: {change.ObjectId} {Overrides.Label(change.Field)} {Overrides.Mm(change.OriginalValue)} -> {Overrides.Mm(change.ReplacementValue)}");
             break;
         case "accept":
             RequireTakeoffRun(json, args[0], reading);
             run = TakeoffJson.Replay(json, cancellation.Token);
-            var acknowledged = options["--acknowledge"].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToImmutableArray();
-            var unacknowledged = TakeoffJson.WarningCodes(run).Except(acknowledged, StringComparer.Ordinal).ToArray();
-            if (unacknowledged.Length > 0)
-                throw new ArgumentException("Acknowledge every current warning code before acceptance. Missing: " + string.Join(",", unacknowledged));
+            // Codes are upper case; accept any case so 'modeled_basis' is not reported as missing.
+            // Object IDs after ':' are case-sensitive and kept as typed.
+            var acknowledged = options["--acknowledge"].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(x => x.IndexOf(':') is var colon and >= 0 ? x[..colon].ToUpperInvariant() + x[colon..] : x.ToUpperInvariant())
+                .Distinct(StringComparer.Ordinal).ToImmutableArray();
             run = TakeoffJson.Accept(run, options["--reviewer"], options["--note"], options.ContainsKey("--partial"), acknowledged, DateTimeOffset.UtcNow);
             break;
         default: // export
@@ -131,20 +161,32 @@ catch (OperationCanceledException)
 }
 catch (JsonException e)
 {
-    Console.Error.WriteLine($"Quentra: {reading}: {DescribeJsonError(e)}");
+    Console.Error.WriteLine($"Quentra: {reading}: {JsonErrors.Describe(e)}");
     return 1;
 }
-catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+catch (UnauthorizedAccessException)
+{
+    Console.Error.WriteLine("Quentra: permission denied. Check that you can read the input files and write to the output folder.");
+    return 1;
+}
+catch (Exception e) when (e is IOException or InvalidDataException or ArgumentException or NotSupportedException)
 {
     Console.Error.WriteLine($"Quentra: {e.Message}");
     return 1;
+}
+
+static async Task<string> ReadInput(string fullPath, string shown, long maximumBytes, CancellationToken token)
+{
+    if (Directory.Exists(fullPath)) throw new ArgumentException($"{shown} is a folder. Give the path of a JSON file.");
+    if (!File.Exists(fullPath)) throw new FileNotFoundException($"{shown} was not found.");
+    return await SnapshotJson.ReadAsync(fullPath, maximumBytes, token);
 }
 
 static string? UsageError(string[] args, out string[] positional, out Dictionary<string, string> options, out List<(string Option, string Value)> edits)
 {
     positional = []; options = new(StringComparer.Ordinal); edits = [];
     if (args.Length == 0) return "No command given.";
-    if (args[0] is not ("calculate" or "replay" or "override" or "accept" or "export" or "template")) return $"Unknown command '{args[0]}'.";
+    if (!Commands.ContainsKey(args[0])) return $"Unknown command '{args[0]}'.";
     string[] allowed = args[0] switch
     {
         "accept" => ["--reviewer", "--note", "--acknowledge", "--partial"],
@@ -168,9 +210,9 @@ static string? UsageError(string[] args, out string[] positional, out Dictionary
         positional = [target];
         return null;
     }
-    var expected = args[0] == "override" && edits.Count == 0 ? 3 : 2;
+    var expected = args[0] == "validate" ? 1 : args[0] == "override" && edits.Count == 0 ? 3 : 2;
     if (positional.Length != expected)
-        return $"'{args[0]}' takes {expected} file paths; {positional.Length} given.";
+        return $"'{args[0]}' takes {expected} file path{(expected == 1 ? "" : "s")}; {positional.Length} given.";
     string[] required = args[0] switch
     {
         "accept" => ["--reviewer", "--note", "--acknowledge"],
@@ -185,13 +227,15 @@ static string? UsageError(string[] args, out string[] positional, out Dictionary
     return null;
 }
 
-// --set ID.field=value[unit], --exclude ID, --include ID. Values without a unit are metres.
+// --set ID.field=value+unit, --exclude ID, --include ID. The unit is required: a bare 700 could be mm or m.
 static (string ObjectId, OverrideField Field, double Value) ParseEdit(string option, string text)
 {
     if (option == "--exclude") return (text, OverrideField.Excluded, 1);
     if (option == "--include") return (text, OverrideField.Excluded, 0);
-    var match = Regex.Match(text, @"^(?<id>.+)\.(?<field>[A-Za-z]+)=(?<value>[-+0-9.eE]+)(?<unit>mm|m|in|ft)?$");
-    if (!match.Success) throw new ArgumentException($"--set '{text}' must look like W1.thickness=0.3 (metres) or W1.thickness=300mm.");
+    if (Regex.Match(text, @"^.+\.[A-Za-z]+=(?<value>[-+0-9.eE]+)$") is { Success: true } bare)
+        throw new ArgumentException($"--set '{text}' needs a unit. Write, for example, {bare.Groups["value"].Value}mm or {bare.Groups["value"].Value}m (mm, m, in and ft are accepted).");
+    var match = Regex.Match(text, @"^(?<id>.+)\.(?<field>[A-Za-z]+)=(?<value>[-+0-9.eE]+)(?<unit>mm|m|in|ft)$");
+    if (!match.Success) throw new ArgumentException($"--set '{text}' must look like W1.thickness=300mm (units: mm, m, in, ft).");
     OverrideField field = match.Groups["field"].Value.ToLowerInvariant() switch
     {
         "width" => OverrideField.FrameWidthM, "depth" => OverrideField.FrameDepthM,
@@ -200,6 +244,7 @@ static (string ObjectId, OverrideField Field, double Value) ParseEdit(string opt
     };
     if (!double.TryParse(match.Groups["value"].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
         throw new ArgumentException($"--set '{text}' has an invalid number.");
+    if (!double.IsFinite(value)) throw new ArgumentException($"--set '{text}' has an invalid number.");
     var unit = match.Groups["unit"].Value switch { "mm" => LengthUnit.Millimetre, "in" => LengthUnit.Inch, "ft" => LengthUnit.Foot, _ => LengthUnit.Metre };
     return (match.Groups["id"].Value, field, value * Units.MetresPerUnit(unit));
 }
@@ -208,24 +253,6 @@ static bool IsRun(string json)
 {
     using var document = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 64 });
     return document.RootElement.ValueKind == JsonValueKind.Object && document.RootElement.TryGetProperty("calculationSha256", out _);
-}
-
-// System.Text.Json messages name .NET types; restate them in terms of the JSON document.
-static string DescribeJsonError(JsonException e)
-{
-    var where = e.Path is { } path ? $" at {path}" + (e.LineNumber is { } line ? $" (line {line + 1})" : "") : "";
-    var message = e.Message;
-    if (Regex.Match(message, "The JSON property '(.+?)' could not be mapped") is { Success: true } unknown)
-        return $"unknown property '{unknown.Groups[1].Value}'{where}. Check the spelling and that this is the right kind of file.";
-    if (Regex.Match(message, "missing required properties including: (.+?)\\.( |$)") is { Success: true } required)
-        return $"missing required properties {required.Groups[1].Value}{where}.";
-    if (message.Contains("could not be converted to", StringComparison.Ordinal))
-        return $"value has the wrong type{where}.";
-    if (e.Path is null && message.Contains("LineNumber:", StringComparison.Ordinal))
-        return $"not valid JSON: {message}";
-    if (message.Contains("System.", StringComparison.Ordinal) || message.Contains("Quentra.", StringComparison.Ordinal))
-        return $"the document does not match the expected format{where}.";
-    return message;
 }
 
 static int Schema(string json)
@@ -244,15 +271,16 @@ static void RequireTakeoffRun(string json, string command, string path)
     if (Schema(json) != 2) throw new NotSupportedException($"{path} has an unsupported run schemaVersion.");
 }
 
+// Same rounding as the export: m³ to 0.001, kg to 0.1. run.json keeps full precision.
 static string Number(double? value, string unit) =>
-    value is { } x ? x.ToString("0.######", CultureInfo.InvariantCulture) + " " + unit : "unknown";
+    value is { } x ? (Math.Round(x, unit == "kg" ? 1 : 3, MidpointRounding.AwayFromZero) + 0.0).ToString(unit == "kg" ? "F1" : "F3", CultureInfo.InvariantCulture) + " " + unit : "unknown";
 
-static void PrintFrameRun(RunPackage package, string outputPath)
+static void PrintFrameRun(RunPackage package, string? outputPath)
 {
     var summary = package.Result.Summary;
     Console.WriteLine("Quentra — draft frame concrete calculation");
     Console.WriteLine($"Source: {package.Snapshot.Origin} — {package.Snapshot.ModelId}");
-    Console.WriteLine($"Known gross modeled concrete: {summary.KnownGrossModeledVolume.CubicMetres.ToString("G12", CultureInfo.InvariantCulture)} m³");
+    Console.WriteLine($"Known gross modeled concrete: {Number(summary.KnownGrossModeledVolume.CubicMetres, "m³")}");
     Console.WriteLine($"Quantified: {summary.QuantifiedCount}/{summary.InScopeCount} in scope; out of scope: {summary.OutOfScopeCount}");
     Console.WriteLine("Steel: unknown (not calculated). Member intersections remain in gross concrete.");
     foreach (var warning in package.Result.Warnings)
@@ -260,10 +288,14 @@ static void PrintFrameRun(RunPackage package, string outputPath)
     foreach (var frame in package.Result.Frames.Where(x => x.GrossModeledVolume is null))
         foreach (var warning in frame.Warnings)
             Console.WriteLine($"[{warning.Code}] {frame.ObjectId}: {warning.Message}");
-    Console.WriteLine($"Run package: {outputPath}");
+    Console.WriteLine(outputPath is null ? "Checked. Nothing was written." : $"Run package: {outputPath}");
 }
 
-static void PrintTakeoffRun(TakeoffRun run, string label, string outputPath)
+// Totals are still shown, but a total that contains a probable unit slip must say so where it is read.
+static string Implausible(IReadOnlyList<string> ids) => ids.Count == 0 ? "" :
+    $" (includes {ids.Count} element{(ids.Count == 1 ? "" : "s")} with implausible values: {string.Join(", ", ids.Take(10))}{(ids.Count > 10 ? $" and {ids.Count - 10} more" : "")})";
+
+static void PrintTakeoffRun(TakeoffRun run, string label, string? outputPath)
 {
     var s = run.Result.Summary;
     Console.WriteLine("Quentra — concrete and steel takeoff");
@@ -271,9 +303,13 @@ static void PrintTakeoffRun(TakeoffRun run, string label, string outputPath)
     Console.WriteLine($"Review status: {TakeoffJson.ReviewStatus(run)}; overrides: {run.Overrides.Length}");
     Console.WriteLine($"Snapshot SHA256: {run.SnapshotSha256}");
     Console.WriteLine($"Quantified: {s.Quantified}/{s.InScope} in scope; unsupported: {s.Unsupported}; invalid: {s.Invalid}; out of scope: {s.OutOfScope}");
-    Console.WriteLine($"Known gross modeled concrete: {Number(s.KnownGrossM3, "m³")}; complete: {Number(s.CompleteGrossM3, "m³")}");
-    Console.WriteLine($"Known opening-adjusted concrete: {Number(s.KnownOpeningAdjustedM3, "m³")}; complete: {Number(s.CompleteOpeningAdjustedM3, "m³")}");
-    Console.WriteLine($"Known steel: {Number(s.KnownSteelKg, "kg")}; complete: {Number(s.CompleteSteelKg, "kg")}; missing components: {s.MissingSteelComponents}");
+    var concreteFlag = Implausible(TakeoffJson.FlaggedElements(run, "IMPLAUSIBLE_DIMENSION"));
+    var steelFlag = Implausible(TakeoffJson.FlaggedElements(run, TakeoffJson.PerElementCodes));
+    if (run.Result.Warnings.Any(x => x.Code == "IMPLAUSIBLE_POLICY")) steelFlag += " (steel density outside its review band)";
+    var complete = TakeoffJson.CompleteLabel(run);
+    Console.WriteLine($"Known gross modeled concrete: {Number(s.KnownGrossM3, "m³")}; {complete}: {Number(s.CompleteGrossM3, "m³")}{concreteFlag}");
+    Console.WriteLine($"Known opening-adjusted concrete: {Number(s.KnownOpeningAdjustedM3, "m³")}; {complete}: {Number(s.CompleteOpeningAdjustedM3, "m³")}{concreteFlag}");
+    Console.WriteLine($"Known steel: {Number(s.KnownSteelKg, "kg")}; {complete}: {Number(s.CompleteSteelKg, "kg")}{steelFlag}; missing components: {s.MissingSteelComponents}");
     foreach (var warning in run.Result.Warnings)
         Console.WriteLine($"[{warning.Code}] {warning.Message}");
     foreach (var element in run.Result.Elements)
@@ -282,31 +318,83 @@ static void PrintTakeoffRun(TakeoffRun run, string label, string outputPath)
     foreach (var steel in run.Result.Steel)
         foreach (var warning in steel.Warnings)
             Console.WriteLine($"[{warning.Code}] {steel.ObjectId}/{steel.Component}: {warning.Message}");
-    Console.WriteLine($"Warning codes: {string.Join(",", TakeoffJson.WarningCodes(run))}");
-    Console.WriteLine($"{label}: {outputPath}");
+    Console.WriteLine($"Warning codes: {string.Join(",", TakeoffJson.RequiredAcknowledgements(run))}  ('quentra codes' explains each)");
+    Console.WriteLine("Quantities are rounded to 0.001 m³ and 0.1 kg; the run file keeps full precision.");
+    if (outputPath is not null) Console.WriteLine($"{label}: {outputPath}");
 }
 
-static void Help() => Console.WriteLine("""
-Quentra — concrete and steel takeoff development CLI
-  quentra calculate <snapshot.json> <new-run.json>
-  quentra replay    <saved-run.json> <new-run.json>
-  quentra override  <run.json> <overrides.json> <new-run.json>
+static void Help()
+{
+    Console.WriteLine("Quentra — concrete and steel takeoff from a structural model snapshot (development CLI)");
+    Console.WriteLine();
+    foreach (var (_, (usage, _)) in Commands) Console.WriteLine(usage);
+    Console.WriteLine("""
+  quentra help <command>   details of one command
+  quentra help format      the snapshot field reference
+  quentra codes            what each warning code and term means
+  quentra --version
+
+Typical order: template -> edit the JSON -> validate -> calculate -> override (optional) -> accept -> export.
+Input is a saved JSON snapshot, not an ETABS model file; a live ETABS connection is not implemented.
+Unknown quantities are shown as 'unknown', never zero. Existing files are never overwritten.
+Exit codes: 0 success, 1 input/IO/validation failure, 2 usage, 130 cancelled.
+""");
+}
+
+partial class Program
+{
+    static readonly Dictionary<string, (string Usage, string Details)> Commands = new(StringComparer.Ordinal)
+    {
+        ["template"] = ("  quentra template  snapshot <new-snapshot.json>", """
+Writes a small synthetic example snapshot (beam, columns, slab, wall and their steel) to edit into your model.
+'quentra help format' prints the field reference for every snapshot field.
+"""),
+        ["validate"] = ("  quentra validate  <snapshot.json>", """
+Reads and calculates a snapshot without writing anything, and prints every problem with the element it belongs to.
+A JSON syntax error or a field of the wrong type (for example an unknown enum value) is reported alone, with its
+line; fix it and run again to see the remaining problems. Use it while editing a snapshot.
+Exit code 1 means the snapshot cannot be read; warnings do not fail it.
+"""),
+        ["calculate"] = ("  quentra calculate <snapshot.json> <new-run.json>", """
+Calculates a snapshot and saves a run file: the snapshot, results, warnings and hashes.
+Schema 2 snapshots give concrete and steel for frames, slabs and walls. Schema 1 (legacy, frame concrete only)
+can be calculated and replayed but not overridden, accepted or exported.
+"""),
+        ["replay"] = ("  quentra replay    <saved-run.json> <new-run.json>", """
+Recalculates a saved run and checks that every saved quantity and hash reproduces. Fails if the run was edited.
+"""),
+        ["override"] = ("""
   quentra override  <run.json> <new-run.json> --reason <text> --author <name>
-                    [--set ID.width|depth|diameter|thickness=VALUE[mm|m|in|ft]]
-                    [--exclude ID] [--include ID]   (options repeatable)
+                    [--set ID.width|depth|diameter|thickness=VALUE<mm|m|in|ft>] [--exclude ID] [--include ID]
+  quentra override  <run.json> <overrides.json> <new-run.json>
+""".Trim('\n'), """
+Records hand changes in a new run. Options can be repeated; each becomes one override (o1, o2, ...).
+  --set B1.depth=700mm   A unit is required. Values far outside the review bands are rejected.
+  --exclude W1           Takes W1 out of scope (the run becomes partial, and totals are labelled
+                         as reduced scope). --include W1 reverses it.
+An override that would change nothing is rejected. Changing a frame's section stops its design-demand steel
+(DemandEquivalent) being counted, because the demand belongs to the old section; the warning names the override.
+The previous acceptance no longer applies to the new run.
+
+An overrides.json file is an array of overrides; --set/--exclude fill these fields in for you:
+  [ { "id": "o1", "objectId": "B1", "field": "FrameDepthM", "originalValue": 0.6, "replacementValue": 0.7,
+      "reason": "Revised drawing S-201 rev C", "author": "A. Engineer", "recordedAt": "2026-09-27T10:00:00Z",
+      "snapshotSha256": "<Snapshot SHA256 printed for the run>" } ]
+  field: FrameWidthM, FrameDepthM, FrameDiameterM, AreaThicknessM (values in metres), or Excluded (0 included, 1 excluded).
+  originalValue must equal the element's current value.
+"""),
+        ["accept"] = ("""
   quentra accept    <run.json> <new-run.json> --reviewer <name> --note <text>
                     --acknowledge <CODE,CODE,...> [--partial]
-  quentra export    <run.json> <new-directory>
-  quentra template  snapshot <new-snapshot.json>
-  quentra --version | --help
-
-calculate/replay detect the schema: 1 = frame concrete only, 2 = takeoff with
-slabs, walls, stories and steel. override, accept and export need schema 2 runs.
-overrides.json is an array of recorded overrides bound to the run's snapshot SHA256
-(fields are listed in the README); --set/--exclude fill in original values and the hash.
-'template snapshot' writes a starter snapshot; docs/SNAPSHOT_FORMAT.md describes it.
-Acceptance lists every current warning code; --partial is required for partial runs.
-Input is a saved snapshot, not an ETABS model file. Live ETABS is not implemented.
-Null quantities are unknown, not zero. Existing files are never overwritten.
-Exit codes: 0 success, 1 input/IO/validation failure, 2 usage, 130 cancel.
-""");
+""".Trim('\n'), """
+Records a reviewer's acceptance of this exact calculation. List every warning code the run printed
+(any letter case); 'quentra codes' explains them. Implausible values are acknowledged per element, exactly as
+printed, for example IMPLAUSIBLE_DIMENSION:B1, so each suspected unit slip is looked at. --partial is required when concrete or steel is incomplete
+or an element was excluded. The measurement policy must be approved first. Any later override clears acceptance.
+"""),
+        ["export"] = ("  quentra export    <run.json> <new-directory>", """
+Writes CSV files, report.xlsx (with a Contents sheet) and manifest.json with a SHA256 for each file.
+Quantities are rounded (m³ to 0.001, kg to 0.1, override dimensions to 0.1 mm); run.json keeps full precision.
+"""),
+    };
+}

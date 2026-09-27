@@ -1,14 +1,16 @@
 using System.Collections.Immutable;
+using System.Globalization;
 using Quentra.Core;
 
 namespace Quentra.Application;
 
 public static class TakeoffEngine
 {
-    public const string Version = "takeoff/0.3.0";
+    public const string Version = "takeoff/0.5.0";
     public static readonly string[] ComponentNames = ["Longitudinal", "LongitudinalTop", "LongitudinalBottom", "Transverse", "Web", "Boundary", "XTop", "XBottom", "YTop", "YBottom", "Detailing", "Accessories"];
 
-    public static TakeoffResult Run(TakeoffSnapshot snapshot, CancellationToken cancellationToken = default, IReadOnlySet<string>? excluded = null)
+    public static TakeoffResult Run(TakeoffSnapshot snapshot, CancellationToken cancellationToken = default, IReadOnlySet<string>? excluded = null,
+        IReadOnlyDictionary<string, string>? sectionChanges = null)
     {
         Validate(snapshot);
         var metadata = snapshot.Metadata.ToDictionary(x => x.ObjectId, StringComparer.Ordinal);
@@ -50,19 +52,25 @@ public static class TakeoffEngine
             string? error = null, code = null;
             if (excluded?.Contains(source.ObjectId) == true) { status = QuantityStatus.OutOfScope; code = "USER_EXCLUDED"; error = "Explicitly excluded by a recorded override; see the override ledger."; }
             else if (source.Material == MaterialKind.NonConcrete) { status = QuantityStatus.OutOfScope; code = "NON_CONCRETE"; error = "Non-concrete area is outside RC scope."; }
-            else if (source.Material == MaterialKind.Unknown || source.Kind == AreaKind.Unsupported || !source.PhysicalThicknessVerified || !source.OpeningsVerified)
-            { status = QuantityStatus.Unsupported; error = "Verify physical thickness, material, planar area role and opening host association."; }
+            else if (UnsupportedReasons(source) is { Length: > 0 } reasons)
+            { status = QuantityStatus.Unsupported; error = "Not quantified: " + string.Join("; ", reasons) + "."; }
             PlanarGeometry? geometry = null;
             double thickness = 0;
             if (error is null)
             {
-                try
+                // Named here: the generic Length check would report a bad thickness as a bad "length".
+                if (!double.IsFinite(source.Thickness.Metres) || source.Thickness.Metres <= 0)
                 {
-                    thickness = new Length(source.Thickness.Metres).Metres;
+                    status = QuantityStatus.Invalid;
+                    error = string.Create(CultureInfo.InvariantCulture, $"Thickness must be finite and positive; the snapshot gives {source.Thickness.Value} {source.Thickness.Unit}.");
+                }
+                else try
+                {
+                    thickness = source.Thickness.Metres;
                     geometry = new PlanarGeometry(source, snapshot.Model.CoordinateUnit, snapshot.Policy);
                     _ = new Volume(geometry.GrossArea * thickness);
                 }
-                catch (ArgumentException ex) { status = QuantityStatus.Invalid; error = ex.Message; }
+                catch (ArgumentException ex) { status = QuantityStatus.Invalid; error = Plain(ex); }
             }
             var element = new ElementTakeoff(source.ObjectId, source.Kind.ToString(), m.MaterialName, m.SectionName,
                 status, source.SourceReference, error is null ? geometry!.GrossArea * thickness : null,
@@ -78,7 +86,7 @@ public static class TakeoffEngine
         var ordered = elements.OrderBy(x => x.ObjectId, StringComparer.Ordinal).ToImmutableArray();
         var byId = ordered.ToDictionary(x => x.ObjectId);
         var steel = snapshot.Reinforcement.OrderBy(x => x.ObjectId, StringComparer.Ordinal).ThenBy(x => x.Component, StringComparer.Ordinal)
-            .Select(x => SteelCalculator.Calculate(x, byId[x.ObjectId], snapshot.Policy)).ToImmutableArray();
+            .Select(x => ExplainOverride(SteelCalculator.Calculate(x, byId[x.ObjectId], snapshot.Policy), x, sectionChanges)).ToImmutableArray();
         var steelByElement = steel.ToLookup(x => x.ObjectId);
         var coverage = ordered.Where(x => x.Status != QuantityStatus.OutOfScope).Select(x =>
         {
@@ -102,19 +110,44 @@ public static class TakeoffEngine
             ordered.Count(x => x.Status == QuantityStatus.Unsupported), ordered.Count(x => x.Status == QuantityStatus.Invalid),
             ordered.Length - inScope, gross, opening, completeConcrete ? gross : null, completeConcrete ? opening : null,
             mass, completeSteel ? mass : null, coverage.Sum(x => x.Missing.Length));
-        if (!completeConcrete) warnings.Add(new("PARTIAL_CONCRETE", "Concrete scope is empty or contains unquantified elements."));
+        if (!completeConcrete) warnings.Add(new("PARTIAL_CONCRETE", inScope == 0
+            ? "Concrete scope is empty; there is no complete concrete quantity."
+            : $"Not quantified: {Names(ordered.Where(x => x.Status is QuantityStatus.Unsupported or QuantityStatus.Invalid).Select(x => x.ObjectId).ToArray())}. Known concrete is only a subtotal; each element's warning says why."));
         if (!completeSteel) warnings.Add(new("PARTIAL_STEEL", inScope == 0
             ? "Steel scope is empty; there is no complete steel quantity."
-            : "Required steel components are missing. Known steel is only a subtotal."));
-        if (stories.Any(x => x.StoryId == "Unallocated")) warnings.Add(new("UNALLOCATED_STORY", "Some geometry is outside declared story bands or lacks a level assignment."));
+            : $"Required steel components missing: {Names(coverage.Where(x => x.Missing.Length > 0).Select(x => $"{x.ObjectId} ({string.Join(", ", x.Missing)})").ToArray())}. Known steel is only a subtotal."));
+        if (coverage.Where(x => x.Required.IsEmpty).Select(x => x.ObjectId).ToArray() is { Length: > 0 } steelFree)
+            warnings.Add(new("NO_STEEL_REQUIRED", $"Declared to need no steel (requiredSteelComponents is empty): {Names(steelFree)}. Their steel counts as complete at 0 kg; confirm none is needed."));
+        if (stories.Where(x => x.StoryId == "Unallocated").Select(x => x.ObjectId).Distinct().ToArray() is { Length: > 0 } unallocated)
+            warnings.Add(new("UNALLOCATED_STORY", $"Not allocated to a story: {Names(unallocated)}. Their geometry is outside the declared story bands, or a slab has no assignedStoryId."));
         DetectDuplicateFrames(snapshot, warnings);
         DetectAreaOverlaps(snapshot, warnings, cancellationToken);
         return new(Version, ordered, stories.OrderBy(x => x.ObjectId, StringComparer.Ordinal).ThenBy(x => x.StoryId, StringComparer.Ordinal).ToImmutableArray(),
             steel, coverage, summary, Groups(ordered, x => x.Category), Groups(ordered, x => x.MaterialName), warnings.ToImmutableArray());
     }
 
+    private static string[] UnsupportedReasons(AreaSnapshot a) =>
+    [
+        .. a.Material == MaterialKind.Unknown ? ["material is Unknown"] : Array.Empty<string>(),
+        .. a.Kind == AreaKind.Unsupported ? ["kind is Unsupported (only Slab and Wall are quantified)"] : Array.Empty<string>(),
+        .. a.PhysicalThicknessVerified ? Array.Empty<string>() : ["physicalThicknessVerified is false (confirm the modeled thickness is the physical thickness)"],
+        .. a.OpeningsVerified ? Array.Empty<string>() : ["openingsVerified is false (confirm every opening belongs to this host)"]
+    ];
+
+    // ArgumentOutOfRangeException appends "(Parameter 'name')", which means nothing to a user.
+    private static string Plain(ArgumentException ex) => ex.ParamName is null ? ex.Message : ex.Message.Replace($" (Parameter '{ex.ParamName}')", "", StringComparison.Ordinal);
+
+    private static string Names(IReadOnlyList<string> ids) => ids.Count <= 20 ? string.Join(", ", ids) : string.Join(", ", ids.Take(20)) + $" and {ids.Count - 20} more";
+
+    private static SteelQuantity ExplainOverride(SteelQuantity quantity, SteelInput input, IReadOnlyDictionary<string, string>? sectionChanges) =>
+        quantity.MassKg is null && input.Method == SteelMethod.DemandEquivalent && sectionChanges?.GetValueOrDefault(input.ObjectId) is { } change
+            ? quantity with { Warnings = [new("STEEL_UNAVAILABLE", $"Not counted: {change} changed {input.ObjectId}'s section, so the design demand for the original section no longer applies. Supply demand from a design run of the new section, or assigned bars.")] }
+            : quantity;
+
     private static ImmutableArray<CalculationWarning> AreaWarnings(AreaSnapshot source, PlanarGeometry geometry, double thickness, LengthUnit unit) =>
     [
+        .. geometry.RemainingArea <= 0 ? [new CalculationWarning("AREA_FULLY_VOIDED",
+            "Openings remove the whole area, so its opening-adjusted volume is 0 m³. Confirm the openings and their host.")] : Array.Empty<CalculationWarning>(),
         .. geometry.OpeningsOutsideHost.Select(i => new CalculationWarning("OPENING_OUTSIDE_HOST",
             $"Opening {i + 1} lies entirely outside the host boundary and deducts nothing. Confirm its host assignment.")),
         .. geometry.OpeningsCrossingHost.Select(i => new CalculationWarning("OPENING_CROSSES_HOST",
@@ -193,18 +226,22 @@ public static class TakeoffEngine
 
     private static void DetectAreaOverlaps(TakeoffSnapshot snapshot, List<CalculationWarning> warnings, CancellationToken token)
     {
-        // Bounding boxes prune candidates; an exact planar intersection establishes overlap.
-        var valid = new List<(AreaSnapshot Source, PlanarGeometry Plane, double MinX, double MaxX)>();
+        // Bounding boxes prune candidates; an exact planar intersection establishes overlap. Only pairs whose boxes
+        // overlap in all three axes count towards the limit, so floors stacked in plan and neighbours that merely
+        // share an edge (which cannot overlap in area) do not exhaust it on a tall building.
+        var valid = new List<(AreaSnapshot Source, PlanarGeometry Plane, Box Box)>();
         var factor = Units.MetresPerUnit(snapshot.Model.CoordinateUnit);
+        var flat = snapshot.Policy.PlanarityToleranceM;
         foreach (var area in snapshot.Areas.Where(x => x.Material == MaterialKind.Concrete && x.PhysicalThicknessVerified && x.OpeningsVerified))
-            try { valid.Add((area, new PlanarGeometry(area, snapshot.Model.CoordinateUnit, snapshot.Policy), area.Boundary.Min(x => x.X) * factor, area.Boundary.Max(x => x.X) * factor)); }
+            try { valid.Add((area, new PlanarGeometry(area, snapshot.Model.CoordinateUnit, snapshot.Policy), Box.Of(area.Boundary, factor))); }
             catch (ArgumentException) { /* Invalid geometry is already reported in its quantity record. */ }
-        valid.Sort((a, b) => a.MinX.CompareTo(b.MinX));
+        valid.Sort((a, b) => a.Box.MinX.CompareTo(b.Box.MinX));
         var candidates = 0;
         for (var i = 0; i < valid.Count; i++)
-            for (var j = i + 1; j < valid.Count && valid[j].MinX <= valid[i].MaxX; j++)
+            for (var j = i + 1; j < valid.Count && valid[j].Box.MinX <= valid[i].Box.MaxX; j++)
             {
                 token.ThrowIfCancellationRequested();
+                if (!valid[i].Box.Overlaps(valid[j].Box, flat)) continue;
                 if (++candidates > 100000)
                 {
                     warnings.Add(new("OVERLAP_SCAN_LIMIT", "Area overlap scan reached its candidate limit. Further overlap review is required.")); return;
@@ -229,84 +266,135 @@ public static class TakeoffEngine
     public static void Validate(TakeoffSnapshot s)
     {
         ArgumentNullException.ThrowIfNull(s);
-        if (s.SchemaVersion != 2) throw new ArgumentException("Expected takeoff schema version 2.");
-        CalculateSnapshot.Validate(s.Model);
+        CalculateSnapshot.ThrowIfAny(Problems(s));
+    }
+
+    // Reports every independent problem (see CalculateSnapshot.Problems). An entry that cannot be identified,
+    // or whose reference is broken, skips the checks that depend on it rather than adding follow-on errors.
+    public static IEnumerable<string> Problems(TakeoffSnapshot s)
+    {
+        if (s.SchemaVersion != 2) { yield return "Expected takeoff schema version 2."; yield break; }
+        if (s.Model is null) { yield return "The model is required."; yield break; }
+        foreach (var problem in CalculateSnapshot.Problems(s.Model)) yield return problem;
+        if (s.Model.Frames.IsDefault) yield break;
         if (s.Areas.IsDefault || s.Stories.IsDefault || s.Metadata.IsDefault || s.Reinforcement.IsDefault || s.Policy is null)
-            throw new ArgumentException("Areas, stories, metadata, reinforcement and policy are required.");
+        {
+            yield return "Areas, stories, metadata, reinforcement and policy are required.";
+            yield break;
+        }
         var p = s.Policy;
         if (string.IsNullOrWhiteSpace(p.Id) || string.IsNullOrWhiteSpace(p.IntendedUse) || !double.IsFinite(p.SteelDensityKgM3) || p.SteelDensityKgM3 <= 0 ||
             !double.IsFinite(p.LinearToleranceM) || p.LinearToleranceM < 1e-6 || p.LinearToleranceM > .001 ||
             !double.IsFinite(p.PlanarityToleranceM) || p.PlanarityToleranceM < p.LinearToleranceM || p.PlanarityToleranceM > .01)
-            throw new ArgumentException("Policy requires identity, intended use, positive density and supported finite tolerances (linear 1e-6–1e-3 m, planarity linear–0.01 m).");
+            yield return "Policy requires identity, intended use, positive density and supported finite tolerances (linear 1e-6–1e-3 m, planarity linear–0.01 m).";
         if ((p.ApprovedAt is null) != string.IsNullOrWhiteSpace(p.ApprovedBy) || p.ApprovedAt == default(DateTimeOffset))
-            throw new ArgumentException("Policy approval requires both name and a nondefault date, or neither.");
-        var ids = s.Model.Frames.Select(x => x.ObjectId).ToHashSet(StringComparer.Ordinal);
+            yield return "Policy approval requires both name and a nondefault date, or neither.";
+        var ids = s.Model.Frames.Where(x => !string.IsNullOrWhiteSpace(x?.ObjectId)).Select(x => x.ObjectId).ToHashSet(StringComparer.Ordinal);
         for (var i = 0; i < s.Areas.Length; i++)
         {
             var area = s.Areas[i];
-            var name = area is null || string.IsNullOrWhiteSpace(area.ObjectId) ? $"Area {i + 1}" : $"Area {area.ObjectId}";
-            if (area is null || string.IsNullOrWhiteSpace(area.ObjectId)) throw new ArgumentException($"{name}: objectId is required.");
-            if (!ids.Add(area.ObjectId)) throw new ArgumentException($"{name}: objectId is already used by another frame or area.");
-            if (string.IsNullOrWhiteSpace(area.SourceReference)) throw new ArgumentException($"{name}: sourceReference is required.");
-            if (!Enum.IsDefined(area.Kind) || !Enum.IsDefined(area.Material)) throw new ArgumentException($"{name}: unknown kind or material.");
-            if (area.Thickness is null || !Enum.IsDefined(area.Thickness.Unit)) throw new ArgumentException($"{name}: thickness needs a value and a known unit.");
-            if (area.Boundary.IsDefault || area.Openings.IsDefault) throw new ArgumentException($"{name}: boundary and openings must be arrays (openings may be empty).");
+            if (area is null || string.IsNullOrWhiteSpace(area.ObjectId)) { yield return $"Area {i + 1}: objectId is required."; continue; }
+            var name = $"Area {area.ObjectId}";
+            if (!ids.Add(area.ObjectId)) yield return $"{name}: objectId is already used by another frame or area.";
+            if (string.IsNullOrWhiteSpace(area.SourceReference)) yield return $"{name}: sourceReference is required.";
+            if (!Enum.IsDefined(area.Kind) || !Enum.IsDefined(area.Material)) yield return $"{name}: unknown kind or material.";
+            if (area.Thickness is null || !Enum.IsDefined(area.Thickness.Unit)) yield return $"{name}: thickness needs a value and a known unit.";
+            if (area.Boundary.IsDefault || area.Openings.IsDefault) yield return $"{name}: boundary and openings must be arrays (openings may be empty).";
         }
         var storyIds = new HashSet<string>(StringComparer.Ordinal);
         double previousTop = double.NegativeInfinity;
         foreach (var band in s.Stories.OrderBy(x => x?.LowerElevationM))
         {
             if (band is null || string.IsNullOrWhiteSpace(band.Id) || band.Id == "Unallocated")
-                throw new ArgumentException("Every story needs a name other than 'Unallocated'.");
-            if (!storyIds.Add(band.Id)) throw new ArgumentException($"Story {band.Id}: the name is used twice.");
+            {
+                yield return "Every story needs a name other than 'Unallocated'.";
+                continue;
+            }
+            if (!storyIds.Add(band.Id)) yield return $"Story {band.Id}: the name is used twice.";
             if (!double.IsFinite(band.LowerElevationM) || !double.IsFinite(band.UpperElevationM) || band.UpperElevationM <= band.LowerElevationM)
-                throw new ArgumentException($"Story {band.Id}: upperElevationM must be finite and above lowerElevationM.");
-            if (band.LowerElevationM < previousTop) throw new ArgumentException($"Story {band.Id}: overlaps the story below it.");
-            previousTop = band.UpperElevationM;
+            {
+                yield return $"Story {band.Id}: upperElevationM must be finite and above lowerElevationM.";
+                continue;
+            }
+            if (band.LowerElevationM < previousTop) yield return $"Story {band.Id}: overlaps the story below it.";
+            previousTop = Math.Max(previousTop, band.UpperElevationM);
         }
-        var metadataIds = new HashSet<string>(StringComparer.Ordinal);
+        var meta = new Dictionary<string, ElementMetadata>(StringComparer.Ordinal);
+        var seen = new HashSet<string>(StringComparer.Ordinal);
         foreach (var m in s.Metadata)
         {
-            if (m is null || string.IsNullOrWhiteSpace(m.ObjectId)) throw new ArgumentException("Every metadata entry needs an objectId.");
+            if (m is null || string.IsNullOrWhiteSpace(m.ObjectId)) { yield return "Every metadata entry needs an objectId."; continue; }
             var name = $"Metadata for {m.ObjectId}";
-            if (!ids.Contains(m.ObjectId)) throw new ArgumentException($"{name}: no frame or area has this objectId.");
-            if (!metadataIds.Add(m.ObjectId)) throw new ArgumentException($"{name}: appears more than once.");
-            if (string.IsNullOrWhiteSpace(m.MaterialName) || string.IsNullOrWhiteSpace(m.SectionName)) throw new ArgumentException($"{name}: materialName and sectionName are required.");
-            if (m.AssignedStoryId is not null && !storyIds.Contains(m.AssignedStoryId)) throw new ArgumentException($"{name}: assignedStoryId '{m.AssignedStoryId}' is not a declared story.");
-            if (m.RequiredSteelComponents.IsDefaultOrEmpty) throw new ArgumentException($"{name}: requiredSteelComponents must list at least one component.");
-            if (m.RequiredSteelComponents.Distinct(StringComparer.Ordinal).Count() != m.RequiredSteelComponents.Length) throw new ArgumentException($"{name}: requiredSteelComponents lists a component twice.");
-            if (m.RequiredSteelComponents.FirstOrDefault(c => !ComponentNames.Contains(c)) is { } unknown)
-                throw new ArgumentException($"{name}: unknown steel component '{unknown}'. Supported: {string.Join(", ", ComponentNames)}.");
-            if (m.RequiredSteelComponents.Contains("Longitudinal") && (m.RequiredSteelComponents.Contains("LongitudinalTop") || m.RequiredSteelComponents.Contains("LongitudinalBottom")))
-                throw new ArgumentException($"{name}: Longitudinal cannot be combined with LongitudinalTop or LongitudinalBottom.");
+            if (!ids.Contains(m.ObjectId)) yield return $"{name}: no frame or area has this objectId.";
+            if (!seen.Add(m.ObjectId)) { yield return $"{name}: appears more than once."; continue; }
+            if (string.IsNullOrWhiteSpace(m.MaterialName) || string.IsNullOrWhiteSpace(m.SectionName)) yield return $"{name}: materialName and sectionName are required.";
+            if (m.AssignedStoryId is not null && !storyIds.Contains(m.AssignedStoryId)) yield return $"{name}: assignedStoryId '{m.AssignedStoryId}' is not a declared story.";
+            // An empty list is an explicit declaration that the element needs no steel; a missing list is an error.
+            if (m.RequiredSteelComponents.IsDefault) { yield return $"{name}: requiredSteelComponents is required. List the components, or give [] for an element that needs no steel."; continue; }
+            var components = m.RequiredSteelComponents;
+            string? componentProblem = null;
+            if (components.Distinct(StringComparer.Ordinal).Count() != components.Length) componentProblem = $"{name}: requiredSteelComponents lists a component twice.";
+            else if (components.FirstOrDefault(c => !ComponentNames.Contains(c)) is { } unknown)
+                componentProblem = $"{name}: unknown steel component '{unknown}'. Supported: {string.Join(", ", ComponentNames)}.";
+            else if (components.Contains("Longitudinal") && (components.Contains("LongitudinalTop") || components.Contains("LongitudinalBottom")))
+                componentProblem = $"{name}: Longitudinal cannot be combined with LongitudinalTop or LongitudinalBottom.";
+            // Only a valid component list is used to check the element's reinforcement entries.
+            if (componentProblem is null) meta.Add(m.ObjectId, m); else yield return componentProblem;
         }
-        if (ids.Except(metadataIds).Order(StringComparer.Ordinal).FirstOrDefault() is { } uncovered)
-            throw new ArgumentException($"{uncovered}: has no metadata entry. Every frame and area needs exactly one.");
-        var meta = s.Metadata.ToDictionary(x => x.ObjectId);
+        var described = s.Metadata.Where(x => x?.ObjectId is not null).Select(x => x.ObjectId).ToHashSet(StringComparer.Ordinal);
+        foreach (var uncovered in ids.Except(described).Order(StringComparer.Ordinal))
+            yield return $"{uncovered}: has no metadata entry. Every frame and area needs exactly one.";
         var componentIds = new HashSet<(string, string)>();
         foreach (var steel in s.Reinforcement)
         {
-            if (steel is null || string.IsNullOrWhiteSpace(steel.ObjectId)) throw new ArgumentException("Every reinforcement entry needs an objectId.");
+            if (steel is null || string.IsNullOrWhiteSpace(steel.ObjectId)) { yield return "Every reinforcement entry needs an objectId."; continue; }
             var name = $"Reinforcement {steel.ObjectId}/{steel.Component}";
-            if (!ids.Contains(steel.ObjectId)) throw new ArgumentException($"{name}: no frame or area has this objectId.");
-            if (!componentIds.Add((steel.ObjectId, steel.Component))) throw new ArgumentException($"{name}: the component is supplied more than once.");
-            if (string.IsNullOrWhiteSpace(steel.SourceReference)) throw new ArgumentException($"{name}: sourceReference is required.");
-            if (steel.Component != "AllIn" && !meta[steel.ObjectId].RequiredSteelComponents.Contains(steel.Component))
-                throw new ArgumentException($"{name}: the component is not in the element's requiredSteelComponents.");
+            if (!ids.Contains(steel.ObjectId)) { yield return $"{name}: no frame or area has this objectId."; continue; }
+            if (!componentIds.Add((steel.ObjectId, steel.Component))) yield return $"{name}: the component is supplied more than once.";
+            if (string.IsNullOrWhiteSpace(steel.SourceReference)) yield return $"{name}: sourceReference is required.";
+            // Without usable metadata the element's own problem is already reported; component checks would only repeat it.
+            var m = meta.GetValueOrDefault(steel.ObjectId);
+            if (m is not null && m.RequiredSteelComponents.IsEmpty)
+                yield return $"{name}: the element's requiredSteelComponents is empty (no steel needed), so it takes no reinforcement entries.";
+            else if (m is not null && steel.Component != "AllIn" && !m.RequiredSteelComponents.Contains(steel.Component))
+                yield return $"{name}: the component is not in the element's requiredSteelComponents.";
             if (!Enum.IsDefined(steel.Method) || !Enum.IsDefined(steel.ConcreteBasis) || !Enum.IsDefined(steel.DesignEvidence))
-                throw new ArgumentException($"{name}: unknown method, concreteBasis or designEvidence.");
+                yield return $"{name}: unknown method, concreteBasis or designEvidence.";
             if (steel.CoversComponents.IsDefault || steel.Stations.IsDefault || steel.Bars.IsDefault || steel.Stations.Any(x => x is null) || steel.Bars.Any(x => x is null))
-                throw new ArgumentException($"{name}: coversComponents, stations and bars must be arrays without null entries.");
-            if (steel.Component == "AllIn" && (steel.Method is not (SteelMethod.VolumeFraction or SteelMethod.KgPerCubicMetre) ||
-                !steel.CoversComponents.ToHashSet(StringComparer.Ordinal).SetEquals(meta[steel.ObjectId].RequiredSteelComponents) ||
+            {
+                yield return $"{name}: coversComponents, stations and bars must be arrays without null entries.";
+                continue;
+            }
+            if (m is { RequiredSteelComponents.IsEmpty: false } && steel.Component == "AllIn" && (steel.Method is not (SteelMethod.VolumeFraction or SteelMethod.KgPerCubicMetre) ||
+                !steel.CoversComponents.ToHashSet(StringComparer.Ordinal).SetEquals(m.RequiredSteelComponents) ||
                 steel.CoversComponents.Distinct().Count() != steel.CoversComponents.Length))
-                throw new ArgumentException($"{name}: an all-in estimate must use VolumeFraction or KgPerCubicMetre and cover exactly the element's required components.");
+                yield return $"{name}: an all-in estimate must use VolumeFraction or KgPerCubicMetre and cover exactly the element's required components.";
             if (steel.Component != "AllIn" && steel.CoversComponents.Length > 0)
-                throw new ArgumentException($"{name}: coversComponents is only for AllIn estimates; a component entry covers only its named component.");
+                yield return $"{name}: coversComponents is only for AllIn estimates; a component entry covers only its named component.";
             if (steel.Method == SteelMethod.DemandEquivalent && steel.Component is not ("Longitudinal" or "LongitudinalTop" or "LongitudinalBottom"))
-                throw new ArgumentException($"{name}: demand integration supports longitudinal area only, not shear area-per-length.");
+                yield return $"{name}: demand integration supports longitudinal area only, not shear area-per-length.";
         }
-        if (s.Reinforcement.GroupBy(x => x.ObjectId).FirstOrDefault(g => g.Count() > 1 && g.Any(x => x.Component == "AllIn")) is { } mixed)
-            throw new ArgumentException($"Reinforcement {mixed.Key}: an AllIn estimate replaces component quantities and cannot be combined with them.");
+        foreach (var mixed in s.Reinforcement.Where(x => !string.IsNullOrWhiteSpace(x?.ObjectId)).GroupBy(x => x.ObjectId, StringComparer.Ordinal)
+            .Where(g => g.Count() > 1 && g.Any(x => x.Component == "AllIn")).OrderBy(g => g.Key, StringComparer.Ordinal))
+            yield return $"Reinforcement {mixed.Key}: an AllIn estimate replaces component quantities and cannot be combined with them.";
+    }
+
+    private readonly record struct Box(double MinX, double MaxX, double MinY, double MaxY, double MinZ, double MaxZ)
+    {
+        public static Box Of(ImmutableArray<Point3> points, double factor) => new(
+            points.Min(p => p.X) * factor, points.Max(p => p.X) * factor, points.Min(p => p.Y) * factor,
+            points.Max(p => p.Y) * factor, points.Min(p => p.Z) * factor, points.Max(p => p.Z) * factor);
+
+        // Along an axis where either area is flat (within tolerance), touching counts, since coplanar areas share
+        // that coordinate. Along any other axis the extents must overlap by a positive length: two areas whose extents
+        // only touch there meet along a line at most, which has no area.
+        public bool Overlaps(Box o, double flat) =>
+            Axis(MinX, MaxX, o.MinX, o.MaxX, flat) && Axis(MinY, MaxY, o.MinY, o.MaxY, flat) && Axis(MinZ, MaxZ, o.MinZ, o.MaxZ, flat);
+
+        private static bool Axis(double a0, double a1, double b0, double b1, double flat)
+        {
+            var overlap = Math.Min(a1, b1) - Math.Max(a0, b0);
+            return a1 - a0 <= flat || b1 - b0 <= flat ? overlap >= -flat : overlap > 0;
+        }
     }
 }
