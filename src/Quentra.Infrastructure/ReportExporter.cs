@@ -31,7 +31,7 @@ public static class ReportExporter
     // One line per sheet for the workbook's Contents sheet.
     private static readonly Dictionary<string, string> Descriptions = new(StringComparer.Ordinal)
     {
-        ["Summary"] = "Model, hashes, review status and headline totals",
+        ["Summary"] = "Report status, model and ETABS source, hashes, methodology and headline totals",
         ["Elements"] = "Concrete per element, with the overrides that changed it",
         ["Story Allocations"] = "Each element's concrete in each story",
         ["Steel Components"] = "Each supplied reinforcement component: evidence, mass, formula, approval",
@@ -52,21 +52,56 @@ public static class ReportExporter
         ["Exclusions"] = "Elements not quantified, and why"
     };
 
+    // The workbook's file name carries the review status, so a draft cannot be passed on as a reviewed report by name alone.
+    public static string WorkbookName(TakeoffRun run) => TakeoffJson.ReviewStatus(run) switch
+    {
+        "Accepted" => "report-ACCEPTED.xlsx",
+        "AcceptedPartial" => "report-ACCEPTED-PARTIAL.xlsx",
+        _ => "report-DRAFT.xlsx"
+    };
+
+    // Plain names for the evidence types stored in each steel row.
+    public const string EvidenceTerms = "DesignDemandEquivalent = design reinforcement equivalent: required area from the design (for example ETABS concrete frame design) integrated along the member, not installed bars. " +
+        "ModelAssignedEquivalent = bars assigned in the model (for example ETABS column bars to be checked, or supplied bars) as straight lengths. Estimated = kg/m³ or volume-fraction estimate. " +
+        "Not supplied = required component with no source: unknown, not zero.";
+
     public static IReadOnlyList<ReportTable> Tables(TakeoffRun run)
     {
         var r = run.Result; var s = r.Summary;
         // "Complete gross in declared scope", or "... in scope reduced by override (excludes W1 (o1))".
         var scope = TakeoffJson.CompleteLabel(run)["complete ".Length..];
+        var source = run.Snapshot.Source;
+        List<object?[]> provenance = source is null ? [] :
+        [
+            ["Source program", $"{source.Program} {source.ProgramVersion} (build {source.ProgramBuild})", ""],
+            ["ETABS support", source.ProgramBuild.StartsWith("22.7.", StringComparison.Ordinal) ? "Tested version (ETABS 22.7)" : "UNTESTED ETABS version", ""],
+            ["API assembly", $"{source.ApiAssembly} ({source.ApiAssemblyVersion})", ""],
+            ["Model file", source.ModelPath, ""],
+            ["Model file SHA256 (last saved file)", source.ModelFileSha256 ?? "not available", ""],
+            ["Model file saved at", source.ModelFileModifiedAt is { } saved ? Time(saved) : "not available", ""],
+            ["Model locked (analysed) at extraction", source.ModelLocked ? "Yes" : "No", ""],
+            ["ETABS present units at extraction", source.PresentUnits + " (all values converted to metres)", ""],
+            ["Extracted at", Time(source.ExtractedAt), ""],
+            ["Extractor", $"{source.Extractor} {source.ExtractorVersion}", ""],
+            ["Raw capture SHA256", source.RawCaptureSha256, ""]
+        ];
+        var evidenceUsed = r.Steel.Select(x => x.Evidence).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
         var tables = new List<ReportTable>
         {
             new("Summary", ["Field", "Value", "Unit"],
             [
+                ["REPORT STATUS", TakeoffJson.StatusBanner(run), ""],
                 ["Model", run.Snapshot.Model.ModelId, ""], ["Origin", run.Snapshot.Model.Origin.ToString(), ""],
                 ["Source", run.Snapshot.Model.SourceDescription, ""], ["Captured at", Time(run.Snapshot.Model.CapturedAt), ""],
+                .. provenance,
+                ["Quentra version", TakeoffJson.QuentraVersion, ""],
                 ["Calculation version", r.CalculationVersion, ""], ["Snapshot SHA256", run.SnapshotSha256, ""],
                 ["Calculation SHA256", run.CalculationSha256, ""], ["Package seal SHA256 (run content, not a file hash)", run.PackageSha256, ""],
                 ["Review status", TakeoffJson.ReviewStatus(run), ""], ["Intended use", run.Snapshot.Policy.IntendedUse, ""],
                 ["Basis", "Modeled volumes; intersections retained; net/BOQ unavailable", ""],
+                ["Concrete methodology", "Gross modeled: section area × 3D axis length (frames), true planar area × uniform thickness (slabs, walls). Opening-adjusted: gross less the union of openings clipped to each host.", ""],
+                ["Steel evidence in this run", evidenceUsed.Length == 0 ? "None supplied" : string.Join("; ", evidenceUsed), ""],
+                ["Steel evidence terms", EvidenceTerms, ""],
                 ["Found", s.Found, "count"], ["In scope", s.InScope, "count"], ["Quantified", s.Quantified, "count"],
                 ["Unsupported", s.Unsupported, "count"], ["Invalid", s.Invalid, "count"], ["Out of scope", s.OutOfScope, "count"],
                 ["Known gross", M3(s.KnownGrossM3), "m³"], ["Known opening adjusted", M3(s.KnownOpeningAdjustedM3), "m³"],
@@ -103,8 +138,11 @@ public static class ReportExporter
             new("Overrides", ["ID", "Object ID", "Field", "Original value", "Replacement value", "Unit", "Reason", "Author", "Recorded at", "Snapshot SHA256"],
                 run.Overrides.Select(x => new object?[] { x.Id, x.ObjectId, Application.Overrides.Label(x.Field), OverrideValue(x, x.OriginalValue), OverrideValue(x, x.ReplacementValue),
                     x.Field == Application.OverrideField.Excluded ? "" : "mm", x.Reason, x.Author, Time(x.RecordedAt), x.SnapshotSha256 }).ToList()),
-            new("Review History", ["Status", "Reviewer", "Reviewed at", "Calculation SHA256", "Current", "Note", "Acknowledged warnings"],
-                run.ReviewHistory.Select(x => new object?[] { x.Status, x.Reviewer, Time(x.ReviewedAt), x.CalculationSha256, x.CalculationSha256 == run.CalculationSha256 ? "Yes" : "No", x.Note, string.Join(";", x.AcknowledgedWarningCodes) }).ToList()),
+            // Identity columns are what the reviewer typed and what the computer reported: recorded, not verified or signed.
+            new("Review History", ["Status", "Reviewer (as entered)", "Reviewed at", "Calculation SHA256", "Current", "Note", "Acknowledged warnings",
+                    "Windows account (recorded, not verified)", "Computer", "Quentra version"],
+                run.ReviewHistory.Select(x => new object?[] { x.Status, x.Reviewer, Time(x.ReviewedAt), x.CalculationSha256, x.CalculationSha256 == run.CalculationSha256 ? "Yes" : "No", x.Note, string.Join(";", x.AcknowledgedWarningCodes),
+                    x.RecordedByAccount ?? "not recorded", x.RecordedOnComputer ?? "not recorded", x.RecordedWithVersion ?? "not recorded" }).ToList()),
             new("Source Index", ["Object ID", "Source", "Original values"],
                 run.Snapshot.Model.Frames.Select(x => new object?[] { x.ObjectId, x.SourceReference, "run.json → snapshot.model.frames; original coordinates and section units retained" })
                     .Concat(run.Snapshot.Areas.Select(x => new object?[] { x.ObjectId, x.SourceReference, "run.json → snapshot.areas; original polygon and thickness retained" })).ToList())
@@ -116,8 +154,10 @@ public static class ReportExporter
         foreach (var (name, groups) in new[] { ("By Category", r.ByCategory), ("By Material", r.ByMaterial) })
             tables.Add(new(name, ["Group", "Count", "Quantified", "Known gross (m³)", "Known opening-adjusted (m³)", "Complete opening-adjusted (m³)"],
                 groups.Select(x => new object?[] { x.Group, x.Count, x.QuantifiedCount, M3(x.KnownGrossM3), M3(x.KnownOpeningAdjustedM3), M3(x.CompleteOpeningAdjustedM3) }).ToList()));
+        // Bottom story first, as the building is read; Unallocated last.
+        var storyOrder = run.Snapshot.Stories.Select((x, i) => (x.Id, i)).ToDictionary(x => x.Id, x => x.i, StringComparer.Ordinal);
         tables.Add(new("By Story", ["Story", "Gross (m³)", "Opening-adjusted (m³)"],
-            r.StoryAllocations.GroupBy(x => x.StoryId).OrderBy(x => x.Key, StringComparer.Ordinal)
+            r.StoryAllocations.GroupBy(x => x.StoryId).OrderBy(x => storyOrder.GetValueOrDefault(x.Key, int.MaxValue)).ThenBy(x => x.Key, StringComparer.Ordinal)
                 .Select(g => new object?[] { g.Key, M3(g.Sum(x => x.GrossM3)), M3(g.Sum(x => x.OpeningAdjustedM3)) }).ToList()));
         tables.Add(new("By Section", ["Section", "Category", "Count", "Known gross (m³)", "Known opening-adjusted (m³)", "Unquantified"],
             r.Elements.Where(x => x.Status != Core.QuantityStatus.OutOfScope).GroupBy(x => (x.SectionName, x.Category))
@@ -181,7 +221,7 @@ public static class ReportExporter
                 cancellationToken.ThrowIfCancellationRequested();
                 await File.WriteAllTextAsync(Path.Combine(staging, table.Name.Replace(' ', '_') + ".csv"), Csv(table), new UTF8Encoding(true), cancellationToken);
             }
-            WriteWorkbook(Path.Combine(staging, "report.xlsx"), tables, run.Snapshot.Model.CapturedAt, cancellationToken);
+            WriteWorkbook(Path.Combine(staging, WorkbookName(run)), tables, run.Snapshot.Model.CapturedAt, TakeoffJson.StatusBanner(run), cancellationToken);
             var hashes = new Dictionary<string, string>(StringComparer.Ordinal);
             foreach (var file in Directory.GetFiles(staging).Order(StringComparer.Ordinal))
             {
@@ -216,19 +256,24 @@ public static class ReportExporter
     }
     private static string Quote(string value) => "\"" + value.Replace("\"", "\"\"") + "\"";
 
-    private static void WriteWorkbook(string path, IReadOnlyList<ReportTable> tables, DateTimeOffset created, CancellationToken token)
+    private static void WriteWorkbook(string path, IReadOnlyList<ReportTable> tables, DateTimeOffset created, string banner, CancellationToken token)
     {
         using var workbook = new XLWorkbook();
         var contents = workbook.AddWorksheet("Contents");
-        contents.Cell(1, 1).Value = "Sheet"; contents.Cell(1, 2).Value = "Contents"; contents.Cell(1, 3).Value = "Rows";
+        // The status banner is the first thing anyone opening the workbook reads.
+        contents.Cell(1, 1).Value = banner;
+        contents.Range(1, 1, 1, 3).Merge().Style.Font.SetBold().Font.SetFontSize(14)
+            .Fill.SetBackgroundColor(banner.StartsWith("DRAFT", StringComparison.Ordinal) ? XLColor.LightSalmon : XLColor.LightGreen);
+        const int header = 3;
+        contents.Cell(header, 1).Value = "Sheet"; contents.Cell(header, 2).Value = "Contents"; contents.Cell(header, 3).Value = "Rows";
         for (var i = 0; i < tables.Count; i++)
         {
-            contents.Cell(i + 2, 1).Value = tables[i].Name;
-            contents.Cell(i + 2, 2).Value = Descriptions.GetValueOrDefault(tables[i].Name, "");
-            contents.Cell(i + 2, 3).Value = tables[i].Rows.Count;
+            contents.Cell(header + i + 1, 1).Value = tables[i].Name;
+            contents.Cell(header + i + 1, 2).Value = Descriptions.GetValueOrDefault(tables[i].Name, "");
+            contents.Cell(header + i + 1, 3).Value = tables[i].Rows.Count;
         }
-        contents.Cell(tables.Count + 3, 1).Value = "Null cells are unknown, not zero. " + RoundingPolicy;
-        contents.Row(1).Style.Font.Bold = true;
+        contents.Cell(header + tables.Count + 2, 1).Value = "Null cells are unknown, not zero. " + RoundingPolicy;
+        contents.Row(header).Style.Font.Bold = true;
         contents.Column(1).Width = 22; contents.Column(2).Width = 70; contents.Column(3).Width = 10;
         foreach (var table in tables)
         {

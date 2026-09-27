@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 
 namespace Quentra.Core;
 
@@ -61,8 +62,33 @@ public sealed record TakeoffPolicy
     public required double PlanarityToleranceM { get; init; }
 }
 
+// A condition the extractor found in the source model (for example an unsupported ETABS section type).
+// The engine reports it with the named element, or with the run when objectId is null, so it is reviewed
+// and acknowledged like any other warning.
+public sealed record SourceWarning(string? ObjectId, string Code, string Message);
+
+// Where an extracted snapshot came from. Recorded for traceability; the engine does not use it.
+public sealed record SnapshotSource
+{
+    public required string Program { get; init; }
+    public required string ProgramVersion { get; init; }
+    public required string ProgramBuild { get; init; }
+    public required string ApiAssembly { get; init; }
+    public required string ApiAssemblyVersion { get; init; }
+    public required string ModelPath { get; init; }
+    public string? ModelFileSha256 { get; init; }
+    public DateTimeOffset? ModelFileModifiedAt { get; init; }
+    public required bool ModelLocked { get; init; }
+    public required string PresentUnits { get; init; }
+    public required string Extractor { get; init; }
+    public required string ExtractorVersion { get; init; }
+    public required DateTimeOffset ExtractedAt { get; init; }
+    public required string RawCaptureSha256 { get; init; }
+}
+
 // Schema 2 adds area objects, physical story bands, explicit component scope and policy.
 // Legacy schema 1 snapshots/runs remain handled by the original replay engine.
+// Source and SourceWarnings are optional and omitted when absent, so snapshots without them keep their hashes.
 public sealed record TakeoffSnapshot
 {
     public required int SchemaVersion { get; init; }
@@ -72,6 +98,10 @@ public sealed record TakeoffSnapshot
     public required ImmutableArray<ElementMetadata> Metadata { get; init; }
     public required ImmutableArray<SteelInput> Reinforcement { get; init; }
     public required TakeoffPolicy Policy { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public SnapshotSource? Source { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public ImmutableArray<SourceWarning> SourceWarnings { get; init; }
 }
 
 public sealed record ElementTakeoff(string ObjectId, string Category, string MaterialName,

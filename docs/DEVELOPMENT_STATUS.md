@@ -1,65 +1,52 @@
 # Development status
 
-Updated: 26 September 2026.
+Updated: 27 September 2026.
 
-## Delivered: offline takeoff foundation
+## Delivered: release candidate 0.2, live ETABS 22.7 extraction
 
-The solution contains Core, Application, Infrastructure, CLI and an xUnit test project. Two synthetic snapshot formats run end to end through the CLI:
+Quentra reads the model open in a running ETABS 22.7 (read-only), builds a schema 2 snapshot, runs a model health check using the existing validation, and takes it through calculation, override, review, acceptance and export, from the CLI or the local GUI. See [ETABS_INTEGRATION.md](ETABS_INTEGRATION.md).
 
-- **Schema 1 (frame concrete):** fixtures A/B, gross modeled beam/column concrete, saved run packages and deterministic replay.
-- **Schema 2 (takeoff):** frames plus planar slabs/walls with unioned openings, story allocation, supplied reinforcement with component coverage, recorded overrides, review/acceptance history, and CSV/Excel/JSON export with a hashed manifest.
-
-Production dependencies are Clipper2 (polygon clipping) and ClosedXML (Excel). No CSI assemblies are referenced.
-
-This covers the offline part of roadmap Phases 1 and 3–5. G0 is pending. None of G1–G5 has passed. Gates G2–G4 require live Windows ETABS extraction and reviewed evidence, and G1/G5 still depend on engineering decisions and engineer review. Schema 2 is a development contract, not the final raw/normalized snapshot schema.
+The calculation engine is unchanged (`takeoff/0.5.0`): it gained two optional snapshot fields (`source`, `sourceWarnings`) and the `LongitudinalTorsion` component. Snapshots without them keep their hashes, and the committed reference runs (made on macOS arm64) replay byte-identically on Windows x64.
 
 | Roadmap area | State |
 |---|---|
-| Phase 0: build/code selection and Windows API experiments | ETABS 22.7 selected; exact build, design code, Windows host and API experiments pending |
-| Phase 1: SI types, schemas, frame calculations, replay, CI | Implemented offline; policy decisions unapproved |
-| Phase 2: ETABS adapter, frame extraction, WPF | Not started (story allocation implemented offline) |
-| Phase 3: slab/wall geometry, openings, overlaps, summaries | Implemented offline; §33 fixtures A–E match; engineer review of fixtures pending |
-| Phase 4: reinforcement integration, ratios, coverage | Calculation implemented for supplied inputs; ETABS result extraction not started |
-| Phase 5: overrides, review, reports | Implemented in core/CLI; WPF review tables not started |
-| Phase 6: qualification and packaging | Not started |
+| Phase 0: build selection and Windows API experiments | ETABS 22.7.0.4095 selected; API experiments done and recorded (ETABS_INTEGRATION.md, "Verified ETABS 22.7 behaviour") |
+| Phase 1: SI types, schemas, frame calculations, replay, CI | Implemented; policy decisions unapproved |
+| Phase 2: ETABS adapter, frame extraction | Implemented (standalone attach by process id; GUI in the browser, not WPF) |
+| Phase 3: slab/wall geometry, openings, summaries | Implemented and verified against ETABS models |
+| Phase 4: reinforcement integration | Beam/column longitudinal design demand and modeled column bars from ETABS; shear, wall and slab steel not extracted |
+| Phase 5: overrides, review, reports | Implemented; review findings resolved (below) |
+| Phase 6: qualification and packaging | Windows package script; qualification by a structural engineer pending |
 
-## Evidence and limits
+## Evidence
 
-Local verification on macOS arm64 with SDK 10.0.401: Release solution build succeeded with zero warnings/errors; all 143 xUnit tests passed.
+Windows 11 x64, .NET SDK 10.0.401, ETABS 22.7.0.4095 (ETABS 23.1.1 also installed and COM-registered).
 
-- **Schema 1:** fixture calculates 1.656 m³.
-- **Schema 2:** fixture calculates 18.408 m³ gross and 17.808 m³ opening-adjusted concrete, and 1,297.505 kg of known steel, all matching hand calculations. Replay is byte-identical.
-- **Validation fixtures:** [A–E](../fixtures/validation/README.md) from design document §33 reproduce every stated gross, opening-adjusted and steel value. They also do so in millimetre/inch units and when C and D are split across their openings. The modelling choices made to build them are listed for engineer review.
-- **CLI:** override, accept (including missing-acknowledgment and partial-scope refusals), export, tamper detection, schema mismatch and usage exit codes were exercised manually.
-- **CI:** GitHub Actions is configured for Linux and Windows core/CLI checks, including the schema 2 calculate/replay/export flow. It also replays the committed [reference runs](../fixtures/reference/) from macOS arm64, to check that calculation hashes are the same on every platform. It has not been run remotely and does not test ETABS.
+- **Build and tests:** Release build with zero warnings; 224 unit tests pass, with or without ETABS installed (a copy built with the ETABS API absent also passes and ships no ETABSv1.dll).
+- **Controlled ETABS models:** 13 models built through the API, with hand-calculated expectations in `fixtures/etabs/v22.7/golden.json`. Their 18 raw captures match in `dotnet test`; the live integration suite (`tools/Quentra.EtabsFixtures verify`) passes 217/217: read-only behaviour for every model, golden values, unit invariance over kN-m, N-mm, kgf-m, kip-ft and lb-in (worst relative difference 3.7e-16), mesh invariance, design-evidence classification, refusal of an unsaved model, and ETABS ended mid-extraction.
+- **Real projects:** two 25-story ETABS 22.7 projects (about 8,400 objects each: beams, slabs, walls, a 1 m raft), extracted read-only. Totals, and every story, match ETABS's own "Material List by Story" and "by Object Type" tables to 0.0005 m³ (the rounding of ETABS's reported weights): 6,267.137 m³ and 6,538.279 m³. Twelve elements of the first (five beam sections, a six-vertex slab, the raft, a stair, M30 and M40 walls) were recomputed independently from the raw coordinates and match to 1e-13 m³. Neither project has frame columns or opening objects, and neither has concrete design results, so columns, openings and ETABS steel are verified on the controlled models only.
+- **Performance:** extraction of a 50,320-object tower takes under a minute; normalise, validate and calculate together about 5 s; export 11 s; 2.4 GB peak (README, Scale).
+- **Windows:** paths with spaces, commas and Unicode, a 403-character path, a read-only destination (clear refusal), existing outputs (never overwritten), several ETABS 22.7 instances (asks for --pid), no ETABS running, an untested version, a model opened from a `.$et` text file.
 
-The tests cover:
+## Review findings resolved
 
-- **Frames:** manual examples, circular columns, inclined lengths, mixed/imperial units, subdivision, missing/invalid geometry and unsupported scope.
-- **Areas:** overlapping and out-of-host openings, rotated and warped slabs, and self-intersecting boundaries.
-- **Stories and overlaps:** story splits and volume conservation, and overlap/coincidence warnings.
-- **Steel:** each steel method, and stale, check-mode, gapped or partial-domain demand.
-- **Validation:** rejection rules for invalid snapshots and invalid overrides.
-- **Input checks:** plausibility bands, openings outside or crossing their host, steel rates above steel density, and object-specific validation messages.
-- **Runs:** review states, overrides prepared from the current run, unknown acknowledgement codes, run files above the snapshot size limit, export integrity and cancellation, byte-identical repeated exports, rounding, steel roll-ups, CSV formula safety, strict JSON parsing, replay integrity, and atomic writes.
+- **Implausible quantities:** until the run is accepted, a total that includes implausible values is labelled "including unreviewed implausible values in ..."; acceptance still needs each flagged element acknowledged.
+- **Draft exports:** workbook named `report-DRAFT.xlsx` / `report-ACCEPTED.xlsx` / `report-ACCEPTED-PARTIAL.xlsx`, status banner at the top of the Contents and Summary sheets and the console, GUI zip named by status.
+- **GUI persistence:** accepted runs are written to disk as soon as they are accepted and can be reopened from a Saved runs list.
+- **Reviewer identity:** acceptance records the typed name, Windows account, computer, time and Quentra version; reports and the GUI say it is recorded, not verified. Older runs without these fields replay unchanged.
+- **Stale results:** editing the snapshot blocks Override, Accept and Export in the GUI; `etabs check` / Check against ETABS compares the run with the live model element by element, and a changed model blocks Accept and Export (enforced by the server).
 
-Reports remain Draft until accepted. Complete quantities mean every in-scope object and required component in this input was quantified, not a complete building. Planar areas are rounded to 1 µm in their local plane. Axis-aligned polygons are exact; rotated polygons carry errors of order 10⁻⁶ m².
+## Open decisions (engineer)
 
-## Open decisions
-
-- **Beam story convention:** a horizontal beam at a level is assigned to the story interval (lower, upper] that the level tops; one at the base level is `Unallocated` unless metadata assigns a story. This matches the design specification's proposed default (§31.4, CQ-004), but the engineer has not yet confirmed it.
-- **Plausibility bands:** the "check the units" ranges in `Plausibility.cs` are provisional (brief question 16).
-- **Elements with no steel:** `requiredSteelComponents: []` declares an element steel-free (complete at 0 kg), and `NO_STEEL_REQUIRED` must be acknowledged. Which element types may be declared steel-free (plain concrete, blinding, some slabs on grade) is for the engineer to confirm.
-- **Measurement policy:** density, tolerances, required steel components per element type and intended report use are fixture values, not approved policy.
-
-These and the other policy questions are collected in the [engineer meeting brief](ETABS_Structural_Engineer_Meeting_Brief.md).
+- Measurement policy approval, plausibility bands, and the required steel components per element type used by the ETABS adapter (beam: top, bottom, transverse; column: longitudinal, transverse; slab: four layers; wall: web, boundary).
+- The default maximum design-station gap (1.0 m). ETABS's default column output has 1.5 m gaps, so column design demand is unknown unless a larger gap is approved.
+- Whether weightless non-concrete materials may be treated as dummy members (current rule; acknowledged per run).
+- Beam story convention and the 1 mm Base band.
 
 ## Next tasks
 
-1. Record the exact ETABS 22.7 build number, design code/edition, Windows host and reviewer in Phase 0 decisions.
-2. Obtain installed API help and approved fixture models; prove read-only attachment and per-field units.
-3. Add adapter contracts and raw-source capture from those verified signatures, producing schema 2 snapshots.
-4. Have the engineer review the A–E fixture modelling choices and the worksheet columns in §33, then rebuild the fixtures in ETABS for the live comparison.
-5. Begin the WPF review flow on Windows over the existing run/review/export contracts.
-
-Continue pure-core development with synthetic inputs while Windows verification is pending. Do not claim ETABS compatibility based on offline fixtures.
+1. Engineer review of the ETABS rules, the controlled models and the measurement policy.
+2. A real project with frame columns, openings and concrete design results, reconciled the same way.
+3. Wall (pier/spandrel) and slab reinforcement extraction; shear steel conversion.
+4. Test ETABS 23 and record it as tested or not.
+5. Bulk (table) reads for per-object attributes on very large models, if extraction time matters.

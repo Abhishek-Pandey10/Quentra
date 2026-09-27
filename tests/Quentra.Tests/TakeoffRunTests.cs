@@ -194,7 +194,7 @@ public class TakeoffRunTests
             await ReportExporter.ExportAsync(run, destination);
             var files = Directory.GetFiles(destination).Select(Path.GetFileName).ToHashSet();
             Assert.Contains("run.json", files);
-            Assert.Contains("report.xlsx", files);
+            Assert.Contains("report-DRAFT.xlsx", files);
             Assert.Contains("manifest.json", files);
             Assert.Contains("Summary.csv", files);
             Assert.Contains("Story_Allocations.csv", files);
@@ -299,7 +299,7 @@ public class TakeoffRunTests
             await ReportExporter.ExportAsync(run, Path.Combine(root, "b"));
             foreach (var file in Directory.GetFiles(Path.Combine(root, "a")).Select(Path.GetFileName))
                 Assert.Equal(await File.ReadAllBytesAsync(Path.Combine(root, "a", file!)), await File.ReadAllBytesAsync(Path.Combine(root, "b", file!)));
-            using var workbook = new ClosedXML.Excel.XLWorkbook(Path.Combine(root, "a", "report.xlsx"));
+            using var workbook = new ClosedXML.Excel.XLWorkbook(Path.Combine(root, "a", "report-DRAFT.xlsx"));
             // One sheet per table, plus the Contents sheet.
             Assert.Equal(ReportExporter.Tables(run).Count + 1, workbook.Worksheets.Count);
             Assert.Equal("Contents", workbook.Worksheets.First().Name);

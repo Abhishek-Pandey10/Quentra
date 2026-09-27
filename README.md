@@ -2,9 +2,25 @@
 
 # Quentra
 
-Traceable concrete and reinforcing-steel quantity takeoff from ETABS. Development has started with a portable .NET 10 calculation core and a command-line snapshot workflow.
+Traceable concrete and reinforcing-steel quantity takeoff from ETABS.
 
-**Current milestone:** Offline takeoff foundation. Frames, slabs, walls, openings, story allocation, supplied reinforcement, overrides, review and export run from saved snapshots. This is a development tool, not a live ETABS integration or a production quantity report.
+**Current milestone: release candidate 0.2 with live ETABS 22.7 extraction.** Quentra reads the model open in ETABS 22.7 (read-only), builds a snapshot, checks model health, calculates, and takes it through override, review, acceptance and export, from the command line or the local GUI. See [docs/ETABS_INTEGRATION.md](docs/ETABS_INTEGRATION.md) for what is extracted, the evidence behind each rule, and the limits.
+
+Quantities are **modeled** gross and opening-adjusted concrete (member intersections retained), not BOQ or procurement quantities. Steel comes only from ETABS design reinforcement equivalents and modeled column bars; everything else is reported as unknown, never zero.
+
+## From ETABS
+
+```
+quentra etabs status                                   # finds ETABS 22.7 and the open model
+quentra etabs extract tower.json --steel-approved-by "A. Engineer" --policy-approved-by "A. Engineer"
+quentra calculate tower.json tower-run.json
+quentra accept tower-run.json tower-accepted.json --reviewer "A. Engineer" --note "..." --acknowledge <codes> --partial
+quentra export tower-accepted.json tower-report
+quentra etabs check tower-accepted.json                # is the ETABS model still the same?
+quentra etabs inspect B42@L3                           # everything read and derived for one object
+```
+
+Or run `quentra-gui` and choose **From ETABS…**. Validation: 13 controlled ETABS models match hand calculations (live suite 217/217), and two real 25-story projects reconcile with ETABS's own material takeoff to 0.0005 m³ per story.
 
 ## Run the examples
 
@@ -31,6 +47,7 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 ## Commands
 
 ```
+quentra etabs status | extract | inspect | build | check    (see 'quentra help etabs')
 quentra template  snapshot <new-snapshot.json>
 quentra validate  <snapshot.json>
 quentra calculate <snapshot.json> <new-run.json>
@@ -86,14 +103,16 @@ Hashes detect changes relative to stored contents; they are not digital signatur
 
 ## Local GUI
 
-A simple browser-based GUI covers the same workflow: open or edit a snapshot, calculate, override, accept, download the run and export the report.
+A browser-based GUI covers the same workflow: extract from ETABS (connection status, approvals, extraction summary and model health), or open or edit a snapshot; calculate, override, accept, download the run and export the report.
+
+Every accepted run is saved at once to `%LOCALAPPDATA%\Quentra\runs` (`--data-dir` to change) and listed under Saved runs for reopening; ETABS captures and snapshots go to `extractions`. A status banner says DRAFT or ACCEPTED on every run and export (the workbook and zip names carry the status too). **Check against ETABS** re-reads the model; if it changed, the run can no longer be accepted or exported. The acceptance records the reviewer's typed name with the Windows account, computer and Quentra version, stated as recorded, not verified.
 
 ```sh
 dotnet run --project src/Quentra.Gui --configuration Release   # opens http://127.0.0.1:5178/
 dotnet run --project src/Quentra.Gui --configuration Release -- --port 5200 --no-browser
 ```
 
-It listens on this computer only and uses the same engine, replay checks and export as the CLI. The GUI keeps the 4 most recent runs in memory, and accepted runs until they are downloaded; a "Runs in this session" list shows what is held, and the page says when a run that was never downloaded is released. Download `run.json` to keep a run. Editing the snapshot after calculating marks the results out of date and blocks Override and Accept until you calculate again. Warnings are acknowledged one by one; there is no "tick all". The page links to the snapshot field reference. Snapshots over 2 MB are sent straight from the file rather than shown in the editor, and tables show 500 rows at a time with a filter. It works with schema 2 snapshots; schema 1 stays CLI-only. It is a stopgap for use on any platform, not the planned WPF review application.
+It listens on this computer only and uses the same engine, replay checks and export as the CLI. The GUI keeps the 4 most recent runs in memory, and accepted runs until they are downloaded; a "Runs in this session" list shows what is held, and the page says when a run that was never downloaded is released. Download `run.json` to keep a run. Editing the snapshot after calculating marks the results out of date and blocks Override, Accept and Export until you calculate again. Warnings are acknowledged one by one; there is no "tick all". The page links to the snapshot field reference. Snapshots over 2 MB are sent straight from the file rather than shown in the editor, and tables show 500 rows at a time with a filter. It works with schema 2 snapshots; schema 1 stays CLI-only. It is a stopgap for use on any platform, not the planned WPF review application.
 
 ## Scale
 
@@ -105,13 +124,24 @@ Measured on synthetic towers (columns, two-way beams, bay slabs with openings, a
 | 70 storeys, 14×10 bays | 43,190 | 74 MB | 5 s | 7 s | 15 s | 3.4 GB | 177 MB |
 | 70 storeys, 20×14 bays | 83,790 | 144 MB | 11 s | 15 s | 32 s | 4.8 GB | 345 MB |
 
-Each command replays the run it reads, so accept and export include a full recalculation. The 60-storey totals were checked by hand. Plan on 8 GB of memory for models of about 40,000 elements and 16 GB above that. Through the GUI, the 70-storey, 43,190-element model took 3–5 s to open and calculate, about 2 s per override and under 1 s to accept, with the GUI process using about 4 GB. No real ETABS model of this size has been run yet.
+Each command replays the run it reads, so accept and export include a full recalculation. The 60-storey totals were checked by hand. Plan on 8 GB of memory for models of about 40,000 elements and 16 GB above that. Through the GUI, the 70-storey, 43,190-element model took 3–5 s to open and calculate, about 2 s per override and under 1 s to accept, with the GUI process using about 4 GB. 
+
+Live ETABS 22.7 on Windows x64 (synthetic towers built by `tools/Quentra.EtabsFixtures perf`; totals match hand calculations exactly):
+
+| ETABS objects | Extract | Normalise | Validate | Calculate | Export | Quentra peak memory | Snapshot |
+|---|---|---|---|---|---|---|---|
+| 1,038 | 2.5 s | 0.1 s | 0.1 s | 0.1 s | 1.4 s | 154 MB | 1 MB |
+| 9,962 | 11.3 s | 0.2 s | 0.3 s | 0.6 s | 4.1 s | 587 MB | 10 MB |
+| 24,920 | 27.4 s | 0.3 s | 0.9 s | 1.3 s | 7.1 s | 1.2 GB | 24 MB |
+| 50,320 | 39 s | 0.5 s | 1.9 s | 3.3 s | 11.0 s | 2.3 GB | 49 MB |
+
+The 50,320-object row is after reading labels in one call (47 s before); the smaller rows were measured before it and are conservative. Extraction time is ETABS API calls (about 0.15 ms per call per object on these models; materials, sections and labels are read once). The two real 8,400-object projects extract in about 1.2 s and complete extraction, validation and calculation in under 4 s.
 
 ## Not implemented yet
 
-Live ETABS extraction, WPF desktop UI, net concrete, curved or non-prismatic frames, shear/transverse demand conversion, reinforcement extraction from ETABS, and Windows packaging. An `Etabs` source label in an imported snapshot is a source declaration, not compatibility certification. All current fixtures are synthetic; no engineering policy or quantity has been accepted by a structural engineer.
+ETABS versions other than 22.7 (untested), net concrete, curved or non-prismatic frames and other section shapes, ribbed/waffle/deck areas, braces, shear/transverse demand conversion, wall (pier/spandrel) and slab reinforcement extraction, and a native desktop UI. The measurement policy, plausibility bands and required steel components are provisional until approved by a structural engineer.
 
-The core and CLI run independently of ETABS on platforms supported by .NET 10. Live CSI integration and WPF development require a licensed Windows ETABS test environment and verification of the exact build/runtime/code combination.
+The core, CLI and GUI build on any platform supported by .NET 10; ETABS extraction needs Windows with ETABS 22.7. Build the Windows package with `scripts/package-windows.ps1` (self-contained; ETABS's API DLL is never shipped).
 
 ## Structure
 
@@ -121,10 +151,13 @@ The core and CLI run independently of ETABS on platforms supported by .NET 10. L
 | `Quentra.Application` | Snapshot validation, takeoff engine, story allocation, coverage, overrides |
 | `Quentra.Infrastructure` | JSON persistence, canonical ordering, hashes, replay, review, CSV/Excel export |
 | `Quentra.Cli` | Offline calculate/replay/override/accept/export workflow |
-| `Quentra.Gui` | Local browser GUI over the same workflow (ASP.NET Core, loopback only) |
+| `Quentra.Gui` | Local browser GUI over the same workflow (ASP.NET Core, loopback only), including From ETABS |
+| `Quentra.Etabs` | ETABS adapter contracts, raw capture, unit normalisation, ETABS-to-snapshot mapping (no CSI dependency) |
+| `Quentra.Etabs.Api` | Live ETABS 22.7 readers (CSI API loaded from the ETABS folder at run time) |
+| `tools/Quentra.EtabsFixtures` | Controlled ETABS models, ETABS integration suite, API experiments |
 | `Quentra.Tests` | Calculation, validation, persistence, review and export tests |
 
-Runtime packages: [Clipper2](https://github.com/AngusJohnson/Clipper2) (polygon clipping, in Core) and [ClosedXML](https://github.com/ClosedXML/ClosedXML) (Excel, in Infrastructure). No CSI assemblies are bundled. The ETABS adapter and desktop projects will be added when their implementation starts.
+Runtime packages: [Clipper2](https://github.com/AngusJohnson/Clipper2) (polygon clipping, in Core) and [ClosedXML](https://github.com/ClosedXML/ClosedXML) (Excel, in Infrastructure). No CSI assemblies are bundled: `Quentra.Etabs.Api` compiles against ETABS 22.7's `ETABSv1.dll` when it is installed (a stub otherwise) and loads it from the ETABS folder at run time.
 
 Schema 2 snapshots contain the frame model plus areas, story bands, per-element metadata (material and section names, optional story, required steel components), reinforcement inputs and a measurement policy. See [takeoff.json](fixtures/synthetic/takeoff.json). Malformed JSON, unknown enum values, duplicate IDs, broken references, overlapping stories and inconsistent steel scopes reject the snapshot. Missing or unverifiable geometry produces unknown quantities instead. Inputs are limited to 192 MiB.
 
@@ -135,4 +168,6 @@ Schema 2 snapshots contain the frame model plus areas, story bands, per-element 
 - [Development status and next tasks](docs/DEVELOPMENT_STATUS.md)
 - [Structural engineer meeting brief](docs/ETABS_Structural_Engineer_Meeting_Brief.md)
 
-The next step is Windows API exploration alongside further offline development. Synthetic test success does not complete the live ETABS compatibility gate.
+- [ETABS integration](docs/ETABS_INTEGRATION.md) and [controlled ETABS models](fixtures/etabs/README.md)
+
+Before production use, a structural engineer must approve the measurement policy and review the controlled-model modelling choices; see the development status.

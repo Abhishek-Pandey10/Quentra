@@ -7,16 +7,24 @@ using Quentra.Application;
 using Quentra.Core;
 using Quentra.Infrastructure;
 
+if (args.Length > 0 && args[0] == "etabs") return await EtabsCommands.Run(args[1..]);
 if (args.Length is 1 or 2 && args[0] is "--help" or "-h" or "help")
 {
     if (args.Length == 1) { Help(); return 0; }
+    if (args[1] == "etabs")
+    {
+        Console.WriteLine(EtabsCommands.Usage.TrimEnd());
+        Console.WriteLine();
+        Console.WriteLine(EtabsCommands.Details.TrimEnd());
+        return 0;
+    }
     if (args[1] == "format")
     {
         await using var reference = typeof(Program).Assembly.GetManifestResourceStream("Quentra.Docs.SNAPSHOT_FORMAT.md")!;
         Console.WriteLine((await new StreamReader(reference).ReadToEndAsync()).ReplaceLineEndings("\n").TrimEnd());
         return 0;
     }
-    if (!Commands.ContainsKey(args[1])) { Console.Error.WriteLine($"Quentra: unknown help topic '{args[1]}'. Topics: {string.Join(", ", Commands.Keys)}, format."); return 2; }
+    if (!Commands.ContainsKey(args[1])) { Console.Error.WriteLine($"Quentra: unknown help topic '{args[1]}'. Topics: etabs, {string.Join(", ", Commands.Keys)}, format."); return 2; }
     Console.WriteLine(Commands[args[1]].Usage);
     Console.WriteLine();
     Console.WriteLine(Commands[args[1]].Details);
@@ -141,7 +149,7 @@ try
             var acknowledged = options["--acknowledge"].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Select(x => x.IndexOf(':') is var colon and >= 0 ? x[..colon].ToUpperInvariant() + x[colon..] : x.ToUpperInvariant())
                 .Distinct(StringComparer.Ordinal).ToImmutableArray();
-            run = TakeoffJson.Accept(run, options["--reviewer"], options["--note"], options.ContainsKey("--partial"), acknowledged, DateTimeOffset.UtcNow);
+            run = TakeoffJson.Accept(run, options["--reviewer"], options["--note"], options.ContainsKey("--partial"), acknowledged, DateTimeOffset.UtcNow, ReviewerContext.Current());
             break;
         default: // export
             RequireTakeoffRun(json, args[0], reading);
@@ -299,7 +307,9 @@ static void PrintTakeoffRun(TakeoffRun run, string label, string? outputPath)
 {
     var s = run.Result.Summary;
     Console.WriteLine("Quentra — concrete and steel takeoff");
-    Console.WriteLine($"Source: {run.Snapshot.Model.Origin} — {run.Snapshot.Model.ModelId}");
+    Console.WriteLine(TakeoffJson.StatusBanner(run));
+    Console.WriteLine($"Source: {run.Snapshot.Model.Origin} — {run.Snapshot.Model.ModelId}" +
+        (run.Snapshot.Source is { } src ? $" (ETABS {src.ProgramBuild}{(src.ProgramBuild.StartsWith("22.7.", StringComparison.Ordinal) ? "" : ", UNTESTED version")}, {src.ModelPath}, extracted {ReportExporter.Time(src.ExtractedAt)})" : ""));
     Console.WriteLine($"Review status: {TakeoffJson.ReviewStatus(run)}; overrides: {run.Overrides.Length}");
     Console.WriteLine($"Snapshot SHA256: {run.SnapshotSha256}");
     Console.WriteLine($"Quantified: {s.Quantified}/{s.InScope} in scope; unsupported: {s.Unsupported}; invalid: {s.Invalid}; out of scope: {s.OutOfScope}");
@@ -320,23 +330,24 @@ static void PrintTakeoffRun(TakeoffRun run, string label, string? outputPath)
             Console.WriteLine($"[{warning.Code}] {steel.ObjectId}/{steel.Component}: {warning.Message}");
     Console.WriteLine($"Warning codes: {string.Join(",", TakeoffJson.RequiredAcknowledgements(run))}  ('quentra codes' explains each)");
     Console.WriteLine("Quantities are rounded to 0.001 m³ and 0.1 kg; the run file keeps full precision.");
-    if (outputPath is not null) Console.WriteLine($"{label}: {outputPath}");
+    if (outputPath is not null) Console.WriteLine($"{label}: {outputPath}" + (label == "Report package" ? $" (workbook {ReportExporter.WorkbookName(run)})" : ""));
 }
 
 static void Help()
 {
     Console.WriteLine("Quentra — concrete and steel takeoff from a structural model snapshot (development CLI)");
     Console.WriteLine();
+    Console.WriteLine(EtabsCommands.Usage.TrimEnd());
     foreach (var (_, (usage, _)) in Commands) Console.WriteLine(usage);
     Console.WriteLine("""
-  quentra help <command>   details of one command
+  quentra help <command>   details of one command (including 'help etabs')
   quentra help format      the snapshot field reference
   quentra codes            what each warning code and term means
   quentra --version
 
-Typical order: template -> edit the JSON -> validate -> calculate -> override (optional) -> accept -> export.
-Input is a saved JSON snapshot, not an ETABS model file; a live ETABS connection is not implemented.
-Unknown quantities are shown as 'unknown', never zero. Existing files are never overwritten.
+From ETABS: open the model in ETABS 22.7 -> etabs extract -> calculate -> override (optional) -> accept -> export.
+By hand: template -> edit the JSON -> validate -> calculate -> ... as above.
+ETABS is only read, never changed. Unknown quantities are shown as 'unknown', never zero. Existing files are never overwritten.
 Exit codes: 0 success, 1 input/IO/validation failure, 2 usage, 130 cancelled.
 """);
 }
@@ -393,7 +404,8 @@ printed, for example IMPLAUSIBLE_DIMENSION:B1, so each suspected unit slip is lo
 or an element was excluded. The measurement policy must be approved first. Any later override clears acceptance.
 """),
         ["export"] = ("  quentra export    <run.json> <new-directory>", """
-Writes CSV files, report.xlsx (with a Contents sheet) and manifest.json with a SHA256 for each file.
+Writes CSV files, a workbook named by review status (report-DRAFT.xlsx, report-ACCEPTED.xlsx or report-ACCEPTED-PARTIAL.xlsx,
+with the status banner on its Contents and Summary sheets) and manifest.json with a SHA256 for each file.
 Quantities are rounded (m³ to 0.001, kg to 0.1, override dimensions to 0.1 mm); run.json keeps full precision.
 """),
     };

@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Acornima" Version="1.8.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
@@ -18,6 +19,10 @@
     <Using Include="Xunit" />
     <ProjectReference Include="../../src/Quentra.Infrastructure/Quentra.Infrastructure.csproj" />
     <ProjectReference Include="../../src/Quentra.Gui/Quentra.Gui.csproj" />
+    <ProjectReference Include="../../src/Quentra.Etabs/Quentra.Etabs.csproj" />
+    <!-- Raw captures of the controlled ETABS 22.7 models and their hand-calculated expectations: replayed without ETABS. -->
+    <Compile Include="../../tools/Quentra.EtabsFixtures/GoldenCheck.cs" Link="Etabs/GoldenCheck.cs" />
+    <None Include="../../fixtures/etabs/v22.7/*.json" LinkBase="fixtures/etabs" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../fixtures/synthetic/frames.json" Link="fixtures/frames.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../fixtures/synthetic/takeoff.json" Link="fixtures/takeoff.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../fixtures/validation/*.json" LinkBase="fixtures/validation" CopyToOutputDirectory="PreserveNewest" />

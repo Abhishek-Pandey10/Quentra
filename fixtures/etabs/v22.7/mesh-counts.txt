@@ -1,0 +1,1 @@
+10-meshed (frame objects, area objects, line elements, area elements) before meshing: (3, 8, 0, 0); after CreateAnalysisModel: (3, 11, 5, 116)

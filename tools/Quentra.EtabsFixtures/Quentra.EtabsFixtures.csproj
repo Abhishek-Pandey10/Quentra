@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Builds the controlled ETABS test models and runs the ETABS integration suite against them. Requires ETABS 22.7:
+       it starts its own ETABS and never touches a model a user has open. See fixtures/etabs/README.md. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <EtabsApiDirectory Condition="'$(EtabsApiDirectory)' == ''">C:\Program Files\Computers and Structures\ETABS 22\</EtabsApiDirectory>
+    <DefineConstants Condition="Exists('$(EtabsApiDirectory)ETABSv1.dll')">$(DefineConstants);ETABS_API</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(EtabsApiDirectory)ETABSv1.dll')">
+    <Reference Include="ETABSv1">
+      <HintPath>$(EtabsApiDirectory)ETABSv1.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Quentra.Etabs.Api/Quentra.Etabs.Api.csproj" />
+  </ItemGroup>
+</Project>

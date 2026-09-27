@@ -1,0 +1,98 @@
+﻿{
+  "about": "Hand-calculated expectations for the controlled ETABS 22.7 models built by tools/Quentra.EtabsFixtures (Models.cs). Written from the model dimensions, not from Quentra output. Volumes in m3, steel in kg (density 7850 kg/m3). Tolerance is relative (and absolute below 1).",
+  "tolerance": 1e-9,
+  "models": {
+    "01-single-beam": {
+      "hand": "0.300 x 0.600 x 6.000 = 1.080",
+      "knownGrossM3": 1.08, "knownOpeningAdjustedM3": 1.08, "completeGrossM3": 1.08, "completeOpeningAdjustedM3": 1.08,
+      "quantified": 1, "unsupported": 0, "invalid": 0, "outOfScope": 0,
+      "byCategory": { "Beam": 1.08 }, "byStory": { "Story1": 1.08 },
+      "warnings": ["ETABS_SOURCE", "ETABS_DESIGN_UNAVAILABLE", "PARTIAL_STEEL"],
+      "absentWarnings": ["UNALLOCATED_STORY", "IMPLAUSIBLE_DIMENSION", "PARTIAL_CONCRETE", "ETABS_API_CALL_FAILED"]
+    },
+    "02-single-column": {
+      "hand": "0.400 x 0.600 x 3.500 = 0.840",
+      "knownGrossM3": 0.84, "completeGrossM3": 0.84, "quantified": 1,
+      "byCategory": { "Column": 0.84 }, "byStory": { "Story1": 0.84 },
+      "absentWarnings": ["UNALLOCATED_STORY", "PARTIAL_CONCRETE", "ETABS_API_CALL_FAILED"]
+    },
+    "03-circular-column": {
+      "hand": "pi x 0.500^2 / 4 x 3.500 = 0.687223392972767",
+      "knownGrossM3": 0.6872233929727672, "completeGrossM3": 0.6872233929727672, "quantified": 1,
+      "byCategory": { "Column": 0.6872233929727672 }, "byStory": { "Story1": 0.6872233929727672 },
+      "absentWarnings": ["UNSUPPORTED_SECTION", "PARTIAL_CONCRETE"]
+    },
+    "04-slab": {
+      "hand": "6.000 x 8.000 x 0.200 = 9.600",
+      "knownGrossM3": 9.6, "knownOpeningAdjustedM3": 9.6, "completeGrossM3": 9.6, "quantified": 1,
+      "byCategory": { "Slab": 9.6 }, "byStory": { "Story1": 9.6 },
+      "warnings": ["ETABS_AREA_STEEL_NOT_EXTRACTED", "PARTIAL_STEEL"],
+      "absentWarnings": ["UNALLOCATED_STORY", "AREA_OVERLAP"]
+    },
+    "05-slab-openings": {
+      "hand": "gross 6 x 8 x 0.2 = 9.600. Openings: O1 2.0 x 1.5 = 3.00 m2, O2 1.5 x 1.0 = 1.50 m2, O1 and O2 overlap 0.5 x 0.5 = 0.25 m2, union 4.25 m2; O3 (5..7 x 6..7) lies half outside the slab, inside part 1.0 x 1.0 = 1.00 m2. Deduction 5.25 x 0.2 = 1.050; opening-adjusted 8.550",
+      "knownGrossM3": 9.6, "knownOpeningAdjustedM3": 8.55, "completeOpeningAdjustedM3": 8.55, "quantified": 1,
+      "byCategory": { "Slab": 9.6 }, "byStory": { "Story1": 9.6 },
+      "warnings": ["ETABS_OPENINGS_ASSIGNED", "OPENING_CROSSES_HOST"],
+      "absentWarnings": ["OPENING_OUTSIDE_HOST", "ETABS_OPENING_NO_HOST"]
+    },
+    "06-wall": {
+      "hand": "5.000 x 3.500 x 0.250 = 4.375",
+      "knownGrossM3": 4.375, "knownOpeningAdjustedM3": 4.375, "completeGrossM3": 4.375, "quantified": 1,
+      "byCategory": { "Wall": 4.375 }, "byStory": { "Story1": 4.375 },
+      "warnings": ["ETABS_WALL_OPENING_GAPS"]
+    },
+    "07-wall-opening": {
+      "hand": "gross 6.000 x 3.500 x 0.250 = 5.250; door 1.0 x 2.1 x 0.25 = 0.525; opening-adjusted 4.725",
+      "knownGrossM3": 5.25, "knownOpeningAdjustedM3": 4.725, "completeOpeningAdjustedM3": 4.725, "quantified": 1,
+      "byCategory": { "Wall": 5.25 }, "byStory": { "Story1": 5.25 },
+      "warnings": ["ETABS_OPENINGS_ASSIGNED"],
+      "absentWarnings": ["OPENING_CROSSES_HOST", "OPENING_OUTSIDE_HOST"]
+    },
+    "08-one-story-frame": {
+      "hand": "columns 4 x 0.4 x 0.4 x 3.5 = 2.240; beams 4 x 0.3 x 0.5 x 6.0 = 3.600 (axis between column centres); slab 6 x 6 x 0.2 = 7.200; wall 6 x 3.5 x 0.2 = 4.200; total 17.240 (member intersections retained)",
+      "knownGrossM3": 17.24, "knownOpeningAdjustedM3": 17.24, "completeGrossM3": 17.24, "quantified": 10,
+      "byCategory": { "Column": 2.24, "Beam": 3.6, "Slab": 7.2, "Wall": 4.2 }, "byStory": { "Story1": 17.24 },
+      "absentWarnings": ["UNALLOCATED_STORY", "PARTIAL_CONCRETE", "AREA_OVERLAP", "COINCIDENT_FRAMES"]
+    },
+    "09-multi-story": {
+      "hand": "Story1 (0-4.0 m): columns 4 x 0.16 x 4.0 = 2.560, beams 3.600, slab 7.200 = 13.360. Story2 and Story3 (3.2 m): columns 4 x 0.16 x 3.2 = 2.048 + 3.600 + 7.200 = 12.848 each. Total 39.056",
+      "knownGrossM3": 39.056, "completeGrossM3": 39.056, "quantified": 27,
+      "byCategory": { "Column": 6.656, "Beam": 10.8, "Slab": 21.6 },
+      "byStory": { "Story1": 13.36, "Story2": 12.848, "Story3": 12.848 },
+      "absentWarnings": ["UNALLOCATED_STORY", "PARTIAL_CONCRETE"]
+    },
+    "10-meshed": {
+      "hand": "slab 6 x 8 x 0.2 = 9.600 less opening 2.0 x 1.5 x 0.2 = 0.600 -> 9.000; wall 6 x 3.5 x 0.25 = 5.250 less door 0.525 -> 4.725; beam in two objects 2 x 0.3 x 0.6 x 3.0 = 1.080; crossing beam 0.3 x 0.6 x 4.0 = 0.720; slab in four panels 4 x 3 x 4 x 0.2 = 9.600. Gross 26.250, opening-adjusted 25.125",
+      "knownGrossM3": 26.25, "knownOpeningAdjustedM3": 25.125, "completeOpeningAdjustedM3": 25.125,
+      "byCategory": { "Beam": 1.8, "Slab": 19.2, "Wall": 5.25 }
+    },
+    "10-meshed.after-mesh": {
+      "hand": "After CreateAnalysisModel ETABS has rewritten the wall into pieces around the door (gross = opening-adjusted = 4.725); everything else identical. Gross 25.725, opening-adjusted 25.125",
+      "knownGrossM3": 25.725, "knownOpeningAdjustedM3": 25.125, "completeOpeningAdjustedM3": 25.125,
+      "byCategory": { "Beam": 1.8, "Slab": 19.2, "Wall": 4.725 }
+    },
+    "11-units": {
+      "hand": "Model 08 extracted with ETABS present units kN-m, N-mm, kgf-m, kip-ft and lb-in: 17.240 in every case",
+      "knownGrossM3": 17.24, "knownOpeningAdjustedM3": 17.24, "completeGrossM3": 17.24, "quantified": 10,
+      "byCategory": { "Column": 2.24, "Beam": 3.6, "Slab": 7.2, "Wall": 4.2 }, "byStory": { "Story1": 17.24 }
+    },
+    "12-unsupported": {
+      "hand": "Only the rectangular beam B1 is measured: 0.3 x 0.6 x 6 = 1.080. Unsupported: non-prismatic beam, concrete tee beam, circular section used as a beam, inclined frame (ETABS brace), ribbed slab, deck. Invalid: slab warped by 50 mm. Out of scope: steel I beam, null (None) area. The opening over nothing deducts from nothing.",
+      "knownGrossM3": 1.08, "completeGrossM3": null, "completeOpeningAdjustedM3": null,
+      "quantified": 1, "unsupported": 6, "invalid": 1, "outOfScope": 2,
+      "warnings": ["ETABS_SECTION_UNSUPPORTED", "UNSUPPORTED_GEOMETRY", "UNSUPPORTED_SECTION", "ETABS_FRAME_ROLE", "UNSUPPORTED_ROLE",
+        "ETABS_AREA_PROPERTY_UNSUPPORTED", "AREA_UNSUPPORTED", "AREA_INVALID", "ETABS_NULL_AREA", "NON_CONCRETE", "ETABS_OPENING_NO_HOST", "PARTIAL_CONCRETE"]
+    },
+    "13-designed-frame": {
+      "hand": "Concrete: columns 4 x 0.4 x 0.4 x 3.5 = 2.240 + beams 4 x 0.3 x 0.5 x 6.0 = 3.600 + slab 6 x 6 x 0.2 = 7.200 = 13.040. Column C3 section checks modeled bars: 2 x (3 + 3) - 4 = 8 bars of 314.2 mm2 over 3.5 m: 8 x 314.2e-6 x 3.5 x 7850 = 69.0612 kg. Design-demand steel is recomputed independently from the ETABS stations. ETABS gives column design stations 1.5 m apart, so this model is built with a 2.0 m maximum station gap.",
+      "steelApprovedBy": "Fixture Reviewer",
+      "knownGrossM3": 13.04, "completeGrossM3": 13.04, "quantified": 9, "maxStationGapM": 2.0,
+      "byCategory": { "Column": 2.24, "Beam": 3.6, "Slab": 7.2 },
+      "steelByEvidenceKg": { "ModelAssignedEquivalent": 69.06116 },
+      "demandIntegration": true,
+      "warnings": ["PARTIAL_DEMAND_DOMAIN", "ETABS_COLUMN_BARS_MODELED", "PARTIAL_STEEL"],
+      "absentWarnings": ["DEMAND_EQUIVALENT", "ETABS_DESIGN_UNAVAILABLE", "ETABS_DESIGN_NOT_CURRENT", "ETABS_STEEL_UNAPPROVED", "STEEL_UNAVAILABLE"]
+    }
+  }
+}

@@ -20,6 +20,9 @@ jobs:
           dotnet-version: '10.0.x'
       - run: dotnet restore Quentra.slnx
       - run: dotnet build Quentra.slnx --configuration Release --no-restore
+      # Includes the ETABS 22.7 raw captures replayed against hand calculations (no ETABS needed). CI machines have no
+      # ETABS, so Quentra.Etabs.Api and the fixture tool build as stubs; the live suite runs on a Windows ETABS machine:
+      # dotnet run --project tools/Quentra.EtabsFixtures -c Release -- verify fixtures/etabs/v22.7
       - run: dotnet test Quentra.slnx --configuration Release --no-build
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- calculate fixtures/synthetic/frames.json output/frames-run.json
       - run: dotnet run --project src/Quentra.Cli --configuration Release --no-build -- replay output/frames-run.json output/frames-replayed.json

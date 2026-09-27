@@ -70,9 +70,10 @@
 <header>
   <div>
     <h1>Quentra</h1>
-    <div class="sub">Concrete and steel takeoff from a model snapshot · development build · runs on this computer only</div>
+    <div class="sub">Concrete and steel takeoff from ETABS 22.7 or a model snapshot · runs on this computer only</div>
   </div>
   <div class="row">
+    <button id="btn-etabs" class="primary">From ETABS…</button>
     <button id="btn-template">New from template</button>
     <button id="btn-open-snapshot">Open snapshot…</button>
     <button id="btn-open-run">Open run…</button>
@@ -85,8 +86,42 @@
   <div id="message" class="banner hidden" role="status" aria-live="polite"></div>
 
   <section id="empty" class="empty">
-    <p><strong>Start with a snapshot</strong>: a JSON description of the model. The <a href="/format" target="_blank" rel="noopener">field reference</a> describes every field.</p>
-    <p>New from template loads a small synthetic example to edit. Open run continues a run you saved earlier.</p>
+    <p><strong>From ETABS</strong> reads the model open in ETABS 22.7. ETABS is only read, never changed.</p>
+    <p>Or start from a snapshot, a JSON description of the model (<a href="/format" target="_blank" rel="noopener">field reference</a>). New from template loads a small synthetic example. Open run continues a run you saved earlier.</p>
+  </section>
+
+  <section id="etabs" class="hidden">
+    <div class="row spread">
+      <h2>ETABS</h2>
+      <button id="btn-etabs-refresh">Refresh</button>
+    </div>
+    <div id="etabs-status" class="muted">Looking for ETABS…</div>
+    <div class="grid-form" style="margin-top:10px">
+      <label>Steel evidence approved by<input id="etabs-steel" placeholder="Name (blank: steel not counted)" autocomplete="name"></label>
+      <label>Measurement policy approved by<input id="etabs-policy" placeholder="Name (blank: cannot be accepted)"></label>
+      <label>Max. design station gap (m)<input id="etabs-gap" type="number" step="0.1" min="0.1" max="10" value="1.0"></label>
+      <button id="btn-etabs-extract" class="primary" disabled>Extract model</button>
+    </div>
+    <p class="muted" style="margin:8px 0 0">Quentra reads object geometry, sections, materials, openings and concrete frame design results. It does not change, save, analyse or design the model.
+      Naming a steel approver counts ETABS design reinforcement equivalents and modeled column bars; they are never presented as installed reinforcement.</p>
+    <div id="etabs-result" class="hidden" style="margin-top:12px">
+      <h2>Extraction summary</h2>
+      <div class="row" style="align-items:flex-start;gap:24px">
+        <div class="table-wrap" style="max-height:none;min-width:240px"><table id="tbl-extraction"></table></div>
+        <div style="flex:1;min-width:280px">
+          <h2 style="margin-bottom:4px">Model health</h2>
+          <div id="etabs-health" class="acks" style="max-height:320px"></div>
+          <p id="etabs-calc-status" style="margin:8px 0 0;font-weight:600"></p>
+          <p id="etabs-saved" class="muted" style="margin:4px 0 0"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="saved-section">
+    <h2>Saved runs</h2>
+    <p class="muted" style="margin-top:0">Accepted runs are saved here automatically as soon as they are accepted: <span id="saved-folder" class="mono"></span></p>
+    <div class="table-wrap" style="max-height:220px"><table id="tbl-saved"></table></div>
   </section>
 
   <section id="editor" class="hidden">
@@ -107,18 +142,22 @@
 
   <div id="run" class="hidden">
     <section>
+      <div id="status-banner" class="banner" style="font-weight:600"></div>
       <div class="row spread">
         <div>
           <h2 style="margin-bottom:4px"><span id="model-id"></span> <span id="review-status" class="pill"></span></h2>
           <div class="muted">Origin <span id="origin"></span> · snapshot <span id="snapshot-hash" class="mono"></span></div>
+          <div id="source-line" class="muted hidden"></div>
         </div>
         <div class="row">
+          <button id="btn-check-source" class="hidden">Check against ETABS</button>
           <button id="btn-download-run" class="primary">Download run.json</button>
           <button id="btn-export">Export report (.zip)</button>
         </div>
       </div>
+      <div id="source-check" class="banner hidden" style="margin:10px 0 0"></div>
       <div id="unsaved" class="muted hidden" style="margin-top:6px">This run has not been downloaded yet. It is kept only while the GUI is running (see Runs in this session).</div>
-      <div id="stale" class="banner warn hidden" style="margin:10px 0 0">The snapshot has been edited since these results were calculated. The results below are for the earlier text; Calculate again before overriding or accepting.</div>
+      <div id="stale" class="banner warn hidden" style="margin:10px 0 0">The snapshot has been edited since these results were calculated. The results below are for the earlier text; Calculate again before overriding, accepting or exporting.</div>
     </section>
 
     <section>
@@ -134,8 +173,8 @@
           <div class="second"><span class="complete-label"></span>: <span id="t-complete-gross"></span></div><div class="flag" id="t-flag-concrete"></div></div>
         <div class="card"><div class="label">Opening-adjusted concrete · known</div><div class="value" id="t-known-open"></div>
           <div class="second"><span class="complete-label"></span>: <span id="t-complete-open"></span></div><div class="flag" id="t-flag-concrete2"></div></div>
-        <div class="card"><div class="label">Steel · known</div><div class="value" id="t-known-steel"></div>
-          <div class="second"><span class="complete-label"></span>: <span id="t-complete-steel"></span> · missing components: <span id="t-missing"></span></div><div class="flag" id="t-flag-steel"></div></div>
+        <div class="card"><div class="label">Steel</div><div class="value" id="t-steel-headline"></div>
+          <div class="second">Known subtotal: <span id="t-known-steel"></span> · <span class="complete-label"></span>: <span id="t-complete-steel"></span> · missing components: <span id="t-missing"></span></div><div class="flag" id="t-flag-steel"></div></div>
       </div>
       <p class="muted" id="t-counts" style="margin:10px 0 0"></p>
       <p class="muted" style="margin:4px 0 0">Unknown quantities are shown as “unknown”, never zero. Volumes are modeled: member intersections are retained; this is not a BOQ quantity.</p>
@@ -179,8 +218,9 @@
 
     <section>
       <h2>Accept</h2>
-      <div id="acc-policy" class="banner warn hidden">The measurement policy has not been approved, so this run cannot be accepted. Approve the policy in the snapshot and calculate again.</div>
+      <div id="acc-policy" class="banner warn hidden">The measurement policy has not been approved, so this run cannot be accepted. From ETABS: extract again with a name in “Measurement policy approved by”. From a snapshot: set policy.approvedBy and approvedAt, then calculate again.</div>
       <p class="muted" style="margin-top:0">Tick each warning you have reviewed; there is deliberately no “tick all”. Implausible values are acknowledged per element.</p>
+      <p id="acc-identity" class="muted" style="margin-top:0"></p>
       <div class="row" style="margin-bottom:6px"><button id="btn-ack-none">Clear</button></div>
       <div id="acks" class="acks"></div>
       <div class="grid-form" style="margin-top:10px">
@@ -256,13 +296,16 @@ function setRun(response, message, basis) {
 
 const currentSource = () => state.snapshotFile ?? $("snapshot-text").value;
 function isStale() { return state.basis.has(state.runId) && state.basis.get(state.runId) !== currentSource(); }
-// Override and Accept act on the shown run, so they are blocked while it no longer matches the snapshot being edited.
+// Override, Accept and Export act on the shown run, so they are blocked while it no longer matches the snapshot being
+// edited, or the ETABS model it came from has changed (the server refuses those too).
+function sourceStale() { return !!(state.view && state.view.sourceCheck && !state.view.sourceCheck.matches); }
 function updateActions() {
   if (!state.view) return;
-  const stale = isStale();
+  const stale = isStale(), changed = sourceStale();
   $("stale").classList.toggle("hidden", !stale);
   $("btn-override").disabled = stale;
-  $("btn-accept").disabled = stale || !state.view.policyApproved;
+  $("btn-accept").disabled = stale || changed || !state.view.policyApproved;
+  $("btn-export").disabled = stale || changed;
 }
 
 function renderHeld() {
@@ -339,7 +382,21 @@ function render() {
   $("run").classList.remove("hidden");
   $("model-id").textContent = v.modelId;
   const status = $("review-status"); status.textContent = v.reviewStatus; status.className = "pill " + v.reviewStatus;
+  $("status-banner").textContent = v.statusBanner;
+  $("status-banner").className = "banner " + (v.reviewStatus === "Draft" ? "warn" : "ok");
   $("origin").textContent = v.origin;
+  const src = v.source;
+  $("source-line").classList.toggle("hidden", !src);
+  $("btn-check-source").classList.toggle("hidden", !src);
+  if (src) $("source-line").textContent = `${src.program} (build ${src.build}${src.tested ? "" : ", UNTESTED version"}) · ${src.modelPath} · extracted ${src.extractedAt} · units ${src.units} · model ${src.locked ? "locked" : "unlocked"}`;
+  const check = v.sourceCheck;
+  $("source-check").classList.toggle("hidden", !check);
+  if (check) {
+    $("source-check").textContent = `Checked against ETABS ${check.checkedAt}: ${check.message}` + (check.matches ? "" : " Accept and Export are blocked for this run.");
+    $("source-check").className = "banner " + (check.matches ? "ok" : "err");
+  }
+  $("btn-export").textContent = `Export report (.zip) · ${v.reviewStatus === "Draft" ? "DRAFT" : v.reviewStatus === "Accepted" ? "ACCEPTED" : "ACCEPTED, PARTIAL"}`;
+  $("acc-identity").textContent = `Your name as typed is recorded with this computer's Windows account (${v.identity.account}), computer name (${v.identity.computer}) and Quentra ${v.identity.quentraVersion}. This is a record, not a verified signature.`;
   $("snapshot-hash").textContent = v.snapshotSha256.slice(0, 12) + "…"; $("snapshot-hash").title = v.snapshotSha256;
   $("unsaved").classList.toggle("hidden", state.saved);
 
@@ -349,6 +406,8 @@ function render() {
   $("t-known-gross").textContent = t.knownGross; $("t-complete-gross").textContent = t.completeGross;
   $("t-known-open").textContent = t.knownOpeningAdjusted; $("t-complete-open").textContent = t.completeOpeningAdjusted;
   $("t-known-steel").textContent = t.knownSteel; $("t-complete-steel").textContent = t.completeSteel; $("t-missing").textContent = t.missingSteelComponents;
+  // An incomplete steel total is never headlined as a number: a known subtotal of 0.0 kg would read as "no steel".
+  $("t-steel-headline").textContent = t.completeSteel === "unknown" ? "unknown (incomplete)" : t.completeSteel;
   $("t-flag-concrete").textContent = $("t-flag-concrete2").textContent = flagText(v.concreteFlagged, false);
   $("t-flag-steel").textContent = flagText(v.steelFlagged, v.densityFlagged);
   $("t-counts").textContent = `Quantified ${t.quantified} of ${t.inScope} in scope · unsupported ${t.unsupported} · invalid ${t.invalid} · out of scope ${t.outOfScope}` +
@@ -358,15 +417,15 @@ function render() {
   $("n-warnings").textContent = `(${v.warnings.length})`; $("n-elements").textContent = `(${v.elements.length})`;
   const row = (cells, ...text) => [cells, text.join(" ").toLowerCase()];
   table($("tbl-warnings"), ["Code", "Subject", "Message"], v.warnings.map(w => row([h("code", {}, w.code), w.subject, w.message], w.code, w.subject, w.message)));
-  table($("tbl-elements"), ["ID", "Category", "Status", "Gross", "Opening-adjusted", "Formula"],
-    v.elements.map(e => row([e.objectId, e.category, e.excluded ? "Excluded" : e.status, e.gross, e.openingAdjusted, h("span", { class: "muted" }, e.formula)],
-      e.objectId, e.category, e.excluded ? "excluded" : e.status)), [3, 4]);
+  table($("tbl-elements"), ["ID", "Category", "Status", "Gross", "Opening-adjusted", "Formula", "Source"],
+    v.elements.map(e => row([e.objectId, e.category, e.excluded ? "Excluded" : e.status, e.gross, e.openingAdjusted, h("span", { class: "muted" }, e.formula), h("span", { class: "muted" }, e.source)],
+      e.objectId, e.category, e.excluded ? "excluded" : e.status, e.source)), [3, 4]);
   table($("tbl-steel"), ["ID", "Required", "Missing", "Known", "Complete"],
     v.steel.map(s => row([s.objectId, s.required, s.missing || "—", s.known, s.complete], s.objectId, s.required, s.missing)), [3, 4]);
   table($("tbl-overrides"), ["ID", "Element", "Change", "Reason", "Author", "Recorded"],
     v.overrides.map(o => row([o.id, o.objectId, o.change, o.reason, o.author, o.recordedAt], o.id, o.objectId, o.change, o.reason, o.author)));
-  table($("tbl-reviews"), ["Status", "Reviewer", "Reviewed", "Note", "Applies to this run"],
-    v.reviews.map(r => row([r.status, r.reviewer, r.reviewedAt, r.note, r.current ? "Yes" : "No (superseded by a later change)"], r.status, r.reviewer, r.note)));
+  table($("tbl-reviews"), ["Status", "Reviewer (as typed)", "Reviewed", "Note", "Applies to this run", "Windows account · computer (recorded, not verified)"],
+    v.reviews.map(r => row([r.status, r.reviewer, r.reviewedAt, r.note, r.current ? "Yes" : "No (superseded by a later change)", `${r.account} · ${r.computer}`], r.status, r.reviewer, r.note)));
 
   // Override form
   state.elementsById = new Map(v.elements.map(e => [e.objectId, e]));
@@ -479,9 +538,94 @@ $("btn-accept").onclick = async e => {
       runId: state.runId, reviewer: $("acc-reviewer").value, note: $("acc-note").value,
       partial: $("acc-partial").checked, acknowledge
     }, e.currentTarget);
-    setRun(await res.json(), "Accepted. Download the run to keep the acceptance; the GUI keeps it until you do.", state.basis.get(state.runId));
+    const response = await res.json();
+    setRun(response, response.savedPath ? `Accepted and saved to ${response.savedPath}.` : "Accepted. Download the run to keep the acceptance; the GUI keeps it until you do.", state.basis.get(state.runId));
+    loadSaved();
   } catch (err) { show(err.message); }
 };
+
+// ---------- ETABS ----------
+let etabsConnection = null;
+async function etabsStatus() {
+  $("etabs-status").textContent = "Looking for ETABS…";
+  $("btn-etabs-extract").disabled = true;
+  try {
+    const s = await (await fetch("/api/etabs/status")).json();
+    etabsConnection = s.connection;
+    const running = s.running.map(r => `process ${r.processId}, ETABS ${r.version ?? "?"} (${r.support})`).join("; ") || "none";
+    const installed = s.installed.map(i => `ETABS ${i.version} (${i.support})`).join("; ") || "none found";
+    const c = s.connection;
+    $("etabs-status").replaceChildren(
+      c ? h("div", {}, h("strong", {}, `Connected to ETABS ${c.version} (build ${c.build}, process ${c.processId})`), h("br"),
+            `Model: ${c.modelSaved ? c.model : "none saved - open or save a model in ETABS"}`, h("br"),
+            `Stories: ${c.stories} · Units: ${c.units} · ${c.locked ? "Locked (analysed)" : "Unlocked"}`, h("br"),
+            h("span", { class: "muted" }, `API: ${c.api}`), h("br"),
+            h("strong", {}, c.modelSaved ? "Status: ready for extraction" : "Status: not ready"))
+        : h("div", { class: "banner err", style: "margin:0" }, s.problem ?? "ETABS is not available."),
+      h("div", { class: "muted", style: "margin-top:6px" }, `Target: ${s.target}. Installed: ${installed}. Running: ${running}.`));
+    $("btn-etabs-extract").disabled = !(c && c.modelSaved);
+  } catch (e) { $("etabs-status").textContent = "Could not ask for ETABS status: " + e.message; }
+}
+$("btn-etabs").onclick = () => {
+  if (!confirmDiscard()) return;
+  $("etabs").classList.remove("hidden"); $("empty").classList.add("hidden");
+  $("etabs").scrollIntoView({ block: "nearest" });
+  etabsStatus();
+};
+$("btn-etabs-refresh").onclick = etabsStatus;
+$("btn-etabs-extract").onclick = async e => {
+  show("Reading the model from ETABS… this takes a few seconds for a large model. ETABS is only read.", "warn");
+  try {
+    const res = await call("/api/etabs/extract", {
+      pid: etabsConnection?.processId ?? null, allowUntested: false,
+      steelApprovedBy: $("etabs-steel").value, policyApprovedBy: $("etabs-policy").value, maxStationGapM: Number($("etabs-gap").value) || null
+    }, e.currentTarget);
+    const r = await res.json();
+    renderExtraction(r.extraction);
+    $("editor").classList.add("hidden");
+    setRun(r.run, `Extracted and calculated in ${r.extraction.seconds} s. Review the model health and warnings before accepting.`);
+  } catch (err) { show(err.message); }
+};
+function renderExtraction(x) {
+  $("etabs-result").classList.remove("hidden");
+  const c = x.counts;
+  drawRows($("tbl-extraction"), ["Extracted", "Count"], [["Beams", c.beams], ["Columns", c.columns], ["Other frames", c.otherFrames], ["Slabs", c.slabs], ["Walls", c.walls],
+    ["Other areas", c.otherAreas], ["Openings", c.openings + (c.openingsWithoutHost ? ` (${c.openingsWithoutHost} without a host)` : "")], ["Non-concrete (out of scope)", c.nonConcrete],
+    ["Stories", c.stories], ["Concrete materials", `${c.concreteMaterials} (${c.concreteMaterialNames.join(", ")})`], ["Steel inputs", c.steelInputs], ["Failed API calls", c.apiIssues]].map(r => [r[0], String(r[1])]), [1]);
+  $("etabs-health").replaceChildren(
+    ...x.ok.map(t => h("div", {}, "✓ " + t)),
+    ...x.warnings.map(w => h("div", {}, h("span", {}, `⚠ ${w.code} ×${w.count}`), h("div", { class: "meaning" }, w.example))),
+    ...x.errors.map(t => h("div", { style: "color:var(--err)" }, "✕ " + t)));
+  $("etabs-calc-status").textContent = "Calculation status: " + x.status;
+  $("etabs-saved").textContent = "Capture and snapshot saved in " + x.savedTo;
+}
+$("btn-check-source").onclick = async e => {
+  show("Re-reading the model from ETABS to compare it with this run…", "warn");
+  try {
+    const res = await call("/api/etabs/check", { runId: state.runId, pid: null, allowUntested: false }, e.currentTarget);
+    const r = await res.json();
+    setRun(r, r.view.sourceCheck?.matches ? "The ETABS model still matches this run." : "The ETABS model has changed. Accept and Export are blocked for this run.");
+  } catch (err) { show(err.message); }
+};
+
+// ---------- saved runs ----------
+async function loadSaved() {
+  try {
+    const s = await (await fetch("/api/saved")).json();
+    $("saved-folder").textContent = s.folder ?? "(not saved: no data folder)";
+    drawRows($("tbl-saved"), ["Saved run", "Saved", ""], s.runs.map(r => [r.name, r.modified,
+      h("button", { onclick: () => openSaved(r.name) }, "Open")]), []);
+  } catch (e) { $("saved-folder").textContent = "could not list saved runs: " + e.message; }
+}
+async function openSaved(name) {
+  if (!confirmDiscard()) return;
+  try {
+    show(`Opening ${name}: recalculating every quantity to check it…`, "warn");
+    const res = await call("/api/saved/open", { name });
+    setRun(await res.json(), `Opened ${name}. Every quantity and hash was recalculated and matches.`);
+  } catch (err) { show(err.message); }
+}
+loadSaved();
 
 document.querySelectorAll("[role=tab]").forEach(tab => tab.onclick = () => {
   document.querySelectorAll("[role=tab]").forEach(t => t.setAttribute("aria-selected", t === tab));

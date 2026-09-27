@@ -15,7 +15,7 @@ public class WarningCatalogueTests
         var catalogued = WarningCatalogue.Entries.Select(x => x.Code).ToHashSet(StringComparer.Ordinal);
         var raised = Directory.GetFiles(Path.Combine(root.FullName, "src"), "*.cs", SearchOption.AllDirectories)
             .Where(x => !x.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.Ordinal) && !x.EndsWith("WarningCatalogue.cs", StringComparison.Ordinal))
-            .SelectMany(x => Regex.Matches(File.ReadAllText(x), "new(?: CalculationWarning)?\\(\"([A-Z]+(?:_[A-Z]+)+)\"").Select(m => m.Groups[1].Value))
+            .SelectMany(x => Regex.Matches(File.ReadAllText(x), "(?:new(?: CalculationWarning)?\\(|Warn\\([^,()]*,\\s*)\"([A-Z]+(?:_[A-Z]+)+)\"").Select(m => m.Groups[1].Value))
             .Append("AREA_UNSUPPORTED").Append("AREA_INVALID") // built as "AREA_" + status
             .ToHashSet(StringComparer.Ordinal);
         Assert.Empty(raised.Except(catalogued));

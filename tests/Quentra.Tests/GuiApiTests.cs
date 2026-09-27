@@ -67,10 +67,10 @@ public class GuiApiTests
     public async Task ExportIsAZipOfTheReportPackage()
     {
         var (zip, name) = await session.Export(Template().RunId);
-        Assert.EndsWith("-report.zip", name, StringComparison.Ordinal);
+        Assert.EndsWith("-report-DRAFT.zip", name, StringComparison.Ordinal);
         using var archive = new ZipArchive(new MemoryStream(zip));
         Assert.Contains(archive.Entries, x => x.FullName == "manifest.json");
-        Assert.Contains(archive.Entries, x => x.FullName == "report.xlsx");
+        Assert.Contains(archive.Entries, x => x.FullName == "report-DRAFT.xlsx");
     }
 
     [Fact]
@@ -104,6 +104,21 @@ public class GuiApiTests
         var excluded = session.Override(new(Template().RunId, "W1", "exclude", null, null, null, "Not in this package", "A. Engineer"));
         Assert.Equal("complete in scope reduced by override (excludes W1 (o1))", excluded.View.CompleteLabel);
         Assert.Equal(["W1 (o1)"], excluded.View.Excluded);
+    }
+
+    // The page's script must parse, and every element it looks up by id must exist: either failure would silently
+    // disable the GUI in a browser, and nothing else in the test suite runs the page.
+    [Fact]
+    public void PageScriptParsesAndItsElementIdsExist()
+    {
+        using var stream = typeof(GuiSession).Assembly.GetManifestResourceStream("Quentra.Gui.index.html")!;
+        var page = new StreamReader(stream).ReadToEnd();
+        var script = System.Text.RegularExpressions.Regex.Match(page, "(?s)<script>(.*)</script>").Groups[1].Value;
+        new Acornima.Parser(new Acornima.ParserOptions { EcmaVersion = Acornima.EcmaVersion.ES2022 }).ParseScript(script);
+        var ids = System.Text.RegularExpressions.Regex.Matches(page, "id=\"([^\"]+)\"").Select(m => m.Groups[1].Value).ToHashSet(StringComparer.Ordinal);
+        var used = System.Text.RegularExpressions.Regex.Matches(script, "\\$\\(\"([^\"]+)\"\\)").Select(m => m.Groups[1].Value).Distinct().ToArray();
+        Assert.NotEmpty(used);
+        Assert.DoesNotContain(used, id => !ids.Contains(id));
     }
 
     [Fact]
